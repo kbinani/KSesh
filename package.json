@@ -1,0 +1,11 @@
+{
+  "name": "wsesh",
+  "version": "0.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "kbinani <kbinani.bt@mail.com>",
+  "license": "MIT",
+  "description": "An Online Hieroglyphic Editor"
+}
