@@ -2,10 +2,23 @@
   "name": "wsesh",
   "version": "0.0.0",
   "main": "index.js",
+  "repository": "https://github.com/kbinani/WSesh.git",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "esbuild src/index.tsx --bundle --outfile=public/js/index.js",
+    "fmt": "prettier --write 'src/**/*.tsx' 'public/css/*.css'"
   },
   "author": "kbinani <kbinani.bt@mail.com>",
   "license": "MIT",
-  "description": "An Online Hieroglyphic Editor"
+  "description": "An Online Hieroglyphic Editor",
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "esbuild": "^0.23.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.3"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
 }
