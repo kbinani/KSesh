@@ -4,8 +4,8 @@
   "main": "index.js",
   "repository": "https://github.com/kbinani/WSesh.git",
   "scripts": {
-    "build": "esbuild src/index.tsx --bundle --outfile=public/js/index.js",
-    "fmt": "prettier --write 'src/**/*.tsx' 'public/css/*.css'"
+    "build": "esbuild src/component/index.tsx --bundle --outfile=public/js/index.js",
+    "fmt": "prettier --write 'src/**/*.ts' 'src/**/*.tsx' 'public/css/*.css'"
   },
   "author": "kbinani <kbinani.bt@mail.com>",
   "license": "MIT",
