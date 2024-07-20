@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ChangeEvent, FC, useEffect, useState } from "react";
+import { ChangeEvent, FC, useEffect, useRef, useState } from "react";
 import { ContentComponent } from "./content";
 import { Content } from "../content";
 
@@ -9,9 +9,29 @@ export const App: FC = ({}) => {
   const [content, setContent] = useState<Content>(new Content(""));
   const [changed, setChanged] = useState(false);
   const [activeSignListTab, setActiveSignListTab] = useState("typing");
+  const textarea = useRef<HTMLTextAreaElement>(null);
   const onChange = (ev: ChangeEvent<HTMLTextAreaElement>) => {
     const text = ev.target.value;
     const content = new Content(text);
+    setContent(content);
+    setChanged(true);
+  };
+  const onClickSign = (id: string, sign: string) => {
+    if (!textarea.current) {
+      return;
+    }
+    let insert = id;
+    const { value, selectionStart, selectionEnd } = textarea.current;
+    if (value.substring(selectionEnd, selectionEnd + 1) !== " ") {
+      insert += " ";
+    }
+    const next =
+      value.substring(0, selectionStart) +
+      insert +
+      value.substring(selectionEnd);
+    textarea.current.setRangeText(insert, selectionStart, selectionEnd, "end");
+    textarea.current.focus();
+    const content = new Content(next);
     setContent(content);
     setChanged(true);
   };
@@ -42,8 +62,9 @@ export const App: FC = ({}) => {
       </div>
       <div style={{ display: "flex", height: "50%" }}>
         <div style={{ display: "flex", width: "50%" }}>
-          <div style={{ padding: "4px" }}>
+          <div style={{ padding: "4px", width: "100%" }}>
             <textarea
+              ref={textarea}
               style={{
                 width: "100%",
                 height: "100%",
@@ -114,7 +135,11 @@ export const App: FC = ({}) => {
               return s.substring(0, found.index) === activeSignListTab;
             })
             .map(([id, sign], index) => (
-              <div className="signListCell" key={index}>
+              <div
+                className="signListCell"
+                key={index}
+                onClick={() => onClickSign(id, sign)}
+              >
                 <div className="signListCellHeader">{id}</div>
                 <div className="signListCellSign">{sign}</div>
               </div>
