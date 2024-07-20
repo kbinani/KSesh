@@ -17,6 +17,7 @@ export const App: FC = ({}) => {
   const [changed, setChanged] = useState(false);
   const [activeSignListTab, setActiveSignListTab] = useState("typing");
   const [typing, setTyping] = useState("A1");
+  const [tabRows, setTabRows] = useState(1);
   const textarea = useRef<HTMLTextAreaElement>(null);
   const onChange = (ev: ChangeEvent<HTMLTextAreaElement>) => {
     const text = ev.target.value;
@@ -97,12 +98,20 @@ export const App: FC = ({}) => {
     textarea.current.focus();
     setChanged(true);
   };
+  const onResize = () => {
+    const columns = Math.floor(window.innerWidth / 61);
+    const rows = Math.ceil((Content.categories.length + 1) / columns);
+    setTabRows(rows);
+  };
   useEffect(() => {
     const text = new Content(placeholder);
     setContent(text);
+    onResize();
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("resize", onResize);
+    };
   }, []);
-  const columns = Math.floor(window.innerWidth / 61);
-  const rows = Math.ceil((Content.categories.length + 1) / columns);
   return (
     <div
       style={{
@@ -168,7 +177,7 @@ export const App: FC = ({}) => {
             style={{
               display: "flex",
               flexFlow: "row wrap",
-              height: `calc(27px * ${rows})`,
+              height: `calc(27px * ${tabRows})`,
               lineHeight: "26px",
               backgroundColor: "#444",
             }}
