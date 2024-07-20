@@ -12,6 +12,7 @@ body {
 body * {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans",
     Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  user-select: none;
 }
 
 @font-face {
@@ -24,4 +25,25 @@ body * {
 .hieroglyphs {
   font-family: "Egyptian Text Proto", sans-serif;
   font-style: normal;
+}
+
+.signListTab::-webkit-scrollbar {
+  display: none;
+}
+
+.signListTab {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.signListTabButton {
+  min-width: 60px;
+  text-align: center;
+  color: white;
+  cursor: pointer;
+  border-left: solid 1px #ccc;
+}
+
+.signListTabButton:first-child {
+  border-left: none;
 }
