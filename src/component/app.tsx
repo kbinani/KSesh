@@ -108,14 +108,15 @@ export const App: FC = ({}) => {
   useEffect(() => {
     const s = window.history.state;
     let raw: string = placeholder;
-    if (typeof s["version"] === "number") {
+    if (typeof s === "object" && typeof s["version"] === "number") {
       if (s.version === stateVersion) {
         if (typeof s["state"] === "string") {
-          raw = s["state"];
-          if (textarea.current) {
-            textarea.current.value = raw;
+          const state = s["state"];
+          if (textarea.current && state !== "") {
+            raw = state;
+            textarea.current.value = state;
+            setChanged(true);
           }
-          setChanged(true);
         }
       }
     }
