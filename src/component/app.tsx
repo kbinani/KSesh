@@ -162,10 +162,10 @@ export const App: FC = ({}) => {
           className="signListTab"
           style={{
             display: "flex",
-            height: "26px",
+            flexFlow: "row wrap",
+            minHeight: "26px",
             lineHeight: "26px",
             backgroundColor: "#444",
-            overflowY: "scroll",
           }}
         >
           <div
@@ -185,6 +185,7 @@ export const App: FC = ({}) => {
               {cat}
             </div>
           ))}
+          <div className="signListTabButtonSpacer" />
         </div>
         <div
           style={{ display: "flex", flexFlow: "row wrap", overflowY: "scroll" }}

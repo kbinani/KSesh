@@ -1,5 +1,4 @@
-import { FC } from "react";
-import React from "react";
+import React, { FC } from "react";
 import { Content } from "../content";
 
 export const ContentComponent: FC<{ content: Content; fontSize: number }> = ({
