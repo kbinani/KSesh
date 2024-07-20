@@ -20,6 +20,8 @@ export const App: FC = ({}) => {
   const [typing, setTyping] = useState("A1");
   const [tabRows, setTabRows] = useState(1);
   const textarea = useRef<HTMLTextAreaElement>(null);
+  const seshA = useRef<HTMLDivElement>(null);
+  const seshB = useRef<HTMLDivElement>(null);
   const onChange = (ev: ChangeEvent<HTMLTextAreaElement>) => {
     const text = ev.target.value;
     const content = new Content(text);
@@ -105,6 +107,22 @@ export const App: FC = ({}) => {
     const rows = Math.ceil((Content.categories.length + 1) / columns);
     setTabRows(rows);
   };
+  const onMouseEnter = () => {
+    seshB.current?.classList.remove("seshBInit");
+
+    seshA.current?.classList.remove("seshFadeIn");
+    seshA.current?.classList.add("seshFadeOut");
+    seshB.current?.classList.remove("seshFadeOut");
+    seshB.current?.classList.add("seshFadeIn");
+  };
+  const onMouseLeave = () => {
+    seshB.current?.classList.remove("seshBInit");
+
+    seshB.current?.classList.remove("seshFadeIn");
+    seshB.current?.classList.add("seshFadeOut");
+    seshA.current?.classList.remove("seshFadeOut");
+    seshA.current?.classList.add("seshFadeIn");
+  };
   useEffect(() => {
     const s = window.history.state;
     let raw: string = placeholder;
@@ -145,6 +163,7 @@ export const App: FC = ({}) => {
     >
       <div
         style={{
+          display: "flex",
           height: "26px",
           lineHeight: "26px",
           fontSize: "20px",
@@ -153,7 +172,41 @@ export const App: FC = ({}) => {
           color: "#fff",
         }}
       >
-        WSesh
+        W
+        <div
+          style={{ color: "#fff", position: "relative", width: "50px" }}
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
+        >
+          <div
+            ref={seshA}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              height: "26px",
+              overflow: "hidden",
+            }}
+          >
+            Sesh
+          </div>
+          <div
+            ref={seshB}
+            className="hieroglyphs seshBInit"
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              height: "26px",
+              fontSize: "20px",
+              overflow: "hidden",
+              lineHeight: "26px",
+              paddingTop: "1px",
+            }}
+          >
+            𓏞𓏜
+          </div>
+        </div>
       </div>
       <div style={{ display: "flex", height: "50%" }}>
         <div style={{ display: "flex", width: "50%" }}>

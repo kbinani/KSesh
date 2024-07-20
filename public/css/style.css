@@ -94,3 +94,17 @@ body * {
   font-size: 40px;
   text-align: center;
 }
+
+.seshFadeIn {
+  opacity: 1;
+  transition: opacity 1s ease-in 1s;
+}
+
+.seshFadeOut {
+  opacity: 0;
+  transition: opacity 1s ease-out 1s;
+}
+
+.seshBInit {
+  opacity: 0;
+}
