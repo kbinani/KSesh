@@ -169,7 +169,7 @@ export const App: FC = ({}) => {
       </div>
       <div style={{ height: "50%" }}>
         <div
-          style={{ display: "flex", flexDirection: "column", height: "100%" }}
+          style={{ display: "flex", flexDirection: "column", height: "50vh" }}
         >
           <div
             className="signListTab"
@@ -214,7 +214,7 @@ export const App: FC = ({}) => {
               display: "flex",
               flexFlow: "row wrap",
               overflowY: "scroll",
-              height: "100%",
+              height: `calc(50vh - 27px * ${tabRows})`,
               alignContent: "start",
             }}
           >
