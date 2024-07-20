@@ -159,11 +159,10 @@ export const App: FC = ({}) => {
           style={{
             width: "50%",
             height: "100%",
-            opacity: changed ? 1 : 0.5,
             backgroundColor: "#ccc",
           }}
         >
-          <div style={{ padding: "8px" }}>
+          <div style={{ padding: "8px", opacity: changed ? 1 : 0.5 }}>
             <ContentComponent content={content} fontSize={48} />
           </div>
         </div>
