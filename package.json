@@ -5,7 +5,7 @@
   "repository": "https://github.com/kbinani/WSesh.git",
   "scripts": {
     "build": "esbuild src/front/component/index.tsx --bundle --outfile=public/js/main.js",
-    "fmt": "prettier --write 'src/front/*.ts' 'src/front/*.tsx' 'public/css/*.css'",
+    "fmt": "prettier --write 'src/front/**/*.ts' 'src/front/**/*.tsx' 'public/css/*.css'",
     "test": "vitest run",
     "dev": "npm run build -- --servedir=public"
   },
