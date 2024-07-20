@@ -102,7 +102,24 @@ export const App: FC = ({}) => {
             </div>
           ))}
         </div>
-        <div>content</div>
+        <div
+          style={{ display: "flex", flexFlow: "row wrap", overflowY: "scroll" }}
+        >
+          {Content.signs
+            .filter(([s, _]) => {
+              const found = /[0-9]/.exec(s);
+              if (!found) {
+                return false;
+              }
+              return s.substring(0, found.index) === activeSignListTab;
+            })
+            .map(([id, sign], index) => (
+              <div className="signListCell" key={index}>
+                <div className="signListCellHeader">{id}</div>
+                <div className="signListCellSign">{sign}</div>
+              </div>
+            ))}
+        </div>
       </div>
     </div>
   );
