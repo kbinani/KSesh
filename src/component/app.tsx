@@ -11,9 +11,7 @@ export const App: FC = ({}) => {
       return;
     }
     const content = new Content(text);
-    if (content.ok) {
-      setContent(content);
-    }
+    setContent(content);
   };
   return (
     <div style={{ display: "flex", width: "100%", height: "100%" }}>
@@ -27,7 +25,7 @@ export const App: FC = ({}) => {
           border: "none",
         }}
         spellCheck={false}
-        defaultValue={"M23-Z7-M18-M17-Z4:D54-G17-X1:G1-N25:X1*Z1"}
+        defaultValue={"Y3 A1"}
         onChange={onChange}
       />
       <div

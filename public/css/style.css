@@ -14,8 +14,14 @@ body * {
     Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
 }
 
+@font-face {
+  font-family: "Egyptian Text Proto";
+  src: url("../font/eot.ttf") format("truetype");
+  font-style: normal;
+  font-display: swap;
+}
+
 .hieroglyphs {
-  font-family: "Noto Sans Egyptian Hieroglyphs", sans-serif;
-  font-weight: 400;
+  font-family: "Egyptian Text Proto", sans-serif;
   font-style: normal;
 }
