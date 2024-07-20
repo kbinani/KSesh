@@ -1097,7 +1097,7 @@ export class Content {
     ["Aa30", "𓐬"],
     ["Aa31", "𓐭"],
     ["Aa32", "𓐮"],
-  ].sort(Content.compareSigns);
+  ];
 
   static readonly special = [
     [":", "\u{13430}"], // EGYPTIAN HIEROGLYPH VERTICAL JOINER
