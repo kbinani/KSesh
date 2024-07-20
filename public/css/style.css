@@ -47,3 +47,8 @@ body * {
 .signListTabButton:first-child {
   border-left: none;
 }
+
+.signListTabButton[data-active="true"] {
+  color: black;
+  background-color: #ccc;
+}

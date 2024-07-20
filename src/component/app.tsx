@@ -3,16 +3,18 @@ import { ChangeEvent, FC, useEffect, useState } from "react";
 import { ContentComponent } from "./content";
 import { Content } from "../content";
 
+const placeholder = "Y3 Y1A";
+
 export const App: FC = ({}) => {
   const [content, setContent] = useState<Content>(new Content(""));
   const [changed, setChanged] = useState(false);
+  const [activeSignListTab, setActiveSignListTab] = useState("typing");
   const onChange = (ev: ChangeEvent<HTMLTextAreaElement>) => {
     const text = ev.target.value;
     const content = new Content(text);
     setContent(content);
     setChanged(true);
   };
-  const placeholder = "Y3 Y1A";
   useEffect(() => {
     const text = new Content(placeholder);
     setContent(text);
@@ -78,14 +80,24 @@ export const App: FC = ({}) => {
             display: "flex",
             height: "26px",
             lineHeight: "26px",
-            paddingLeft: "4px",
             backgroundColor: "#444",
             overflowY: "scroll",
           }}
         >
-          <div className="signListTabButton">typing</div>
+          <div
+            className="signListTabButton"
+            data-active={activeSignListTab === "typing"}
+            onClick={() => setActiveSignListTab("typing")}
+          >
+            typing
+          </div>
           {Content.categories.map((cat, index) => (
-            <div className="signListTabButton" key={index}>
+            <div
+              className="signListTabButton"
+              data-active={activeSignListTab === cat}
+              onClick={() => setActiveSignListTab(cat)}
+              key={index}
+            >
               {cat}
             </div>
           ))}
