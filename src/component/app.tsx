@@ -25,6 +25,7 @@ export const App: FC = ({}) => {
     const content = new Content(text);
     setContent(content);
     setChanged(true);
+    setActiveSignListTab("typing");
   };
   const onSelect = (ev: SyntheticEvent<HTMLTextAreaElement>) => {
     if (!textarea.current) {
