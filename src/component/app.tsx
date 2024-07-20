@@ -101,6 +101,8 @@ export const App: FC = ({}) => {
     const text = new Content(placeholder);
     setContent(text);
   }, []);
+  const columns = Math.floor(window.innerWidth / 61);
+  const rows = Math.ceil((Content.categories.length + 1) / columns);
   return (
     <div
       style={{
@@ -157,65 +159,75 @@ export const App: FC = ({}) => {
           </div>
         </div>
       </div>
-      <div style={{ display: "flex", flexDirection: "column", height: "50%" }}>
+      <div style={{ height: "50%" }}>
         <div
-          className="signListTab"
-          style={{
-            display: "flex",
-            flexFlow: "row wrap",
-            minHeight: "26px",
-            lineHeight: "26px",
-            backgroundColor: "#444",
-          }}
+          style={{ display: "flex", flexDirection: "column", height: "100%" }}
         >
           <div
-            className="signListTabButton"
-            data-active={activeSignListTab === "typing"}
-            onClick={() => setActiveSignListTab("typing")}
+            className="signListTab"
+            style={{
+              display: "flex",
+              flexFlow: "row wrap",
+              height: `calc(27px * ${rows})`,
+              lineHeight: "26px",
+              backgroundColor: "#444",
+            }}
           >
-            typing
-          </div>
-          {Content.categories.map((cat, index) => (
             <div
               className="signListTabButton"
-              data-active={activeSignListTab === cat}
-              onClick={() => setActiveSignListTab(cat)}
-              key={index}
+              data-active={activeSignListTab === "typing"}
+              onClick={() => setActiveSignListTab("typing")}
             >
-              {cat}
+              typing
             </div>
-          ))}
-          <div className="signListTabButtonSpacer" />
-        </div>
-        <div
-          style={{ display: "flex", flexFlow: "row wrap", overflowY: "scroll" }}
-        >
-          {Content.signs
-            .filter(([s, _]) => {
-              if (activeSignListTab === "typing") {
-                if (typing === "") {
-                  return false;
-                } else {
-                  return s.startsWith(typing);
-                }
-              } else {
-                const found = /[0-9]/.exec(s);
-                if (!found) {
-                  return false;
-                }
-                return s.substring(0, found.index) === activeSignListTab;
-              }
-            })
-            .map(([id, sign], index) => (
+            {Content.categories.map((cat, index) => (
               <div
-                className="signListCell"
+                className="signListTabButton"
+                data-active={activeSignListTab === cat}
+                onClick={() => setActiveSignListTab(cat)}
                 key={index}
-                onClick={() => onClickSign(id, sign)}
               >
-                <div className="signListCellHeader">{id}</div>
-                <div className="signListCellSign">{sign}</div>
+                {cat}
               </div>
             ))}
+            <div className="signListTabButtonSpacer" />
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexFlow: "row wrap",
+              overflowY: "scroll",
+              height: "100%",
+              alignContent: "start",
+            }}
+          >
+            {Content.signs
+              .filter(([s, _]) => {
+                if (activeSignListTab === "typing") {
+                  if (typing === "") {
+                    return false;
+                  } else {
+                    return s.startsWith(typing);
+                  }
+                } else {
+                  const found = /[0-9]/.exec(s);
+                  if (!found) {
+                    return false;
+                  }
+                  return s.substring(0, found.index) === activeSignListTab;
+                }
+              })
+              .map(([id, sign], index) => (
+                <div
+                  className="signListCell"
+                  key={index}
+                  onClick={() => onClickSign(id, sign)}
+                >
+                  <div className="signListCellHeader">{id}</div>
+                  <div className="signListCellSign">{sign}</div>
+                </div>
+              ))}
+          </div>
         </div>
       </div>
     </div>
