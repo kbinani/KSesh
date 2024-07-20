@@ -7,7 +7,7 @@ export const ContentComponent: FC<{ content: Content; fontSize: number }> = ({
   fontSize,
 }) => {
   return (
-    <div className="hieroglyphs" style={{ fontSize }}>
+    <div className="hieroglyphs" style={{ fontSize, userSelect: "text" }}>
       {content.result}
     </div>
   );
