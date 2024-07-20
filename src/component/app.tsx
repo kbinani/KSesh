@@ -11,6 +11,7 @@ import { ContentComponent } from "./content";
 import { Content } from "../content";
 
 const placeholder = "Y3 Y1A";
+const stateVersion = 1;
 
 export const App: FC = ({}) => {
   const [content, setContent] = useState<Content>(new Content(""));
@@ -104,7 +105,20 @@ export const App: FC = ({}) => {
     setTabRows(rows);
   };
   useEffect(() => {
-    const text = new Content(placeholder);
+    const s = window.history.state;
+    let raw: string = placeholder;
+    if (typeof s["version"] === "number") {
+      if (s.version === stateVersion) {
+        if (typeof s["state"] === "string") {
+          raw = s["state"];
+          if (textarea.current) {
+            textarea.current.value = raw;
+          }
+          setChanged(true);
+        }
+      }
+    }
+    const text = new Content(raw);
     setContent(text);
     onResize();
     window.addEventListener("resize", onResize);
@@ -112,6 +126,12 @@ export const App: FC = ({}) => {
       window.removeEventListener("resize", onResize);
     };
   }, []);
+  useEffect(() => {
+    window.history.replaceState(
+      { version: stateVersion, state: content.raw },
+      "",
+    );
+  }, [content]);
   return (
     <div
       style={{
