@@ -50,7 +50,7 @@ body * {
 
 .signListTabButton[data-active="true"] {
   color: black;
-  background-color: #ccc;
+  background-color: #888;
 }
 
 .signListCell {
