@@ -196,7 +196,16 @@ export const App: FC = ({}) => {
                 onClick={() => setActiveSignListTab(cat)}
                 key={index}
               >
-                {cat}
+                {cat}&nbsp;
+                <span className="hieroglyphs">
+                  {
+                    Content.signs[
+                      Content.signs.findIndex(([s, _]) => {
+                        return s.startsWith(cat);
+                      })
+                    ][1]
+                  }
+                </span>
               </div>
             ))}
             <div className="signListTabButtonSpacer" />
@@ -232,7 +241,7 @@ export const App: FC = ({}) => {
                   key={index}
                   onClick={() => onClickSign(id, sign)}
                 >
-                  <div className="signListCellHeader">{id}</div>
+                  <div className="signListCellHeader"> {id} </div>
                   <div className="signListCellSign">{sign}</div>
                 </div>
               ))}

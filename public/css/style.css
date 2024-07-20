@@ -38,6 +38,7 @@ body * {
 
 .signListTabButton {
   min-width: 60px;
+  height: 26px;
   text-align: center;
   color: white;
   cursor: pointer;
@@ -49,9 +50,17 @@ body * {
   border-right: none;
 }
 
+.signListTabButton > span {
+  color: #ddd;
+}
+
 .signListTabButton[data-active="true"] {
   color: black;
   background-color: #888;
+}
+
+.signListTabButton[data-active="true"] > span {
+  color: black;
 }
 
 .signListTabButtonSpacer {
