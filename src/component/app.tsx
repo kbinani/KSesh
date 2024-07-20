@@ -18,31 +18,56 @@ export const App: FC = ({}) => {
     setContent(text);
   }, []);
   return (
-    <div style={{ display: "flex", width: "100%", height: "100%" }}>
-      <textarea
-        style={{
-          width: "50%",
-          height: "100%",
-          fontSize: "20px",
-          resize: "none",
-          outline: "none",
-          border: "none",
-        }}
-        autoFocus={true}
-        spellCheck={false}
-        placeholder={changed ? undefined : placeholder}
-        onChange={onChange}
-      />
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        width: "100%",
+        height: "100%",
+      }}
+    >
       <div
-        className="hieroglyphs"
         style={{
-          width: "50%",
-          height: "100%",
-          fontSize: "48px",
-          opacity: changed ? 1 : 0.5,
+          height: "22px",
+          lineHeight: "22px",
+          fontSize: "16px",
+          paddingLeft: "4px",
+          backgroundColor: "#444",
+          color: "#fff",
         }}
       >
-        <ContentComponent content={content} />
+        WSesh
+      </div>
+      <div style={{ display: "flex", height: "100%" }}>
+        <div style={{ width: "50%", padding: 4 }}>
+          <textarea
+            style={{
+              width: "100%",
+              height: "100%",
+              fontSize: "20px",
+              resize: "none",
+              outline: "none",
+              border: "none",
+              padding: 0,
+            }}
+            autoFocus={true}
+            spellCheck={false}
+            placeholder={changed ? undefined : placeholder}
+            onChange={onChange}
+          />
+        </div>
+        <div
+          style={{
+            width: "50%",
+            height: "100%",
+            opacity: changed ? 1 : 0.5,
+            backgroundColor: "#ccc",
+          }}
+        >
+          <div style={{ padding: 4 }}>
+            <ContentComponent content={content} fontSize={48} />
+          </div>
+        </div>
       </div>
     </div>
   );
