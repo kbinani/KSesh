@@ -25,7 +25,7 @@ export class Content {
 
   static readonly signs: string[][] = [
     ["A1", "𓀀"],
-    ["A2", "𓀁|"],
+    ["A2", "𓀁"],
     ["A3", "𓀂"],
     ["A4", "𓀃"],
     ["A5", "𓀄"],
