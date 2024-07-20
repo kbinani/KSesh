@@ -19,9 +19,11 @@ export const App: FC = ({}) => {
   const [activeSignListTab, setActiveSignListTab] = useState("typing");
   const [typing, setTyping] = useState("A1");
   const [tabRows, setTabRows] = useState(1);
+  const [fontSize, setFontSize] = useState<number>(48);
   const textarea = useRef<HTMLTextAreaElement>(null);
   const seshA = useRef<HTMLDivElement>(null);
   const seshB = useRef<HTMLDivElement>(null);
+  const [font, setFont] = useState<string>();
   const onChange = (ev: ChangeEvent<HTMLTextAreaElement>) => {
     const text = ev.target.value;
     const content = new Content(text);
@@ -123,6 +125,34 @@ export const App: FC = ({}) => {
     seshA.current?.classList.remove("seshFadeOut");
     seshA.current?.classList.add("seshFadeIn");
   };
+  const onClickExportSvg = () => {
+    if (font === undefined) {
+      return;
+    }
+    const s: string[] = [];
+    s.push(
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 ${fontSize}">`,
+    );
+    s.push(`  <defs>`);
+    s.push(`    <style>`);
+    s.push(`      @font-face {`);
+    s.push(`        font-family: "Egyptian Text Proto";`);
+    s.push(`        src: url("${font}");`);
+    s.push(`      }`);
+    s.push(`    </style>`);
+    s.push(`  </defs>`);
+    s.push(
+      `  <text style='font-family: "Egyptian Text Proto"; font-size: ${fontSize}px;'>${content.result}</text>`,
+    );
+    s.push(`</svg>`);
+    const blob = new Blob([s.join("\n")], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a") as HTMLAnchorElement;
+    link.href = url;
+    link.download = "result.svg";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
   useEffect(() => {
     const s = window.history.state;
     let raw: string = placeholder;
@@ -141,8 +171,27 @@ export const App: FC = ({}) => {
     const text = new Content(raw);
     setContent(text);
     onResize();
+    const controller = new AbortController();
+    fetch("/font/eot.ttf", { signal: controller.signal }).then((res) => {
+      res.blob().then((b) => {
+        if (controller.signal.aborted) {
+          return;
+        }
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (controller.signal.aborted) {
+            return;
+          }
+          if (typeof reader.result === "string") {
+            setFont(reader.result);
+          }
+        };
+        reader.readAsDataURL(b);
+      });
+    });
     window.addEventListener("resize", onResize);
     return () => {
+      controller.abort();
       window.removeEventListener("resize", onResize);
     };
   }, []);
@@ -207,6 +256,16 @@ export const App: FC = ({}) => {
             𓏞𓏜
           </div>
         </div>
+        <div style={{ width: "20px" }} />
+        <div className="menuBar">
+          <div
+            className="menuBarItem"
+            onClick={onClickExportSvg}
+            data-enabled={font !== undefined}
+          >
+            <div className="menuBarItemInner">Export to SVG</div>
+          </div>
+        </div>
       </div>
       <div style={{ display: "flex", height: "50%" }}>
         <div style={{ display: "flex", width: "50%" }}>
@@ -238,7 +297,7 @@ export const App: FC = ({}) => {
           }}
         >
           <div style={{ padding: "8px", opacity: changed ? 1 : 0.5 }}>
-            <ContentComponent content={content} fontSize={48} />
+            <ContentComponent content={content} fontSize={fontSize} />
           </div>
         </div>
       </div>
