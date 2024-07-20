@@ -659,8 +659,9 @@ export class Content {
     ["O26", "𓉸"],
     ["O27", "𓉹"],
     ["O28", "𓉺"],
-    ["O29", "𓉻"],
     ["O29A", "𓉼"],
+    ["O29v", "𓉼"],
+    ["O29", "𓉻"],
     ["O30", "𓉽"],
     ["O30A", "𓉾"],
     ["O31", "𓉿"],
@@ -1013,6 +1014,7 @@ export class Content {
     ["X8A", "𓏚"],
     ["Y1", "𓏛"],
     ["Y1A", "𓏜"],
+    ["Y1v", "𓏜"],
     ["Y2", "𓏝"],
     ["Y3", "𓏞"],
     ["Y4", "𓏟"],
@@ -1095,7 +1097,7 @@ export class Content {
     ["Aa30", "𓐬"],
     ["Aa31", "𓐭"],
     ["Aa32", "𓐮"],
-  ];
+  ].sort(Content.compareSigns);
 
   static readonly special = [
     [":", "\u{13430}"], // EGYPTIAN HIEROGLYPH VERTICAL JOINER
@@ -1299,8 +1301,8 @@ export class Content {
     ["zH", "𓉲"],
     ["txn", "𓉶"],
     ["iwn", "𓉺"],
-    ["aA", "𓉻"],
     ["aAv", "𓉼"],
+    ["aA", "𓉻"],
     ["zxnt", "𓉽"],
     ["zb", "𓊄"],
     ["inb", "𓊅"],
@@ -1478,7 +1480,9 @@ export class Content {
     ["8", "𓐁"],
     ["9", "𓐂"],
     ["nn", "𓇒"],
-  ].sort((left, right) => {
+  ].sort(Content.compareSigns);
+
+  private static compareSigns(left: string[], right: string[]): number {
     const l = left[0];
     const r = right[0];
     if (l.length === r.length) {
@@ -1486,7 +1490,7 @@ export class Content {
     } else {
       return r.length - l.length;
     }
-  });
+  }
 
   private static _mapping: string[][] = [];
 
@@ -1494,7 +1498,7 @@ export class Content {
     if (this._mapping.length === 0) {
       const m: string[][] = [...this.signs].reverse();
       m.push(...this.special);
-      this._mapping = m;
+      this._mapping = m.sort(this.compareSigns);
     }
     return this._mapping;
   }
