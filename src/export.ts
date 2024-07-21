@@ -9,6 +9,12 @@ export type EdgeInset = {
   right: number;
 };
 
+export function base64FromBuffer(buffer: Uint8Array): string {
+  return btoa(
+    buffer.reduce((data, byte) => data + String.fromCharCode(byte), ""),
+  );
+}
+
 export function svg(
   content: Content,
   font: FontData,

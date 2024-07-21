@@ -9,16 +9,10 @@ import {
 } from "react";
 import { ContentComponent } from "./content";
 import { Content } from "../content";
-import { svg } from "../export";
-
+import { base64FromBuffer, svg } from "../export";
 import { loadHarfbuzz } from "../harfbuzz";
-
-// @ts-ignore
-import hbWASMBinary from "../../node_modules/harfbuzzjs/hb.wasm";
-
-// @ts-ignore
-import eotTTFBinary from "../../public/eot.ttf";
 import { FontData } from "../font-data";
+import { staticData } from "../static-data";
 
 const placeholder = "Y3 Y1A";
 const stateVersion = 1;
@@ -174,19 +168,14 @@ export const App: FC = ({}) => {
     const text = new Content(raw);
     setContent(text);
     onResize();
-    const base64String = btoa(
-      (hbWASMBinary as Uint8Array).reduce(
-        (data, byte) => data + String.fromCharCode(byte),
-        "",
-      ),
-    );
+    const base64String = base64FromBuffer(staticData.harfbuzz);
     const controller = new AbortController();
     loadHarfbuzz("data:application/wasm;base64," + base64String)
       .then(() => {
         if (controller.signal.aborted) {
           return;
         }
-        setFont(new FontData(eotTTFBinary));
+        setFont(new FontData(staticData.eot));
       })
       .catch((e) => console.error(e));
     window.addEventListener("resize", onResize);
