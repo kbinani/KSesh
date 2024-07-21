@@ -113,6 +113,15 @@ body * {
   height: 100%;
 }
 
+.mainInit {
+  opacity: 0;
+}
+
+.mainFadeIn {
+  opacity: 1;
+  transition: opacity 0.2s ease-in;
+}
+
 .seshContainer {
   color: #fff;
   position: relative;

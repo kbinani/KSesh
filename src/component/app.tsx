@@ -30,10 +30,11 @@ export const App: FC = ({}) => {
   const [typing, setTyping] = useState("A1");
   const [tabRows, setTabRows] = useState(1);
   const [fontSize, setFontSize] = useState<number>(48);
+  const [font, setFont] = useState<FontData>();
+  const main = useRef<HTMLDivElement>(null);
   const textarea = useRef<HTMLTextAreaElement>(null);
   const seshA = useRef<HTMLDivElement>(null);
   const seshB = useRef<HTMLDivElement>(null);
-  const [font, setFont] = useState<FontData>();
   const onChange = (ev: ChangeEvent<HTMLTextAreaElement>) => {
     const text = ev.target.value;
     const content = new Content(text);
@@ -173,10 +174,17 @@ export const App: FC = ({}) => {
     onResize();
     const base64String = base64FromBuffer(staticData.harfbuzz);
     const controller = new AbortController();
-    loadHarfbuzz("data:application/wasm;base64," + base64String)
+    Promise.all([
+      loadHarfbuzz("data:application/wasm;base64," + base64String),
+      document.fonts.load("48px 'Egyptian Text Proto'", "𓏞𓏜"),
+    ])
       .then(() => {
         if (controller.signal.aborted) {
           return;
+        }
+        if (main.current) {
+          main.current.classList.remove("mainInit");
+          main.current.classList.add("mainFadeIn");
         }
         setFont(new FontData(staticData.eot));
       })
@@ -195,7 +203,7 @@ export const App: FC = ({}) => {
     );
   }, [content]);
   return (
-    <div className="main">
+    <div ref={main} className="main mainInit">
       <div className="header">
         W
         <div
@@ -254,7 +262,7 @@ export const App: FC = ({}) => {
           </div>
         </div>
       </div>
-      <div style={{ height: "50%" }}>
+      <div style={{ height: "50vh" }}>
         <div
           style={{ display: "flex", flexDirection: "column", height: "50vh" }}
         >
