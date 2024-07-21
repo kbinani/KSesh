@@ -324,57 +324,18 @@ export const App: FC = ({}) => {
     console.log(content.result);
   }, [content]);
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        width: "100%",
-        height: "100%",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          height: "26px",
-          lineHeight: "26px",
-          fontSize: "20px",
-          paddingLeft: "4px",
-          backgroundColor: "#444",
-          color: "#fff",
-        }}
-      >
+    <div className="main">
+      <div className="header">
         W
         <div
-          style={{ color: "#fff", position: "relative", width: "50px" }}
+          className="seshContainer"
           onMouseEnter={onMouseEnter}
           onMouseLeave={onMouseLeave}
         >
-          <div
-            ref={seshA}
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              height: "26px",
-              overflow: "hidden",
-            }}
-          >
+          <div ref={seshA} className="seshA">
             Sesh
           </div>
-          <div
-            ref={seshB}
-            className="hieroglyphs seshBInit"
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              height: "26px",
-              fontSize: "20px",
-              overflow: "hidden",
-              lineHeight: "26px",
-              paddingTop: "1px",
-            }}
-          >
+          <div ref={seshB} className="hieroglyphs seshB seshBInit">
             𓏞𓏜
           </div>
         </div>
@@ -394,15 +355,7 @@ export const App: FC = ({}) => {
           <div style={{ padding: "4px", width: "100%" }}>
             <textarea
               ref={textarea}
-              style={{
-                width: "100%",
-                height: "100%",
-                fontSize: "20px",
-                resize: "none",
-                outline: "none",
-                border: "none",
-                padding: 0,
-              }}
+              className="textArea"
               autoFocus={true}
               spellCheck={false}
               placeholder={changed ? undefined : placeholder}
@@ -429,13 +382,7 @@ export const App: FC = ({}) => {
         >
           <div
             className="signListTab"
-            style={{
-              display: "flex",
-              flexFlow: "row wrap",
-              height: `calc(27px * ${tabRows})`,
-              lineHeight: "26px",
-              backgroundColor: "#444",
-            }}
+            style={{ height: `calc(27px * ${tabRows})` }}
           >
             <div
               className="signListTabButton"
@@ -466,13 +413,8 @@ export const App: FC = ({}) => {
             <div className="signListTabButtonSpacer" />
           </div>
           <div
-            style={{
-              display: "flex",
-              flexFlow: "row wrap",
-              overflowY: "scroll",
-              height: `calc(50vh - 27px * ${tabRows})`,
-              alignContent: "start",
-            }}
+            className="signList"
+            style={{ height: `calc(50vh - 27px * ${tabRows})` }}
           >
             {Content.signs
               .filter(([s, _]) => {
