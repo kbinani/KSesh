@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 import { ContentComponent } from "./content";
-import { Content, Rect } from "../content";
+import { Content } from "../content";
 import {
   base64FromBuffer,
   download,
@@ -21,6 +21,7 @@ import {
 import { loadHarfbuzz } from "../harfbuzz";
 import { FontData } from "../font-data";
 import { staticData } from "../static-data";
+import { Rect } from "../rect";
 
 const placeholder = "Y3 Y1A";
 const stateVersion = 1;
