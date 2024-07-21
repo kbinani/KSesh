@@ -15,7 +15,6 @@ export function svg(
   fontSize: number,
   edgeInset: EdgeInset,
 ): Blob {
-  const s: string[] = [];
   const buffer = new HarfBuzzBuffer();
   buffer.addText(content.result);
 
@@ -26,10 +25,17 @@ export function svg(
   const output = buffer.json();
 
   const scale = (1 / font.ot.unitsPerEm) * fontSize;
-  s.push(`  <g transform="translate(${edgeInset.left} ${edgeInset.top})">`);
-  s.push(
-    `    <g transform="scale(${scale} ${scale}) translate(0 ${font.ot.unitsPerEm + font.ot.descender})">`,
+
+  const ns = "http://www.w3.org/2000/svg";
+  const g0 = document.createElementNS(ns, "g");
+  g0.setAttribute("translate", `translate(${edgeInset.left} ${edgeInset.top})`);
+
+  const g1 = document.createElementNS(ns, "g") as unknown as SVGGElement;
+  g1.setAttribute(
+    "transform",
+    `scale(${scale} ${scale}) translate(0 ${font.ot.unitsPerEm + font.ot.descender})`,
   );
+  g0.appendChild(g1);
 
   let x = 0;
   let y = 0;
@@ -43,25 +49,29 @@ export function svg(
     );
     maxX = Math.max(maxX, path.getBoundingBox().x2);
     if (path.commands.length > 0) {
-      s.push("        " + path.toSVG(1));
+      const str = path.toSVG(2);
+      const p = document.createElementNS(ns, "path");
+      g1.appendChild(p);
+      p.outerHTML = str;
     }
     x += g.XAdvance;
     y += g.YAdvance;
   }
   buffer.destroy();
 
-  s.push(`    </g>`);
-  s.push(`  </g>`);
-  s.push(`</svg>`);
-
   const width = maxX * scale + edgeInset.left + edgeInset.right;
   const height =
     ((font.ot.ascender - font.ot.descender) / font.ot.unitsPerEm) * fontSize +
     edgeInset.top +
     edgeInset.bottom;
-  const header = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}">`;
 
-  const lines = header + "\n" + s.join("\n");
+  const root = document.createElementNS(ns, "svg");
+  root.setAttribute("xmlns", ns);
+  root.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  root.setAttribute("data-text", content.result);
+  root.setAttribute("data-raw", content.raw);
 
-  return new Blob([lines], { type: "image/svg+xml" });
+  root.appendChild(g0);
+
+  return new Blob([root.outerHTML], { type: "image/svg+xml" });
 }
