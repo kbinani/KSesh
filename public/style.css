@@ -166,6 +166,7 @@ body * {
 .menuBarItem {
   min-width: 40px;
   text-align: center;
+  cursor: pointer;
 }
 
 .menuBarItem[data-enabled="false"] {

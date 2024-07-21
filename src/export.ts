@@ -24,6 +24,14 @@ export function download(blob: Blob, filename: string) {
   URL.revokeObjectURL(url);
 }
 
+export function writeClipboard(blob: Blob) {
+  navigator.clipboard.write([
+    new ClipboardItem({
+      [blob.type]: blob,
+    }),
+  ]);
+}
+
 function bufferFromContent(content: Content, font: FontData): HarfBuzzBuffer {
   const buffer = new HarfBuzzBuffer();
   buffer.addText(content.result);

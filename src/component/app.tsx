@@ -9,7 +9,14 @@ import {
 } from "react";
 import { ContentComponent } from "./content";
 import { Content } from "../content";
-import { base64FromBuffer, download, EdgeInset, png, svg } from "../export";
+import {
+  base64FromBuffer,
+  download,
+  EdgeInset,
+  png,
+  svg,
+  writeClipboard,
+} from "../export";
 import { loadHarfbuzz } from "../harfbuzz";
 import { FontData } from "../font-data";
 import { staticData } from "../static-data";
@@ -150,6 +157,20 @@ export const App: FC = ({}) => {
     const blob = await png(content, font, fontSize, edgeInset);
     download(blob, "result.png");
   };
+  const onClickCopySvg = () => {
+    if (font === undefined) {
+      return;
+    }
+    const blob = svg(content, font, fontSize, edgeInset);
+    writeClipboard(blob);
+  };
+  const onClickCopyPng = async () => {
+    if (font === undefined) {
+      return;
+    }
+    const blob = await png(content, font, fontSize, edgeInset);
+    writeClipboard(blob);
+  };
   useEffect(() => {
     const s = window.history.state;
     let raw: string = placeholder;
@@ -233,6 +254,20 @@ export const App: FC = ({}) => {
             data-enabled={font !== undefined}
           >
             <div className="menuBarItemInner">Export to PNG</div>
+          </div>
+          <div
+            className="menuBarItem"
+            onClick={onClickCopySvg}
+            data-enabled={font !== undefined}
+          >
+            <div className="menuBarItemInner">Copy SVG to Clipboard</div>
+          </div>
+          <div
+            className="menuBarItem"
+            onClick={onClickCopyPng}
+            data-enabled={font !== undefined}
+          >
+            <div className="menuBarItemInner">Copy PNG to Clipboard</div>
           </div>
         </div>
       </div>
