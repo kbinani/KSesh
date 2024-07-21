@@ -241,33 +241,40 @@ export const App: FC = ({}) => {
         </div>
         <div style={{ width: "20px" }} />
         <div className="menuBar">
+          <div className="menuBarCategoryHeader">
+            <div className="menuBarCategoryHeaderInner">Export as file:</div>
+          </div>
           <div
             className="menuBarItem"
             onClick={onClickExportSvg}
             data-enabled={font !== undefined}
           >
-            <div className="menuBarItemInner">Export to SVG</div>
+            <div className="menuBarItemInner">SVG</div>
           </div>
           <div
             className="menuBarItem"
             onClick={onClickExportPng}
             data-enabled={font !== undefined}
           >
-            <div className="menuBarItemInner">Export to PNG</div>
+            <div className="menuBarItemInner">PNG</div>
+          </div>
+          <div style={{ width: "40px" }} />
+          <div className="menuBarCategoryHeader">
+            <div className="menuBarCategoryHeaderInner">Copy to clipboard:</div>
           </div>
           <div
             className="menuBarItem"
             onClick={onClickCopySvg}
             data-enabled={font !== undefined}
           >
-            <div className="menuBarItemInner">Copy SVG to Clipboard</div>
+            <div className="menuBarItemInner">SVG</div>
           </div>
           <div
             className="menuBarItem"
             onClick={onClickCopyPng}
             data-enabled={font !== undefined}
           >
-            <div className="menuBarItemInner">Copy PNG to Clipboard</div>
+            <div className="menuBarItemInner">PNG</div>
           </div>
         </div>
       </div>

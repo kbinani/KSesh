@@ -163,6 +163,14 @@ body * {
   font-size: 16px;
 }
 
+.menuBarCategoryHeader {
+  background-color: #666;
+}
+
+.menuBarCategoryHeaderInner {
+  margin: 0 20px;
+}
+
 .menuBarItem {
   min-width: 40px;
   text-align: center;
