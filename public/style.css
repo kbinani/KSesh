@@ -17,7 +17,7 @@ body * {
 
 @font-face {
   font-family: "Egyptian Text Proto";
-  src: url("../font/eot.ttf") format("truetype");
+  src: url("eot.ttf") format("truetype");
   font-style: normal;
   font-display: swap;
 }
