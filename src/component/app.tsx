@@ -13,6 +13,7 @@ import {
   base64FromBuffer,
   download,
   EdgeInset,
+  pdf,
   png,
   svg,
   writeClipboard,
@@ -157,6 +158,13 @@ export const App: FC = ({}) => {
     const blob = await png(content, font, fontSize, edgeInset);
     download(blob, "result.png");
   };
+  const onClickExportPdf = async () => {
+    if (font === undefined) {
+      return;
+    }
+    const blob = await pdf(content, font, fontSize, edgeInset);
+    download(blob, "result.pdf");
+  };
   const onClickCopySvg = () => {
     if (font === undefined) {
       return;
@@ -169,6 +177,13 @@ export const App: FC = ({}) => {
       return;
     }
     const blob = await png(content, font, fontSize, edgeInset);
+    writeClipboard(blob);
+  };
+  const onClickCopyPdf = async () => {
+    if (font === undefined) {
+      return;
+    }
+    const blob = await pdf(content, font, fontSize, edgeInset);
     writeClipboard(blob);
   };
   useEffect(() => {
@@ -246,6 +261,13 @@ export const App: FC = ({}) => {
           </div>
           <div
             className="menuBarItem"
+            onClick={onClickExportPng}
+            data-enabled={font !== undefined}
+          >
+            <div className="menuBarItemInner">PNG</div>
+          </div>
+          <div
+            className="menuBarItem"
             onClick={onClickExportSvg}
             data-enabled={font !== undefined}
           >
@@ -253,14 +275,21 @@ export const App: FC = ({}) => {
           </div>
           <div
             className="menuBarItem"
-            onClick={onClickExportPng}
+            onClick={onClickExportPdf}
             data-enabled={font !== undefined}
           >
-            <div className="menuBarItemInner">PNG</div>
+            <div className="menuBarItemInner">PDF</div>
           </div>
           <div style={{ width: "40px" }} />
           <div className="menuBarCategoryHeader">
             <div className="menuBarCategoryHeaderInner">Copy to clipboard:</div>
+          </div>
+          <div
+            className="menuBarItem"
+            onClick={onClickCopyPng}
+            data-enabled={font !== undefined}
+          >
+            <div className="menuBarItemInner">PNG</div>
           </div>
           <div
             className="menuBarItem"
@@ -271,10 +300,10 @@ export const App: FC = ({}) => {
           </div>
           <div
             className="menuBarItem"
-            onClick={onClickCopyPng}
+            onClick={onClickCopyPdf}
             data-enabled={font !== undefined}
           >
-            <div className="menuBarItemInner">PNG</div>
+            <div className="menuBarItemInner">PDF</div>
           </div>
         </div>
       </div>

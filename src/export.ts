@@ -2,6 +2,9 @@ import { Content } from "./content";
 import { FontData } from "./font-data";
 import { HarfBuzzBuffer, hb, HB_TAG } from "./harfbuzz";
 
+const PDFDocument = require("./pdfkit.standalone.js") as PDFKit.PDFDocument;
+const blobStream = require("../node_modules/blob-stream/.js");
+
 export type EdgeInset = {
   top: number;
   left: number;
@@ -56,6 +59,31 @@ function* enumerateGlyphs(
   }
 }
 
+function getPageScale(font: FontData, fontSize: number): number {
+  const { unitsPerEm } = font.ot;
+  return (1 / unitsPerEm) * fontSize;
+}
+
+function calculatePageSize(
+  buffer: HarfBuzzBuffer,
+  font: FontData,
+  fontSize: number,
+  edgeInset: EdgeInset,
+): { width: number; height: number; scale: number } {
+  const { ascender, descender, unitsPerEm } = font.ot;
+  const scale = getPageScale(font, fontSize);
+  let maxX = 0;
+  for (const { x, y, gid } of enumerateGlyphs(buffer)) {
+    const glyph = font.ot.glyphs.get(gid);
+    const path = glyph.getPath(x, y, unitsPerEm);
+    maxX = Math.max(maxX, path.getBoundingBox().x2);
+  }
+  const width = maxX * scale + edgeInset.left + edgeInset.right;
+  const lineHeight = ((ascender - descender) / unitsPerEm) * fontSize;
+  const height = lineHeight + edgeInset.top + edgeInset.bottom;
+  return { width, height, scale };
+}
+
 export function svg(
   content: Content,
   font: FontData,
@@ -65,7 +93,7 @@ export function svg(
   const buffer = bufferFromContent(content, font);
 
   const { ascender, descender, unitsPerEm } = font.ot;
-  const scale = (1 / unitsPerEm) * fontSize;
+  const scale = getPageScale(font, fontSize);
 
   const ns = "http://www.w3.org/2000/svg";
   const g0 = document.createElementNS(ns, "g");
@@ -114,18 +142,13 @@ export async function png(
   edgeInset: EdgeInset,
 ): Promise<Blob> {
   const buffer = bufferFromContent(content, font);
-  const { ascender, descender, unitsPerEm } = font.ot;
-  const scale = (1 / unitsPerEm) * fontSize;
-
-  let maxX = 0;
-  for (const { x, y, gid } of enumerateGlyphs(buffer)) {
-    const glyph = font.ot.glyphs.get(gid);
-    const path = glyph.getPath(x, y, unitsPerEm);
-    maxX = Math.max(maxX, path.getBoundingBox().x2);
-  }
-  const width = maxX * scale + edgeInset.left + edgeInset.right;
-  const lineHeight = ((ascender - descender) / unitsPerEm) * fontSize;
-  const height = lineHeight + edgeInset.top + edgeInset.bottom;
+  const { descender, unitsPerEm } = font.ot;
+  const { width, height, scale } = calculatePageSize(
+    buffer,
+    font,
+    fontSize,
+    edgeInset,
+  );
 
   const canvas = document.createElement("canvas");
   canvas.width = width;
@@ -153,5 +176,47 @@ export async function png(
     } catch {
       reject();
     }
+  });
+}
+
+export async function pdf(
+  content: Content,
+  font: FontData,
+  fontSize: number,
+  edgeInset: EdgeInset,
+): Promise<Blob> {
+  const buffer = bufferFromContent(content, font);
+  const { descender, unitsPerEm } = font.ot;
+  const { width, height, scale } = calculatePageSize(
+    buffer,
+    font,
+    fontSize,
+    edgeInset,
+  );
+
+  const doc = new PDFDocument({ size: [width, height] });
+  const stream = doc.pipe(blobStream());
+
+  doc.translate(edgeInset.left, edgeInset.top);
+  doc.scale(scale, scale);
+  doc.translate(0, unitsPerEm + descender);
+
+  for (const { x, y, gid } of enumerateGlyphs(buffer)) {
+    const glyph = font.ot.glyphs.get(gid);
+    const path = glyph.getPath(x, y, unitsPerEm);
+    const data = path.toPathData(2);
+    doc.path(data).fill("black");
+  }
+
+  doc.end();
+
+  return new Promise((resolve, reject) => {
+    stream.on("finish", () => {
+      const blob = stream.toBlob("application/pdf");
+      resolve(blob);
+    });
+    stream.on("error", (e: any) => {
+      reject();
+    });
   });
 }
