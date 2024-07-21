@@ -12,12 +12,7 @@ import { Content } from "../content";
 import opentype, { parse } from "opentype.js";
 import { svg } from "../export";
 
-import {
-  loadHarfbuzz,
-  HarfBuzzBuffer,
-  HarfBuzzBlob,
-  HarfBuzzFace,
-} from "harfbuzzjs/harfbuzz";
+import { loadHarfbuzz } from "../harfbuzz";
 
 // @ts-ignore
 import hbWASMBinary from "../../node_modules/harfbuzzjs/hb.wasm";
@@ -193,152 +188,11 @@ export const App: FC = ({}) => {
         "",
       ),
     );
-    // console.log(base64String);
-    // data:text/plain;base64,SGVsbG8sIFdvcmxkIQ==
-    // loadHarfbuzz("data:application/wasm;base64," + base64String).then(m => {
-    //   console.log(m);
-    // });
-    loadHarfbuzz("hb.wasm")
+    loadHarfbuzz("data:application/wasm;base64," + base64String)
       .then(() => {
         setHarfbuzz(true);
       })
       .catch((e) => console.error(e));
-    // WebAssembly.instantiate(hbWASMBinary).then(m => {
-    //   setHarfbuzz(m);
-    //   // console.log(loadHarfbuzz);
-    //   // const blob = hb.createBlob(eotTTFBinary.buffer);
-    //   // console.log(blob);
-    // });
-    // const controller = new AbortController();
-    // fetch("/eot.ttf", { signal: controller.signal }).then((res) => {
-    //   res.blob().then((b) => {
-    //     if (controller.signal.aborted) {
-    //       return;
-    //     }
-    //     b.arrayBuffer().then(buffer => {
-    //       if (controller.signal.aborted) {
-    //         return;
-    //       }
-    //       const ot = parse(buffer);
-    //       setFont({font: ot, data: buffer});
-    //     });
-    //   });
-    // });
-    // load("/font/eot.ttf").then((ft) => {
-    //   setOtFont(ft);
-    //   const list = [
-    //     [470, 0, 0],
-    //     [15010, 105, 1860],
-    //     [14990, 105, 1860],
-    //     [14211, 105, 1860],
-    //     [13508, 420, 930],
-    //     [2270, 420, 0],
-    //     [14087, 840, 0],
-    //     [13877, 840, 0],
-    //     [472, 840, 0],
-    //     [15010, 945, 1860],
-    //     [14992, 945, 1860],
-    //     [14223, 945, 1860],
-    //     [13508, 1575, 930],
-    //     [2180, 1575, 0],
-    //     [14087, 2310, 0],
-    //     [13877, 2310, 0],
-    //     [472, 2310, 0],
-    //     [15010, 2415, 1860],
-    //     [14992, 2415, 1860],
-    //     [14223, 2415, 1860],
-    //     [13508, 3045, 930],
-    //     [2087, 3045, 445],
-    //     [14087, 3780, 0],
-    //     [13877, 3780, 0],
-    //     [474, 3780, 0],
-    //     [15010, 3885, 1860],
-    //     [14994, 3885, 1860],
-    //     [14235, 3885, 1860],
-    //     [13508, 4830, 930],
-    //     [2150, 4830, 0],
-    //     [14087, 5880, 0],
-    //     [13877, 5880, 0],
-    //     [473, 5880, 0],
-    //     [15010, 5985, 1860],
-    //     [14993, 5985, 1860],
-    //     [14229, 5985, 1860],
-    //     [13508, 6772, 930],
-    //     [1811, 6772, 0],
-    //     [14087, 7665, 0],
-    //     [13877, 7665, 0],
-    //     [474, 7665, 0],
-    //     [15006, 7770, 1860],
-    //     [14994, 7770, 1860],
-    //     [14231, 7770, 1860],
-    //     [13508, 8715, 1550],
-    //     [1950, 8715, 1338],
-    //     [14087, 9765, 0],
-    //     [13877, 9765, 0],
-    //     [14150, 7770, 1240],
-    //     [15006, 7770, 620],
-    //     [14994, 7770, 620],
-    //     [14231, 7770, 620],
-    //     [13508, 8715, 310],
-    //     [2807, 8715, 43],
-    //     [14087, 9765, 0],
-    //     [13877, 9765, 0],
-    //     [472, 9765, 0],
-    //     [15010, 9870, 1860],
-    //     [14992, 9870, 1860],
-    //     [14223, 9870, 1860],
-    //     [13508, 10500, 930],
-    //     [2209, 10500, 563],
-    //     [14087, 11235, 0],
-    //     [13877, 11235, 0],
-    //     [474, 11235, 0],
-    //     [15010, 11340, 1860],
-    //     [14994, 11340, 1860],
-    //     [14235, 11340, 1860],
-    //     [13508, 12285, 930],
-    //     [2150, 12285, 0],
-    //     [14087, 13335, 0],
-    //     [13877, 13335, 0],
-    //     [472, 13335, 0],
-    //     [15006, 13440, 1860],
-    //     [14992, 13440, 1860],
-    //     [14219, 13440, 1860],
-    //     [13508, 14070, 1550],
-    //     [2786, 14070, 1385],
-    //     [14087, 14805, 0],
-    //     [13877, 14805, 0],
-    //     [15008, 13440, 1240],
-    //     [14992, 13440, 1240],
-    //     [14221, 13440, 1240],
-    //     [13508, 14070, 620],
-    //     [2473, 14070, 106],
-    //     [14087, 14805, 0],
-    //     [13877, 14805, 0],
-    //   ];
-    //   const canvas = document.createElement("canvas") as HTMLCanvasElement;
-    //   const width = 800;
-    //   const height = 150;
-    //   canvas.width = width;
-    //   canvas.height = height;
-    //   const ctx = canvas.getContext("2d")!;
-    //   ctx.fillStyle = "white";
-    //   ctx.fillRect(0, 0, canvas.width, canvas.height);
-    //   const scale = (1.0 / ft.unitsPerEm) * 80;
-    //   console.log(ft.unitsPerEm);
-    //   ctx.translate(0, height / 2);
-    //   ctx.scale(scale, scale);
-    //   for (const [gid, x, y] of list) {
-    //     const g = ft.glyphs.get(gid);
-    //     ctx.fillStyle = "black";
-    //     g.draw(ctx, x, height / 2 - y, ft.unitsPerEm);
-    //   }
-    //   const b64 = canvas.toDataURL("image/png");
-    //   console.log(
-    //     `%c `,
-    //     `padding: ${height / 2}px ${width / 2}px; background: url("${b64}") no-repeat;`,
-    //   );
-    // });
-
     window.addEventListener("resize", onResize);
     return () => {
       window.removeEventListener("resize", onResize);

@@ -4,9 +4,10 @@ import {
   HarfBuzzBlob,
   HarfBuzzBuffer,
   HarfBuzzFace,
-  hb,
   HarfBuzzFont,
-} from "harfbuzzjs/harfbuzz";
+  hb,
+  HB_TAG,
+} from "./harfbuzz";
 
 export type EdgeInset = {
   top: number;
@@ -33,7 +34,6 @@ export function svg(
 
   hb.hb_shape(font.ptr, buffer.ptr, undefined, 0);
   const output = buffer.json();
-  console.log(ft.font.ascender, ft.font.descender);
 
   const scale = (1 / ft.font.unitsPerEm) * fontSize;
   s.push(`  <g transform="translate(${edgeInset.left} ${edgeInset.top})">`);
@@ -77,13 +77,4 @@ export function svg(
   const lines = header + "\n" + s.join("\n");
 
   return new Blob([lines], { type: "image/svg+xml" });
-}
-
-function HB_TAG(a: string, b: string, c: string, d: string): number {
-  return (
-    (a.charCodeAt(0) << 24) +
-    (b.charCodeAt(0) << 16) +
-    (c.charCodeAt(0) << 8) +
-    d.charCodeAt(0)
-  );
 }
