@@ -27,6 +27,8 @@ const stateVersion = 1;
 const padding = 8;
 const cursorPadding = 4;
 
+type Cursor = { rect: Rect; ranged: boolean };
+
 export const App: FC = ({}) => {
   const [content, setContent] = useState<Content | undefined>();
   const [changed, setChanged] = useState(false);
@@ -35,7 +37,8 @@ export const App: FC = ({}) => {
   const [tabRows, setTabRows] = useState(1);
   const [fontSize, setFontSize] = useState<number>(48);
   const [font, setFont] = useState<FontData>();
-  const [cursor, setCursor] = useState<Rect | undefined>();
+  const [cursor, setCursor] = useState<Cursor | undefined>();
+  const [focus, setFocus] = useState(false);
   const main = useRef<HTMLDivElement>(null);
   const textarea = useRef<HTMLTextAreaElement>(null);
   const seshA = useRef<HTMLDivElement>(null);
@@ -79,7 +82,7 @@ export const App: FC = ({}) => {
     }
     const c = content?.cursor({ fontSize, selectionStart, selectionEnd });
     if (c) {
-      setCursor(c);
+      setCursor({ rect: c, ranged: selectionStart !== selectionEnd });
     } else {
       setCursor(undefined);
     }
@@ -211,6 +214,12 @@ export const App: FC = ({}) => {
     }
     const blob = new Blob([content.result], { type: "text/plain" });
     writeClipboard(blob);
+  };
+  const onFocus = () => {
+    setFocus(true);
+  };
+  const onBlur = () => {
+    setFocus(false);
   };
   useEffect(() => {
     const s = window.history.state;
@@ -377,6 +386,8 @@ export const App: FC = ({}) => {
               placeholder={changed ? undefined : placeholder}
               onChange={onChange}
               onSelect={onSelect}
+              onFocus={onFocus}
+              onBlur={onBlur}
             />
           </div>
         </div>
@@ -394,14 +405,14 @@ export const App: FC = ({}) => {
               opacity: changed ? 1 : 0.5,
             }}
           >
-            {cursor && (
+            {focus && cursor && (
               <div
                 style={{
                   position: "absolute",
-                  left: padding + cursor.x - cursorPadding,
-                  top: padding + cursor.y - cursorPadding,
-                  width: cursor.width + 2 * cursorPadding,
-                  height: cursor.height + 2 * cursorPadding,
+                  left: padding + cursor.rect.x - cursorPadding,
+                  top: padding + cursor.rect.y - cursorPadding,
+                  width: cursor.rect.width + 2 * cursorPadding,
+                  height: cursor.rect.height + 2 * cursorPadding,
                   backgroundColor: "rgba(0, 0, 255, 0.2)",
                 }}
               />
@@ -409,14 +420,14 @@ export const App: FC = ({}) => {
             {content && (
               <ContentComponent content={content} fontSize={fontSize} />
             )}
-            {cursor && (
+            {focus && cursor?.ranged === false && (
               <div
                 style={{
                   position: "absolute",
-                  left: padding + cursor.x - cursorPadding,
-                  top: padding + cursor.y - cursorPadding,
-                  width: cursor.width + 2 * cursorPadding,
-                  height: cursor.height + 2 * cursorPadding,
+                  left: padding + cursor.rect.x - cursorPadding,
+                  top: padding + cursor.rect.y - cursorPadding,
+                  width: cursor.rect.width + 2 * cursorPadding,
+                  height: cursor.rect.height + 2 * cursorPadding,
                   borderRight: "solid 2px rgba(0, 0, 255, 0.5)",
                 }}
               />
