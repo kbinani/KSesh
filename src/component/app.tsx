@@ -9,13 +9,19 @@ import {
 } from "react";
 import { ContentComponent } from "./content";
 import { Content } from "../content";
-import { base64FromBuffer, svg } from "../export";
+import { base64FromBuffer, download, EdgeInset, png, svg } from "../export";
 import { loadHarfbuzz } from "../harfbuzz";
 import { FontData } from "../font-data";
 import { staticData } from "../static-data";
 
 const placeholder = "Y3 Y1A";
 const stateVersion = 1;
+const edgeInset: EdgeInset = {
+  top: 8,
+  left: 8,
+  bottom: 8,
+  right: 8,
+};
 
 export const App: FC = ({}) => {
   const [content, setContent] = useState<Content>(new Content(""));
@@ -133,18 +139,15 @@ export const App: FC = ({}) => {
     if (font === undefined) {
       return;
     }
-    const blob = svg(content, font, fontSize, {
-      top: 8,
-      left: 8,
-      bottom: 8,
-      right: 8,
-    });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a") as HTMLAnchorElement;
-    link.href = url;
-    link.download = "result.svg";
-    link.click();
-    URL.revokeObjectURL(url);
+    const blob = svg(content, font, fontSize, edgeInset);
+    download(blob, "result.svg");
+  };
+  const onClickExportPng = async () => {
+    if (font === undefined) {
+      return;
+    }
+    const blob = await png(content, font, fontSize, edgeInset);
+    download(blob, "result.png");
   };
   useEffect(() => {
     const s = window.history.state;
@@ -215,6 +218,13 @@ export const App: FC = ({}) => {
             data-enabled={font !== undefined}
           >
             <div className="menuBarItemInner">Export to SVG</div>
+          </div>
+          <div
+            className="menuBarItem"
+            onClick={onClickExportPng}
+            data-enabled={font !== undefined}
+          >
+            <div className="menuBarItemInner">Export to PNG</div>
           </div>
         </div>
       </div>
