@@ -23,6 +23,14 @@ export class Content {
     this.result = chars.map((c) => c.char).join("");
   }
 
+  get plainText(): string {
+    let ret = this.result;
+    for (let code = 0x13430; code <= 0x13455; code++) {
+      ret = ret.replaceAll(String.fromCodePoint(code), "");
+    }
+    return ret;
+  }
+
   static readonly signs: string[][] = [
     ["A1", "𓀀"],
     ["A2", "𓀁"],

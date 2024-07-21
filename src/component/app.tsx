@@ -186,6 +186,20 @@ export const App: FC = ({}) => {
     const blob = await pdf(content, font, fontSize, edgeInset);
     writeClipboard(blob);
   };
+  const onClickCopyPlainUnicode = () => {
+    if (font === undefined) {
+      return;
+    }
+    const blob = new Blob([content.plainText], { type: "text/plain" });
+    writeClipboard(blob);
+  };
+  const onClickCopyUnicode = () => {
+    if (font === undefined) {
+      return;
+    }
+    const blob = new Blob([content.result], { type: "text/plain" });
+    writeClipboard(blob);
+  };
   useEffect(() => {
     const s = window.history.state;
     let raw: string = placeholder;
@@ -305,6 +319,26 @@ export const App: FC = ({}) => {
           {/*>*/}
           {/*  <div className="menuBarItemInner">PDF</div>*/}
           {/*</div>*/}
+          <div
+            className="menuBarItem"
+            onClick={onClickCopyPlainUnicode}
+            data-enabled={font !== undefined}
+            title={
+              "Copy the hieroglyph text without Egyptian Hieroglyph Format Controls"
+            }
+          >
+            <div className="menuBarItemInner">Plain Text</div>
+          </div>
+          <div
+            className="menuBarItem"
+            onClick={onClickCopyUnicode}
+            data-enabled={font !== undefined}
+            title={
+              "Copy the hieroglyph text with Egyptian Hieroglyph Format Controls"
+            }
+          >
+            <div className="menuBarItemInner">Text</div>
+          </div>
         </div>
       </div>
       <div style={{ display: "flex", height: "50%" }}>
