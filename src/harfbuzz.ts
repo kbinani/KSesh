@@ -74,6 +74,10 @@ class HarfBuzzExports {
     length: number,
   ) => any;
   readonly hb_buffer_destroy: (bufferPtr: Pointer) => void;
+  readonly hb_buffer_set_cluster_level: (
+    bufferPtr: Pointer,
+    level: number,
+  ) => void;
 
   constructor(exports: any) {
     this.heapu8 = new Uint8Array(exports.memory.buffer);
@@ -108,6 +112,7 @@ class HarfBuzzExports {
     this.hb_buffer_get_glyph_infos = exports.hb_buffer_get_glyph_infos;
     this.hb_buffer_get_glyph_positions = exports.hb_buffer_get_glyph_positions;
     this.hb_buffer_destroy = exports.hb_buffer_destroy;
+    this.hb_buffer_set_cluster_level = exports.hb_buffer_set_cluster_level;
   }
 }
 
@@ -211,7 +216,13 @@ export class HarfBuzzFont {
 
 export type HarfBuzzDirection = "ltr" | "rtl" | "ttb" | "btt";
 
-class GlyphInformation {
+export const HB_BUFFER_CLUSTER_LEVEL_MONOTONE_GRAPHEMES = 0;
+export const HB_BUFFER_CLUSTER_LEVEL_MONOTONE_CHARACTERS = 1;
+export const HB_BUFFER_CLUSTER_LEVEL_CHARACTERS = 2;
+export const HB_BUFFER_CLUSTER_LEVEL_DEFAULT =
+  HB_BUFFER_CLUSTER_LEVEL_MONOTONE_GRAPHEMES;
+
+export class GlyphInformation {
   readonly GlyphId: number;
   readonly Cluster: number;
   readonly XAdvance: number;

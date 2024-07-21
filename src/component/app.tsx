@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 import { ContentComponent } from "./content";
-import { Content } from "../content";
+import { Content, Rect } from "../content";
 import {
   base64FromBuffer,
   download,
@@ -24,28 +24,34 @@ import { staticData } from "../static-data";
 
 const placeholder = "Y3 Y1A";
 const stateVersion = 1;
-const edgeInset: EdgeInset = {
-  top: 8,
-  left: 8,
-  bottom: 8,
-  right: 8,
-};
+const padding = 8;
+const cursorPadding = 4;
 
 export const App: FC = ({}) => {
-  const [content, setContent] = useState<Content>(new Content(""));
+  const [content, setContent] = useState<Content | undefined>();
   const [changed, setChanged] = useState(false);
   const [activeSignListTab, setActiveSignListTab] = useState("typing");
   const [typing, setTyping] = useState("A1");
   const [tabRows, setTabRows] = useState(1);
   const [fontSize, setFontSize] = useState<number>(48);
   const [font, setFont] = useState<FontData>();
+  const [cursor, setCursor] = useState<Rect | undefined>();
   const main = useRef<HTMLDivElement>(null);
   const textarea = useRef<HTMLTextAreaElement>(null);
   const seshA = useRef<HTMLDivElement>(null);
   const seshB = useRef<HTMLDivElement>(null);
+  const edgeInset: EdgeInset = {
+    top: padding,
+    left: padding,
+    right: padding,
+    bottom: padding,
+  };
   const onChange = (ev: ChangeEvent<HTMLTextAreaElement>) => {
+    if (font === undefined) {
+      return;
+    }
     const text = ev.target.value;
-    const content = new Content(text);
+    const content = new Content(text, font);
     setContent(content);
     setChanged(true);
     setActiveSignListTab("typing");
@@ -71,9 +77,15 @@ export const App: FC = ({}) => {
     } else {
       setTyping("");
     }
+    const c = content?.cursor({ fontSize, selectionStart, selectionEnd });
+    if (c) {
+      setCursor(c);
+    } else {
+      setCursor(undefined);
+    }
   };
   const onClickSign = (id: string, sign: string) => {
-    if (!textarea.current) {
+    if (!textarea.current || font === undefined) {
       return;
     }
     const { value, selectionStart, selectionEnd } = textarea.current;
@@ -100,7 +112,7 @@ export const App: FC = ({}) => {
       textarea.current.value = next;
       const location = selectionStart - typing.length + insert.length;
       textarea.current.setSelectionRange(location, location);
-      const content = new Content(next);
+      const content = new Content(next, font);
       setContent(content);
     } else {
       let insert = id;
@@ -117,7 +129,7 @@ export const App: FC = ({}) => {
         selectionEnd,
         "end",
       );
-      const content = new Content(next);
+      const content = new Content(next, font);
       setContent(content);
     }
     textarea.current.focus();
@@ -145,56 +157,56 @@ export const App: FC = ({}) => {
     seshA.current?.classList.add("seshFadeIn");
   };
   const onClickExportSvg = () => {
-    if (font === undefined) {
+    if (font === undefined || content === undefined) {
       return;
     }
     const blob = svg(content, font, fontSize, edgeInset);
     download(blob, "result.svg");
   };
   const onClickExportPng = async () => {
-    if (font === undefined) {
+    if (font === undefined || content === undefined) {
       return;
     }
     const blob = await png(content, font, fontSize, edgeInset);
     download(blob, "result.png");
   };
   const onClickExportPdf = async () => {
-    if (font === undefined) {
+    if (font === undefined || content === undefined) {
       return;
     }
     const blob = await pdf(content, font, fontSize, edgeInset);
     download(blob, "result.pdf");
   };
   const onClickCopySvg = () => {
-    if (font === undefined) {
+    if (font === undefined || content === undefined) {
       return;
     }
     const blob = svg(content, font, fontSize, edgeInset);
     writeClipboard(blob);
   };
   const onClickCopyPng = async () => {
-    if (font === undefined) {
+    if (font === undefined || content === undefined) {
       return;
     }
     const blob = await png(content, font, fontSize, edgeInset);
     writeClipboard(blob);
   };
   const onClickCopyPdf = async () => {
-    if (font === undefined) {
+    if (font === undefined || content === undefined) {
       return;
     }
     const blob = await pdf(content, font, fontSize, edgeInset);
     writeClipboard(blob);
   };
   const onClickCopyPlainUnicode = () => {
-    if (font === undefined) {
+    if (font === undefined || content === undefined) {
       return;
     }
     const blob = new Blob([content.plainText], { type: "text/plain" });
     writeClipboard(blob);
   };
   const onClickCopyUnicode = () => {
-    if (font === undefined) {
+    if (font === undefined || content === undefined) {
       return;
     }
     const blob = new Blob([content.result], { type: "text/plain" });
@@ -211,16 +223,16 @@ export const App: FC = ({}) => {
       if (s.version === stateVersion) {
         if (typeof s["state"] === "string") {
           const state = s["state"];
-          if (textarea.current && state !== "") {
+          if (state !== "") {
             raw = state;
-            textarea.current.value = state;
             setChanged(true);
           }
         }
       }
     }
-    const text = new Content(raw);
-    setContent(text);
+    if (textarea.current) {
+      textarea.current.value = raw;
+    }
     onResize();
     const base64String = base64FromBuffer(staticData.harfbuzz);
     const controller = new AbortController();
@@ -247,11 +259,24 @@ export const App: FC = ({}) => {
     };
   }, []);
   useEffect(() => {
-    window.history.replaceState(
-      { version: stateVersion, state: content.raw },
-      "",
-    );
+    if (content) {
+      window.history.replaceState(
+        { version: stateVersion, state: content.raw },
+        "",
+      );
+    }
   }, [content]);
+  useEffect(() => {
+    if (content !== undefined || font === undefined) {
+      return;
+    }
+    const value = textarea.current?.value;
+    if (value === undefined) {
+      return;
+    }
+    const c = new Content(value, font);
+    setContent(c);
+  }, [font]);
   return (
     <div ref={main} className="main mainInit">
       <div className="header">
@@ -362,8 +387,40 @@ export const App: FC = ({}) => {
             backgroundColor: "#ccc",
           }}
         >
-          <div style={{ padding: "8px", opacity: changed ? 1 : 0.5 }}>
-            <ContentComponent content={content} fontSize={fontSize} />
+          <div
+            style={{
+              position: "relative",
+              padding: padding,
+              opacity: changed ? 1 : 0.5,
+            }}
+          >
+            {cursor && (
+              <div
+                style={{
+                  position: "absolute",
+                  left: padding + cursor.x - cursorPadding,
+                  top: padding + cursor.y - cursorPadding,
+                  width: cursor.width + 2 * cursorPadding,
+                  height: cursor.height + 2 * cursorPadding,
+                  backgroundColor: "rgba(0, 0, 255, 0.2)",
+                }}
+              />
+            )}
+            {content && (
+              <ContentComponent content={content} fontSize={fontSize} />
+            )}
+            {cursor && (
+              <div
+                style={{
+                  position: "absolute",
+                  left: padding + cursor.x - cursorPadding,
+                  top: padding + cursor.y - cursorPadding,
+                  width: cursor.width + 2 * cursorPadding,
+                  height: cursor.height + 2 * cursorPadding,
+                  borderRight: "solid 2px rgba(0, 0, 255, 0.5)",
+                }}
+              />
+            )}
           </div>
         </div>
       </div>
