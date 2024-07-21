@@ -158,7 +158,11 @@ export const App: FC = ({}) => {
   useEffect(() => {
     const s = window.history.state;
     let raw: string = placeholder;
-    if (typeof s === "object" && typeof s["version"] === "number") {
+    if (
+      s != null &&
+      typeof s === "object" &&
+      typeof s["version"] === "number"
+    ) {
       if (s.version === stateVersion) {
         if (typeof s["state"] === "string") {
           const state = s["state"];
