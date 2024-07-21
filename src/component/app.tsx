@@ -9,7 +9,6 @@ import {
 } from "react";
 import { ContentComponent } from "./content";
 import { Content } from "../content";
-import opentype, { parse } from "opentype.js";
 import { svg } from "../export";
 
 import { loadHarfbuzz } from "../harfbuzz";
@@ -19,14 +18,10 @@ import hbWASMBinary from "../../node_modules/harfbuzzjs/hb.wasm";
 
 // @ts-ignore
 import eotTTFBinary from "../../public/eot.ttf";
+import { FontData } from "../font-data";
 
 const placeholder = "Y3 Y1A";
 const stateVersion = 1;
-
-export type Font = {
-  data: ArrayBuffer;
-  font: opentype.Font;
-};
 
 export const App: FC = ({}) => {
   const [content, setContent] = useState<Content>(new Content(""));
@@ -38,8 +33,7 @@ export const App: FC = ({}) => {
   const textarea = useRef<HTMLTextAreaElement>(null);
   const seshA = useRef<HTMLDivElement>(null);
   const seshB = useRef<HTMLDivElement>(null);
-  const [font, setFont] = useState<Font>();
-  const [harfbuzz, setHarfbuzz] = useState(false);
+  const [font, setFont] = useState<FontData>();
   const onChange = (ev: ChangeEvent<HTMLTextAreaElement>) => {
     const text = ev.target.value;
     const content = new Content(text);
@@ -180,21 +174,25 @@ export const App: FC = ({}) => {
     const text = new Content(raw);
     setContent(text);
     onResize();
-    const ot = parse(eotTTFBinary.buffer);
-    setFont({ font: ot, data: eotTTFBinary.buffer });
     const base64String = btoa(
       (hbWASMBinary as Uint8Array).reduce(
         (data, byte) => data + String.fromCharCode(byte),
         "",
       ),
     );
+    const controller = new AbortController();
     loadHarfbuzz("data:application/wasm;base64," + base64String)
       .then(() => {
-        setHarfbuzz(true);
+        if (controller.signal.aborted) {
+          return;
+        }
+        setFont(new FontData(eotTTFBinary));
       })
       .catch((e) => console.error(e));
     window.addEventListener("resize", onResize);
     return () => {
+      controller.abort();
+      font?.destroy();
       window.removeEventListener("resize", onResize);
     };
   }, []);
