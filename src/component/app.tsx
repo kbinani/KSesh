@@ -291,20 +291,20 @@ export const App: FC = ({}) => {
           >
             <div className="menuBarItemInner">PNG</div>
           </div>
-          <div
-            className="menuBarItem"
-            onClick={onClickCopySvg}
-            data-enabled={font !== undefined}
-          >
-            <div className="menuBarItemInner">SVG</div>
-          </div>
-          <div
-            className="menuBarItem"
-            onClick={onClickCopyPdf}
-            data-enabled={font !== undefined}
-          >
-            <div className="menuBarItemInner">PDF</div>
-          </div>
+          {/*<div*/}
+          {/*  className="menuBarItem"*/}
+          {/*  onClick={onClickCopySvg}*/}
+          {/*  data-enabled={font !== undefined}*/}
+          {/*>*/}
+          {/*  <div className="menuBarItemInner">SVG</div>*/}
+          {/*</div>*/}
+          {/*<div*/}
+          {/*  className="menuBarItem"*/}
+          {/*  onClick={onClickCopyPdf}*/}
+          {/*  data-enabled={font !== undefined}*/}
+          {/*>*/}
+          {/*  <div className="menuBarItemInner">PDF</div>*/}
+          {/*</div>*/}
         </div>
       </div>
       <div style={{ display: "flex", height: "50%" }}>
