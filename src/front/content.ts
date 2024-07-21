@@ -1481,7 +1481,7 @@ export class Content {
     ["8", "𓐁"],
     ["9", "𓐂"],
     ["nn", "𓇒"],
-  ].sort(Content.compareSigns);
+  ];
 
   private static compareSigns(left: string[], right: string[]): number {
     const l = left[0];
@@ -1528,5 +1528,17 @@ export class Content {
       }
     }
     return this._categories;
+  }
+
+  private static _reverseMapping = new Map<string, string[]>();
+
+  static mapReverse(sign: string): string[] | undefined {
+    if (this._reverseMapping.size === 0) {
+      for (const [write, sign] of this.special) {
+        const current: string[] = this._reverseMapping.get(sign) ?? [];
+        this._reverseMapping.set(sign, [...current, write]);
+      }
+    }
+    return this._reverseMapping.get(sign);
   }
 }

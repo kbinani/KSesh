@@ -321,7 +321,6 @@ export const App: FC = ({}) => {
       { version: stateVersion, state: content.raw },
       "",
     );
-    console.log(content.result);
   }, [content]);
   return (
     <div className="main">
@@ -437,6 +436,7 @@ export const App: FC = ({}) => {
                   className="signListCell"
                   key={index}
                   onClick={() => onClickSign(id, sign)}
+                  title={Content.mapReverse(sign)?.join(", ")}
                 >
                   <div className="signListCellHeader"> {id} </div>
                   <div className="signListCellSign">{sign}</div>
