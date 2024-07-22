@@ -3,6 +3,7 @@ import { FontData } from "./font-data";
 import { Rect } from "./rect";
 import { BoundingBox } from "./bounding-box";
 import { rangeIntersectsWith } from "./range";
+import { HarfBuzzBuffer } from "./harfbuzz";
 
 type Char = { char: string; index: number };
 
@@ -18,6 +19,7 @@ export class Content {
   readonly boundingBox: Rect | undefined;
   readonly unitsPerEm: number;
   readonly chars: ReadonlyArray<Readonly<Char>>;
+  readonly buffer: HarfBuzzBuffer;
 
   constructor(raw: string, font: FontData) {
     this.raw = raw;
@@ -66,7 +68,7 @@ export class Content {
         );
       }
     }
-    buffer.destroy();
+    this.buffer = buffer;
     if (lastCluster < utf8.length) {
       clusters.push({ index: offset, bounds: bb.rect });
     }
@@ -80,6 +82,10 @@ export class Content {
       (ascender - descender) / unitsPerEm,
     );
     this.unitsPerEm = font.ot.unitsPerEm;
+  }
+
+  destroy() {
+    this.buffer.destroy();
   }
 
   cursor({

@@ -1,8 +1,11 @@
 import * as React from "react";
 import {
   ChangeEvent,
+  Dispatch,
   FC,
+  MutableRefObject,
   SyntheticEvent,
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -22,6 +25,7 @@ import { loadHarfbuzz } from "../harfbuzz";
 import { FontData } from "../font-data";
 import { staticData } from "../static-data";
 import { Rect } from "../rect";
+import { useRefState } from "../hook";
 
 const placeholder = "Y3 Y1A";
 const stateVersion = 1;
@@ -31,7 +35,7 @@ const cursorPadding = 4;
 type Cursor = { rect: Rect; ranged: boolean };
 
 export const App: FC = ({}) => {
-  const [content, setContent] = useState<Content | undefined>();
+  const [content, setContent] = useRefState<Content | undefined>(undefined);
   const [changed, setChanged] = useState(false);
   const [activeSignListTab, setActiveSignListTab] = useState("typing");
   const [typing, setTyping] = useState("A1");
@@ -81,7 +85,11 @@ export const App: FC = ({}) => {
     } else {
       setTyping("");
     }
-    const c = content?.cursor({ fontSize, selectionStart, selectionEnd });
+    const c = content.current?.cursor({
+      fontSize,
+      selectionStart,
+      selectionEnd,
+    });
     if (c) {
       setCursor({ rect: c, ranged: selectionStart !== selectionEnd });
     } else {
@@ -161,59 +169,59 @@ export const App: FC = ({}) => {
     seshA.current?.classList.add("seshFadeIn");
   };
   const onClickExportSvg = () => {
-    if (font === undefined || content === undefined) {
+    if (font === undefined || content.current === undefined) {
       return;
     }
-    const blob = svg(content, font, fontSize, edgeInset);
+    const blob = svg(content.current, font, fontSize, edgeInset);
     download(blob, "result.svg");
   };
   const onClickExportPng = async () => {
-    if (font === undefined || content === undefined) {
+    if (font === undefined || content.current === undefined) {
       return;
     }
-    const blob = await png(content, font, fontSize, edgeInset);
+    const blob = await png(content.current, font, fontSize, edgeInset);
     download(blob, "result.png");
   };
   const onClickExportPdf = async () => {
-    if (font === undefined || content === undefined) {
+    if (font === undefined || content.current === undefined) {
       return;
     }
-    const blob = await pdf(content, font, fontSize, edgeInset);
+    const blob = await pdf(content.current, font, fontSize, edgeInset);
     download(blob, "result.pdf");
   };
   const onClickCopySvg = () => {
-    if (font === undefined || content === undefined) {
+    if (font === undefined || content.current === undefined) {
       return;
     }
-    const blob = svg(content, font, fontSize, edgeInset);
+    const blob = svg(content.current, font, fontSize, edgeInset);
     writeClipboard(blob);
   };
   const onClickCopyPng = async () => {
-    if (font === undefined || content === undefined) {
+    if (font === undefined || content.current === undefined) {
       return;
     }
-    const blob = await png(content, font, fontSize, edgeInset);
+    const blob = await png(content.current, font, fontSize, edgeInset);
     writeClipboard(blob);
   };
   const onClickCopyPdf = async () => {
-    if (font === undefined || content === undefined) {
+    if (font === undefined || content.current === undefined) {
       return;
     }
-    const blob = await pdf(content, font, fontSize, edgeInset);
+    const blob = await pdf(content.current, font, fontSize, edgeInset);
     writeClipboard(blob);
   };
   const onClickCopyPlainUnicode = () => {
-    if (font === undefined || content === undefined) {
+    if (font === undefined || content.current === undefined) {
       return;
     }
-    const blob = new Blob([content.plainText], { type: "text/plain" });
+    const blob = new Blob([content.current.plainText], { type: "text/plain" });
     writeClipboard(blob);
   };
   const onClickCopyUnicode = () => {
-    if (font === undefined || content === undefined) {
+    if (font === undefined || content.current === undefined) {
       return;
     }
-    const blob = new Blob([content.result], { type: "text/plain" });
+    const blob = new Blob([content.current.result], { type: "text/plain" });
     writeClipboard(blob);
   };
   const onFocus = () => {
@@ -265,19 +273,21 @@ export const App: FC = ({}) => {
     return () => {
       controller.abort();
       font?.destroy();
+      content.current?.destroy();
       window.removeEventListener("resize", onResize);
     };
   }, []);
   useEffect(() => {
-    if (content) {
-      window.history.replaceState(
-        { version: stateVersion, state: content.raw },
-        "",
-      );
+    const c = content.current;
+    if (c) {
+      window.history.replaceState({ version: stateVersion, state: c.raw }, "");
     }
-  }, [content]);
+    return () => {
+      c?.destroy();
+    };
+  }, [content.current]);
   useEffect(() => {
-    if (content !== undefined || font === undefined) {
+    if (content.current !== undefined || font === undefined) {
       return;
     }
     const value = textarea.current?.value;
@@ -418,8 +428,8 @@ export const App: FC = ({}) => {
                 }}
               />
             )}
-            {content && (
-              <ContentComponent content={content} fontSize={fontSize} />
+            {content.current && (
+              <ContentComponent content={content.current} fontSize={fontSize} />
             )}
             {focus && cursor?.ranged === false && (
               <div
