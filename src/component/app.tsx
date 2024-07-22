@@ -39,6 +39,7 @@ export const App: FC = ({}) => {
   const [typing, setTyping] = useState("A1");
   const [tabRows, setTabRows] = useState(1);
   const [fontSize, setFontSize] = useState<number>(48);
+  const [lineSpacing, setLineSpacing] = useState<number>(12);
   const [font, setFont] = useState<FontData>();
   const [cursor, setCursor] = useState<Cursor | undefined>();
   const [focus, setFocus] = useState(false);
@@ -219,7 +220,10 @@ export const App: FC = ({}) => {
     if (font === undefined || content.current === undefined) {
       return;
     }
-    const blob = new Blob([content.current.result], { type: "text/plain" });
+    const blob = new Blob(
+      [content.current.lines.map((line) => line.plainText).join("\n")],
+      { type: "text/plain" },
+    );
     writeClipboard(blob);
   };
   const onFocus = () => {
@@ -432,6 +436,7 @@ export const App: FC = ({}) => {
                 content={content}
                 fontSize={fontSize}
                 font={font}
+                lineSpacing={lineSpacing}
               />
             )}
             {focus && cursor?.ranged === false && (

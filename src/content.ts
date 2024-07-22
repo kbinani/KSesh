@@ -13,80 +13,27 @@ type Cluster = {
   bounds?: Rect;
 };
 
+type Point = { x: number; y: number };
+
 export class Content {
-  readonly raw: string;
-  readonly result: string;
-  readonly clusters: ReadonlyArray<Readonly<Cluster>>;
-  readonly boundingBox: Rect | undefined;
-  readonly unitsPerEm: number;
-  readonly chars: ReadonlyArray<Readonly<Char>>;
-  readonly buffer: HarfBuzzBuffer;
+  readonly lines: ReadonlyArray<Line>;
 
-  constructor(raw: string, font: FontData) {
-    this.raw = raw;
-    let chars: Char[] = [];
-    for (let offset = 0; offset < raw.length; ) {
-      const map = SignList.map(raw, offset);
-      if (map === undefined) {
-        chars.push({ char: raw.substring(offset, offset + 1), index: offset });
-        offset += 1;
-      } else {
-        if (map[1].length > 0) {
-          chars.push({ char: map[1], index: offset });
-        }
-        offset = offset + map[0].length;
-      }
-    }
-    this.chars = chars;
-    this.result = chars.map((c) => c.char).join("");
-    const e = new TextEncoder();
-    const utf8 = e.encode(this.result);
-    const buffer = bufferFromText(this.result, font);
-    const clusters: Cluster[] = [];
-    let lastCluster = 0;
+  constructor(
+    readonly raw: string,
+    font: FontData,
+  ) {
+    const lines: Line[] = [];
     let offset = 0;
-    let bb = new BoundingBox();
-    const d = new TextDecoder();
-    let maxX = 0;
-    for (const { x, y, info } of enumerateGlyphs(buffer, font)) {
-      const glyph = font.ot.glyphs.get(info.GlyphId);
-      const p = glyph.getPath(x, y, font.ot.unitsPerEm);
-      const bounds = p.getBoundingBox();
-      maxX = Math.max(maxX, bounds.x2);
-      if (info.Cluster !== lastCluster) {
-        const u16 = d.decode(utf8.slice(lastCluster, info.Cluster));
-        clusters.push({ index: offset, bounds: bb.rect });
-        offset += u16.length;
-        lastCluster = info.Cluster;
-        bb = new BoundingBox();
-      }
-      if (p.commands.length > 0) {
-        bb.add(
-          bounds.x1,
-          bounds.y1,
-          bounds.x2 - bounds.x1,
-          bounds.y2 - bounds.y1,
-        );
-      }
+    for (const line of raw.split("\n")) {
+      const l = new Line(offset, line, font);
+      lines.push(l);
+      offset += 1 + line.length;
     }
-    this.buffer = buffer;
-    if (lastCluster < utf8.length) {
-      clusters.push({ index: offset, bounds: bb.rect });
-    }
-    this.clusters = clusters;
-
-    const { ascender, descender, unitsPerEm } = font.ot;
-    this.boundingBox = new Rect(
-      0,
-      0,
-      maxX / unitsPerEm,
-      (ascender - descender) / unitsPerEm,
-    );
-    this.unitsPerEm = font.ot.unitsPerEm;
+    this.lines = lines;
   }
 
   destroy() {
-    this.buffer.destroy();
+    this.lines.forEach((line) => line.destroy());
   }
 
   cursor({
@@ -98,6 +45,8 @@ export class Content {
     selectionStart: number;
     selectionEnd: number;
   }): Rect | undefined {
+    return undefined;
+    /*
     let start: number | undefined;
     let end: number | undefined;
     let offset = 0;
@@ -172,6 +121,85 @@ export class Content {
       rect.width * scale,
       rect.height * scale,
     );
+    */
+  }
+
+  get plainText(): string {
+    return this.lines.map((line) => line.plainText).join("\n");
+  }
+}
+
+export class Line {
+  readonly result: string;
+  readonly clusters: ReadonlyArray<Readonly<Cluster>>;
+  readonly boundingBox: Rect | undefined;
+  readonly unitsPerEm: number;
+  readonly chars: ReadonlyArray<Readonly<Char>>;
+  readonly buffer: HarfBuzzBuffer;
+
+  constructor(
+    readonly offset: number,
+    readonly raw: string,
+    font: FontData,
+  ) {
+    let chars: Char[] = [];
+    for (let index = 0; index < raw.length; ) {
+      const map = SignList.map(raw, index);
+      if (map === undefined) {
+        chars.push({ char: raw.substring(index, index + 1), index: index });
+        index += 1;
+      } else {
+        if (map[1].length > 0) {
+          chars.push({ char: map[1], index: index });
+        }
+        index = index + map[0].length;
+      }
+    }
+    this.chars = chars;
+    this.result = chars.map((c) => c.char).join("");
+    const e = new TextEncoder();
+    const utf8 = e.encode(this.result);
+    const buffer = bufferFromText(this.result, font);
+    const clusters: Cluster[] = [];
+    let lastCluster = 0;
+    let index = 0;
+    let bb = new BoundingBox();
+    const d = new TextDecoder();
+    let maxX = 0;
+    for (const { x, y, info } of enumerateGlyphs(buffer, font)) {
+      const glyph = font.ot.glyphs.get(info.GlyphId);
+      const p = glyph.getPath(x, y, font.ot.unitsPerEm);
+      const bounds = p.getBoundingBox();
+      maxX = Math.max(maxX, bounds.x2);
+      if (info.Cluster !== lastCluster) {
+        const u16 = d.decode(utf8.slice(lastCluster, info.Cluster));
+        clusters.push({ index: index, bounds: bb.rect });
+        index += u16.length;
+        lastCluster = info.Cluster;
+        bb = new BoundingBox();
+      }
+      if (p.commands.length > 0) {
+        bb.add(
+          bounds.x1,
+          bounds.y1,
+          bounds.x2 - bounds.x1,
+          bounds.y2 - bounds.y1,
+        );
+      }
+    }
+    this.buffer = buffer;
+    if (lastCluster < utf8.length) {
+      clusters.push({ index: index, bounds: bb.rect });
+    }
+    this.clusters = clusters;
+
+    const { ascender, descender, unitsPerEm } = font.ot;
+    this.boundingBox = new Rect(0, 0, maxX, ascender - descender);
+    this.unitsPerEm = font.ot.unitsPerEm;
+  }
+
+  destroy() {
+    this.buffer.destroy();
   }
 
   get plainText(): string {

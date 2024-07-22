@@ -7,7 +7,8 @@ export const ContentComponent: FC<{
   content: MutableRefObject<Content | undefined>;
   font: FontData;
   fontSize: number;
-}> = ({ content, fontSize, font }) => {
+  lineSpacing: number;
+}> = ({ content, fontSize, font, lineSpacing }) => {
   const canvas = useRef<HTMLCanvasElement>(null);
   const dirty = useRef<boolean>(true);
   const draw = () => {
@@ -22,9 +23,14 @@ export const ContentComponent: FC<{
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     const scale = (fontSize / font.ot.unitsPerEm) * window.devicePixelRatio;
     ctx.scale(scale, scale);
-    for (const { x, y, gid } of enumerateGlyphs(content.current.buffer, font)) {
-      const glyph = font.ot.glyphs.get(gid);
-      glyph.draw(ctx, x, y, font.ot.unitsPerEm);
+    let dy = 0;
+    let dx = 0;
+    for (const line of content.current.lines) {
+      for (const { x, y, gid } of enumerateGlyphs(line.buffer, font)) {
+        const glyph = font.ot.glyphs.get(gid);
+        glyph.draw(ctx, dx + x, dy + y, font.ot.unitsPerEm);
+      }
+      dy += lineSpacing / scale + font.ot.unitsPerEm;
     }
     ctx.restore();
   };
