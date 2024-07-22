@@ -1,11 +1,8 @@
 import * as React from "react";
 import {
   ChangeEvent,
-  Dispatch,
   FC,
-  MutableRefObject,
   SyntheticEvent,
-  useCallback,
   useEffect,
   useRef,
   useState,
@@ -407,6 +404,7 @@ export const App: FC = ({}) => {
             width: "50%",
             height: "100%",
             backgroundColor: "#ccc",
+            overflow: "hidden",
           }}
         >
           <div
@@ -428,8 +426,12 @@ export const App: FC = ({}) => {
                 }}
               />
             )}
-            {content.current && (
-              <ContentComponent content={content.current} fontSize={fontSize} />
+            {content.current && font && (
+              <ContentComponent
+                content={content}
+                fontSize={fontSize}
+                font={font}
+              />
             )}
             {focus && cursor?.ranged === false && (
               <div
