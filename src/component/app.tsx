@@ -388,7 +388,7 @@ export const App: FC = ({}) => {
           </div>
         </div>
       </div>
-      <div style={{ display: "flex", height: "50%" }}>
+      <div style={{ display: "flex", height: "50vh" }}>
         <div style={{ display: "flex", width: "50%" }}>
           <div style={{ padding: "4px", width: "100%" }}>
             <textarea
@@ -454,10 +454,8 @@ export const App: FC = ({}) => {
           </div>
         </div>
       </div>
-      <div style={{ height: "50vh" }}>
-        <div
-          style={{ display: "flex", flexDirection: "column", height: "50vh" }}
-        >
+      <div style={{ height: "calc(50vh - var(--headerHeight))" }}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
           <div
             className="signListTab"
             style={{ height: `calc(27px * ${tabRows})` }}
@@ -492,7 +490,9 @@ export const App: FC = ({}) => {
           </div>
           <div
             className="signList"
-            style={{ height: `calc(50vh - 27px * ${tabRows})` }}
+            style={{
+              height: `calc(50vh - 27px * ${tabRows} - var(--headerHeight))`,
+            }}
           >
             {SignList.signs
               .filter(([s, _]) => {

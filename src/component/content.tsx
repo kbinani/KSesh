@@ -75,9 +75,9 @@ export const ContentComponent: FC<{
   return (
     <canvas
       ref={canvas}
-      width={window.innerWidth * window.devicePixelRatio}
-      height={window.innerHeight * window.devicePixelRatio}
-      style={{ width: window.innerWidth, height: window.innerHeight }}
+      width={(window.innerWidth * window.devicePixelRatio) / 2}
+      height={(window.innerHeight * window.devicePixelRatio) / 2}
+      style={{ width: window.innerWidth / 2, height: window.innerHeight / 2 }}
     />
   );
 };
