@@ -1,6 +1,6 @@
 import React, { FC, MutableRefObject, useEffect, useRef } from "react";
 import { Content } from "../content";
-import { enumerateGlyphs } from "../export";
+import { EdgeInset, enumeratePath } from "../export";
 import { FontData } from "../font-data";
 
 export const ContentComponent: FC<{
@@ -8,7 +8,8 @@ export const ContentComponent: FC<{
   font: FontData;
   fontSize: number;
   lineSpacing: number;
-}> = ({ content, fontSize, font, lineSpacing }) => {
+  edgeInset: EdgeInset;
+}> = ({ content, fontSize, font, lineSpacing, edgeInset }) => {
   const canvas = useRef<HTMLCanvasElement>(null);
   const dirty = useRef<boolean>(true);
   const draw = () => {
@@ -21,16 +22,15 @@ export const ContentComponent: FC<{
     }
     ctx.save();
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    const scale = (fontSize / font.ot.unitsPerEm) * window.devicePixelRatio;
-    ctx.scale(scale, scale);
-    let dy = 0;
-    let dx = 0;
-    for (const line of content.current.lines) {
-      for (const { x, y, gid } of enumerateGlyphs(line.buffer, font)) {
-        const glyph = font.ot.glyphs.get(gid);
-        glyph.draw(ctx, dx + x, dy + y, font.ot.unitsPerEm);
-      }
-      dy += lineSpacing / scale + font.ot.unitsPerEm;
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    for (const path of enumeratePath({
+      content: content.current,
+      font,
+      fontSize,
+      lineSpacing,
+      edgeInset,
+    })) {
+      path.draw(ctx);
     }
     ctx.restore();
   };

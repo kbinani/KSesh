@@ -71,104 +71,157 @@ export function* enumerateGlyphs(
   }
 }
 
+export function* enumeratePath({
+  content,
+  font,
+  fontSize,
+  lineSpacing,
+  edgeInset,
+}: {
+  content: Content;
+  font: FontData;
+  fontSize: number;
+  lineSpacing: number;
+  edgeInset: EdgeInset;
+}) {
+  const scale = getPageScale(font, fontSize);
+  const dx = edgeInset.left;
+  let dy = edgeInset.top;
+  for (const line of content.lines) {
+    for (const { x, y, gid } of enumerateGlyphs(line.buffer, font)) {
+      const glyph = font.ot.glyphs.get(gid);
+      const path = glyph.getPath(
+        dx + x * scale,
+        dy + y * scale,
+        font.ot.unitsPerEm * scale,
+      );
+      yield path;
+    }
+    dy += lineSpacing + fontSize;
+  }
+}
+
 function getPageScale(font: FontData, fontSize: number): number {
   const { unitsPerEm } = font.ot;
   return (1 / unitsPerEm) * fontSize;
 }
 
-function calculatePageSize(
-  buffer: HarfBuzzBuffer,
-  font: FontData,
-  fontSize: number,
-  edgeInset: EdgeInset,
-): { width: number; height: number; scale: number } {
+function calculatePageSize({
+  content,
+  font,
+  fontSize,
+  lineSpacing,
+  edgeInset,
+}: {
+  content: Content;
+  font: FontData;
+  fontSize: number;
+  lineSpacing: number;
+  edgeInset: EdgeInset;
+}): { width: number; height: number } {
   const { ascender, descender, unitsPerEm } = font.ot;
   const scale = getPageScale(font, fontSize);
-  let maxX = 0;
-  for (const { x, y, gid } of enumerateGlyphs(buffer, font)) {
-    const glyph = font.ot.glyphs.get(gid);
-    const path = glyph.getPath(x, y, unitsPerEm);
+  let maxX = edgeInset.left;
+  for (const path of enumeratePath({
+    content,
+    font,
+    fontSize,
+    lineSpacing,
+    edgeInset,
+  })) {
     maxX = Math.max(maxX, path.getBoundingBox().x2);
   }
-  const width = maxX * scale + edgeInset.left + edgeInset.right;
-  const lineHeight = ((ascender - descender) / unitsPerEm) * fontSize;
-  const height = lineHeight + edgeInset.top + edgeInset.bottom;
-  return { width, height, scale };
+  const width = maxX + edgeInset.right;
+  const lineHeight = (ascender - descender) * scale;
+  const height =
+    lineHeight * content.lines.length +
+    lineSpacing * (content.lines.length - 1) +
+    edgeInset.top +
+    edgeInset.bottom;
+  return { width, height };
 }
 
-export function svg(
-  content: Content,
-  font: FontData,
-  fontSize: number,
-  edgeInset: EdgeInset,
-): Blob {
-  const buffer = bufferFromText(content.result, font);
-
-  const { ascender, descender, unitsPerEm } = font.ot;
-  const scale = getPageScale(font, fontSize);
+export function svg({
+  content,
+  font,
+  fontSize,
+  lineSpacing,
+  edgeInset,
+}: {
+  content: Content;
+  font: FontData;
+  fontSize: number;
+  lineSpacing: number;
+  edgeInset: EdgeInset;
+}): Blob {
+  const { width, height } = calculatePageSize({
+    content,
+    font,
+    fontSize,
+    lineSpacing,
+    edgeInset,
+  });
 
   const ns = "http://www.w3.org/2000/svg";
-  const g0 = document.createElementNS(ns, "g");
-  g0.setAttribute("translate", `translate(${edgeInset.left} ${edgeInset.top})`);
+  const root = document.createElementNS(ns, "svg");
 
-  const g1 = document.createElementNS(ns, "g");
-  g1.setAttribute("transform", `scale(${scale} ${scale})`);
-  g0.appendChild(g1);
-
-  let maxX: number = 0;
-  for (const { x, y, gid } of enumerateGlyphs(buffer, font)) {
-    const glyph = font.ot.glyphs.get(gid);
-    const path = glyph.getPath(x, y, unitsPerEm);
-    maxX = Math.max(maxX, path.getBoundingBox().x2);
+  for (const path of enumeratePath({
+    content,
+    font,
+    fontSize,
+    lineSpacing,
+    edgeInset,
+  })) {
     if (path.commands.length > 0) {
       const str = path.toSVG(2);
       const pathElement = document.createElementNS(ns, "path");
-      g1.appendChild(pathElement);
+      root.appendChild(pathElement);
       pathElement.outerHTML = str;
     }
   }
-  buffer.destroy();
 
-  const width = maxX * scale + edgeInset.left + edgeInset.right;
-  const lineHeight = ((ascender - descender) / unitsPerEm) * fontSize;
-  const height = lineHeight + edgeInset.top + edgeInset.bottom;
-
-  const root = document.createElementNS(ns, "svg");
   root.setAttribute("xmlns", ns);
   root.setAttribute("viewBox", `0 0 ${width} ${height}`);
-  root.setAttribute("data-text", content.result);
+  root.setAttribute("data-text", content.plainText);
   root.setAttribute("data-raw", content.raw);
-
-  root.appendChild(g0);
 
   return new Blob([root.outerHTML], { type: "image/svg+xml" });
 }
 
-export async function png(
-  content: Content,
-  font: FontData,
-  fontSize: number,
-  edgeInset: EdgeInset,
-): Promise<Blob> {
-  const buffer = bufferFromText(content.result, font);
-  const { descender, unitsPerEm } = font.ot;
-  const { width, height, scale } = calculatePageSize(
-    buffer,
+export async function png({
+  content,
+  font,
+  fontSize,
+  lineSpacing,
+  edgeInset,
+}: {
+  content: Content;
+  font: FontData;
+  fontSize: number;
+  lineSpacing: number;
+  edgeInset: EdgeInset;
+}): Promise<Blob> {
+  const { width, height } = calculatePageSize({
+    content,
     font,
     fontSize,
+    lineSpacing,
     edgeInset,
-  );
+  });
 
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
 
   const ctx = canvas.getContext("2d")!;
-  ctx.translate(edgeInset.left, edgeInset.top);
-  ctx.scale(scale, scale);
-  for (const { x, y, gid } of enumerateGlyphs(buffer, font)) {
-    const glyph = font.ot.glyphs.get(gid);
-    glyph.draw(ctx, x, y, unitsPerEm);
+  for (const path of enumeratePath({
+    content,
+    font,
+    fontSize,
+    lineSpacing,
+    edgeInset,
+  })) {
+    path.draw(ctx);
   }
 
   return new Promise((resolve, reject) => {
@@ -186,37 +239,42 @@ export async function png(
   });
 }
 
-export async function pdf(
-  content: Content,
-  font: FontData,
-  fontSize: number,
-  edgeInset: EdgeInset,
-): Promise<Blob> {
-  const buffer = bufferFromText(content.result, font);
-  const { descender, unitsPerEm } = font.ot;
-  const { width, height, scale } = calculatePageSize(
-    buffer,
+export async function pdf({
+  content,
+  font,
+  fontSize,
+  lineSpacing,
+  edgeInset,
+}: {
+  content: Content;
+  font: FontData;
+  fontSize: number;
+  lineSpacing: number;
+  edgeInset: EdgeInset;
+}): Promise<Blob> {
+  const { width, height } = calculatePageSize({
+    content,
     font,
     fontSize,
+    lineSpacing,
     edgeInset,
-  );
+  });
 
   const doc = new PDFDocument({ size: [width, height] });
   const stream = doc.pipe(blobStream());
 
-  doc.translate(edgeInset.left, edgeInset.top);
-  doc.scale(scale, scale);
-
-  for (const { x, y, gid } of enumerateGlyphs(buffer, font)) {
-    const glyph = font.ot.glyphs.get(gid);
-    const path = glyph.getPath(x, y, unitsPerEm);
-    const data = path.toPathData(2);
+  for (const path of enumeratePath({
+    content,
+    font,
+    fontSize,
+    lineSpacing,
+    edgeInset,
+  })) {
+    const data = path.toPathData(5);
     doc.path(data).fill("black");
   }
 
-  doc.end();
-
-  return new Promise((resolve, reject) => {
+  const promise = new Promise<Blob>((resolve, reject) => {
     stream.on("finish", () => {
       const blob = stream.toBlob("application/pdf");
       resolve(blob);
@@ -225,4 +283,8 @@ export async function pdf(
       reject();
     });
   });
+
+  doc.end();
+
+  return promise;
 }

@@ -171,42 +171,52 @@ export const App: FC = ({}) => {
     if (font === undefined || content.current === undefined) {
       return;
     }
-    const blob = svg(content.current, font, fontSize, edgeInset);
+    const blob = svg({
+      content: content.current,
+      font,
+      fontSize,
+      lineSpacing,
+      edgeInset,
+    });
     download(blob, "result.svg");
   };
   const onClickExportPng = async () => {
     if (font === undefined || content.current === undefined) {
       return;
     }
-    const blob = await png(content.current, font, fontSize, edgeInset);
+    const blob = await png({
+      content: content.current,
+      font,
+      fontSize,
+      lineSpacing,
+      edgeInset,
+    });
     download(blob, "result.png");
   };
   const onClickExportPdf = async () => {
     if (font === undefined || content.current === undefined) {
       return;
     }
-    const blob = await pdf(content.current, font, fontSize, edgeInset);
+    const blob = await pdf({
+      content: content.current,
+      font,
+      fontSize,
+      lineSpacing,
+      edgeInset,
+    });
     download(blob, "result.pdf");
-  };
-  const onClickCopySvg = () => {
-    if (font === undefined || content.current === undefined) {
-      return;
-    }
-    const blob = svg(content.current, font, fontSize, edgeInset);
-    writeClipboard(blob);
   };
   const onClickCopyPng = async () => {
     if (font === undefined || content.current === undefined) {
       return;
     }
-    const blob = await png(content.current, font, fontSize, edgeInset);
-    writeClipboard(blob);
-  };
-  const onClickCopyPdf = async () => {
-    if (font === undefined || content.current === undefined) {
-      return;
-    }
-    const blob = await pdf(content.current, font, fontSize, edgeInset);
+    const blob = await png({
+      content: content.current,
+      font,
+      fontSize,
+      lineSpacing,
+      edgeInset,
+    });
     writeClipboard(blob);
   };
   const onClickCopyPlainUnicode = () => {
@@ -415,7 +425,6 @@ export const App: FC = ({}) => {
           <div
             style={{
               position: "relative",
-              padding: padding,
               opacity: changed ? 1 : 0.5,
             }}
           >
@@ -437,6 +446,7 @@ export const App: FC = ({}) => {
                 fontSize={fontSize}
                 font={font}
                 lineSpacing={lineSpacing}
+                edgeInset={edgeInset}
               />
             )}
             {focus && cursor?.ranged === false && (
