@@ -23,6 +23,7 @@ import { FontData } from "../font-data";
 import { staticData } from "../static-data";
 import { Rect } from "../rect";
 import { useRefState } from "../hook";
+import { SignList } from "../sign-list";
 
 const placeholder = "Y3 Y1A";
 const stateVersion = 1;
@@ -146,7 +147,7 @@ export const App: FC = ({}) => {
   };
   const onResize = () => {
     const columns = Math.floor(window.innerWidth / 61);
-    const rows = Math.ceil((Content.categories.length + 1) / columns);
+    const rows = Math.ceil((SignList.categories.length + 1) / columns);
     setTabRows(rows);
   };
   const onMouseEnter = () => {
@@ -463,7 +464,7 @@ export const App: FC = ({}) => {
             >
               typing
             </div>
-            {Content.categories.map((cat, index) => (
+            {SignList.categories.map((cat, index) => (
               <div
                 className="signListTabButton"
                 data-active={activeSignListTab === cat}
@@ -473,8 +474,8 @@ export const App: FC = ({}) => {
                 {cat}&nbsp;
                 <span className="hieroglyphs">
                   {
-                    Content.signs[
-                      Content.signs.findIndex(([s, _]) => {
+                    SignList.signs[
+                      SignList.signs.findIndex(([s, _]) => {
                         return s.startsWith(cat);
                       })
                     ][1]
@@ -488,7 +489,7 @@ export const App: FC = ({}) => {
             className="signList"
             style={{ height: `calc(50vh - 27px * ${tabRows})` }}
           >
-            {Content.signs
+            {SignList.signs
               .filter(([s, _]) => {
                 if (activeSignListTab === "typing") {
                   if (typing === "") {
@@ -509,7 +510,7 @@ export const App: FC = ({}) => {
                   className="signListCell"
                   key={index}
                   onClick={() => onClickSign(id, sign)}
-                  title={Content.mapReverse(sign)?.join(", ")}
+                  title={SignList.mapReverse(sign)?.join(", ")}
                 >
                   <div className="signListCellHeader"> {id} </div>
                   <div className="signListCellSign">{sign}</div>
