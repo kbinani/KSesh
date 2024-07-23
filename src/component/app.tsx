@@ -31,6 +31,12 @@ const padding = 8;
 const cursorPadding = 4;
 
 type Cursor = { rect: Rect; ranged: boolean };
+type Direction = "forward" | "backward";
+type TextSelection = {
+  start: number;
+  end: number;
+  direction: Direction | undefined;
+};
 
 export const App: FC = ({}) => {
   const [content, setContent] = useRefState<Content | undefined>(undefined);
@@ -43,6 +49,11 @@ export const App: FC = ({}) => {
   const [font, setFont] = useState<FontData>();
   const [cursor, setCursor] = useState<Cursor | undefined>();
   const [focus, setFocus] = useState(false);
+  const [textSelection, setTextSelection] = useState<TextSelection>({
+    start: 0,
+    end: 0,
+    direction: "forward",
+  });
   const main = useRef<HTMLDivElement>(null);
   const textarea = useRef<HTMLTextAreaElement>(null);
   const seshA = useRef<HTMLDivElement>(null);
@@ -67,7 +78,25 @@ export const App: FC = ({}) => {
     if (!textarea.current) {
       return;
     }
-    const { value, selectionStart, selectionEnd } = textarea.current;
+    const { value, selectionStart, selectionEnd, selectionDirection } =
+      textarea.current;
+    if (selectionStart === selectionEnd) {
+      const last =
+        textSelection.direction === "forward"
+          ? textSelection.end
+          : textSelection.start;
+      setTextSelection({
+        start: selectionStart,
+        end: selectionEnd,
+        direction: last < selectionStart ? "forward" : "backward",
+      });
+    } else {
+      setTextSelection({
+        start: selectionStart,
+        end: selectionEnd,
+        direction: undefined,
+      });
+    }
     const s = value.substring(0, selectionStart);
     let found = -1;
     for (let i = s.length - 1; i >= 0; i--) {
