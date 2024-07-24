@@ -114,17 +114,15 @@ export const App: FC = ({}) => {
     }
     let c: Cursor | undefined;
     if (font) {
-      if (selectionStart === selectionEnd) {
-        c = content.current?.cursor({
-          selectionStart,
-          selectionEnd,
-          font,
-          fontSize,
-          lineSpacing,
-          edgeInset,
-          direction: direction ?? "forward",
-        });
-      }
+      c = content.current?.cursor({
+        selectionStart,
+        selectionEnd,
+        font,
+        fontSize,
+        lineSpacing,
+        edgeInset,
+        direction: direction ?? "forward",
+      });
     }
     if (c) {
       setCursor(c);

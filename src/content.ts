@@ -37,17 +37,9 @@ export class Content {
 
   private cursorLocation({
     location,
-    font,
-    fontSize,
-    lineSpacing,
-    edgeInset,
     direction,
   }: {
     location: number;
-    font: FontData;
-    fontSize: number;
-    lineSpacing: number;
-    edgeInset: EdgeInset;
     direction: Direction;
   }): CursorLocation | undefined {
     let lineIndex: number | undefined;
@@ -147,10 +139,6 @@ export class Content {
     if (selectionStart === selectionEnd) {
       const location = this.cursorLocation({
         location: selectionStart,
-        font,
-        fontSize,
-        lineSpacing,
-        edgeInset,
         direction,
       });
       if (location === undefined) {
@@ -187,12 +175,81 @@ export class Content {
         }
       }
     } else {
-      return { rect: undefined, selectionRects: [] };
+      const startLocation = this.cursorLocation({
+        location: selectionStart,
+        direction: "forward",
+      });
+      const endLocation = this.cursorLocation({
+        location: selectionEnd,
+        direction: "backward",
+      });
+      const selectionRects: Rect[] = [];
+      if (startLocation !== undefined && endLocation !== undefined) {
+        const start = {
+          line: startLocation.lineIndex,
+          cluster: startLocation.clusterIndex,
+        };
+        const end = {
+          line: endLocation.lineIndex,
+          cluster: endLocation.clusterIndex,
+        };
+        const dx = edgeInset.left;
+        for (let i = 0; i < this.lines.length; i++) {
+          const dy = edgeInset.top + (fontSize + lineSpacing) * i;
+          const line = this.lines[i];
+          const bb = new BoundingBox();
+          for (let j = 0; j < line.clusters.length; j++) {
+            const c = { line: i, cluster: j };
+            if (compareLineAndCluster(start, c) === 0) {
+              if (startLocation.type !== "left") {
+                continue;
+              }
+            } else if (compareLineAndCluster(end, c) === 0) {
+              if (endLocation.type !== "right") {
+                continue;
+              }
+            } else if (
+              0 <= compareLineAndCluster(start, c) ||
+              compareLineAndCluster(c, end) >= 0
+            ) {
+              continue;
+            }
+            const cluster = line.clusters[j];
+            const bounds = cluster.bounds?.scaled(scale);
+            if (bounds) {
+              bb.add(
+                new Rect(
+                  dx + bounds.x,
+                  dy + bounds.y,
+                  bounds.width,
+                  bounds.height,
+                ),
+              );
+            }
+          }
+          const lineBounds = bb.rect;
+          if (lineBounds) {
+            selectionRects.push(lineBounds);
+          }
+        }
+      }
+      return { rect: undefined, selectionRects };
     }
   }
 
   get plainText(): string {
     return this.lines.map((line) => line.plainText).join("\n");
+  }
+}
+
+function compareLineAndCluster(
+  left: { line: number; cluster: number },
+  right: { line: number; cluster: number },
+): number {
+  if (left.line === right.line) {
+    return left.cluster - right.cluster;
+  } else {
+    return left.line - right.line;
   }
 }
 
