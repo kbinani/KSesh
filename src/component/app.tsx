@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 import { ContentComponent } from "./content";
-import { Content } from "../content";
+import { Content, Cursor } from "../content";
 import {
   base64FromBuffer,
   download,
@@ -21,7 +21,6 @@ import {
 import { loadHarfbuzz } from "../harfbuzz";
 import { FontData } from "../font-data";
 import { staticData } from "../static-data";
-import { Rect } from "../rect";
 import { useRefState } from "../hook";
 import { SignList } from "../sign-list";
 
@@ -46,7 +45,7 @@ export const App: FC = ({}) => {
   const [fontSize, setFontSize] = useState<number>(48);
   const [lineSpacing, setLineSpacing] = useState<number>(12);
   const [font, setFont] = useState<FontData>();
-  const [cursor, setCursor] = useState<Rect | undefined>();
+  const [cursor, setCursor] = useState<Cursor>();
   const [focus, setFocus] = useState(false);
   const [textSelection, setTextSelection] = useState<TextSelection>({
     start: 0,
@@ -113,11 +112,12 @@ export const App: FC = ({}) => {
     } else {
       setTyping("");
     }
-    let c: Rect | undefined;
+    let c: Cursor | undefined;
     if (font) {
       if (selectionStart === selectionEnd) {
         c = content.current?.cursor({
-          location: selectionStart,
+          selectionStart,
+          selectionEnd,
           font,
           fontSize,
           lineSpacing,
@@ -399,20 +399,6 @@ export const App: FC = ({}) => {
           >
             <div className="menuBarItemInner">PNG</div>
           </div>
-          {/*<div*/}
-          {/*  className="menuBarItem"*/}
-          {/*  onClick={onClickCopySvg}*/}
-          {/*  data-enabled={font !== undefined}*/}
-          {/*>*/}
-          {/*  <div className="menuBarItemInner">SVG</div>*/}
-          {/*</div>*/}
-          {/*<div*/}
-          {/*  className="menuBarItem"*/}
-          {/*  onClick={onClickCopyPdf}*/}
-          {/*  data-enabled={font !== undefined}*/}
-          {/*>*/}
-          {/*  <div className="menuBarItemInner">PDF</div>*/}
-          {/*</div>*/}
           <div
             className="menuBarItem"
             onClick={onClickCopyPlainUnicode}
@@ -472,7 +458,7 @@ export const App: FC = ({}) => {
                 font={font}
                 lineSpacing={lineSpacing}
                 edgeInset={edgeInset}
-                cursor={cursor}
+                cursor={focus ? cursor : undefined}
                 cursorPadding={cursorPadding}
               />
             )}

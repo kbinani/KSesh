@@ -6,6 +6,14 @@ import { HarfBuzzBuffer } from "./harfbuzz";
 import { SignList } from "./sign-list";
 import { Direction } from "./component/app";
 
+export type Cursor = { rect: Rect | undefined; selectionRects: Rect[] };
+type CursorLocation = {
+  lineIndex: number;
+  clusterIndex: number;
+  type: "right" | "left";
+  block: boolean;
+};
+
 export class Content {
   readonly lines: ReadonlyArray<Line>;
 
@@ -27,7 +35,7 @@ export class Content {
     this.lines.forEach((line) => line.destroy());
   }
 
-  cursor({
+  private cursorLocation({
     location,
     font,
     fontSize,
@@ -41,11 +49,11 @@ export class Content {
     lineSpacing: number;
     edgeInset: EdgeInset;
     direction: Direction;
-  }): Rect | undefined {
-    const scale = fontSize / font.ot.unitsPerEm;
+  }): CursorLocation | undefined {
     let lineIndex: number | undefined;
     let type: "left" | "right" | undefined;
     let clusterIndex: number | undefined;
+    let block = false;
     for (let j = 0; j < this.lines.length; j++) {
       const line = this.lines[j];
       if (location < line.unicodeOffset) {
@@ -80,6 +88,7 @@ export class Content {
           lineIndex = j;
           clusterIndex = char.cluster;
           type = "right";
+          block = true;
           break;
         } else if (from < location && location < to) {
           lineIndex = j;
@@ -89,6 +98,7 @@ export class Content {
             type = "right";
           }
           clusterIndex = char.cluster;
+          block = true;
           break;
         }
       }
@@ -111,19 +121,73 @@ export class Content {
       type === undefined
     ) {
       return undefined;
-    }
-    const dx = edgeInset.left;
-    const dy = edgeInset.top + (fontSize + lineSpacing) * lineIndex;
-    const line = this.lines[lineIndex];
-    const cluster = line.clusters[clusterIndex];
-    const bounds = cluster.bounds?.scaled(scale);
-    if (bounds === undefined) {
-      return undefined;
-    }
-    if (type === "left") {
-      return new Rect(dx + bounds.x, dy + bounds.y, 0, bounds.height);
     } else {
-      return new Rect(dx + bounds.maxX, dy + bounds.y, 0, bounds.height);
+      return { lineIndex, clusterIndex, type, block };
+    }
+  }
+
+  cursor({
+    selectionStart,
+    selectionEnd,
+    font,
+    fontSize,
+    lineSpacing,
+    edgeInset,
+    direction,
+  }: {
+    selectionStart: number;
+    selectionEnd: number;
+    font: FontData;
+    fontSize: number;
+    lineSpacing: number;
+    edgeInset: EdgeInset;
+    direction: Direction;
+  }): Cursor {
+    const scale = fontSize / font.ot.unitsPerEm;
+    if (selectionStart === selectionEnd) {
+      const location = this.cursorLocation({
+        location: selectionStart,
+        font,
+        fontSize,
+        lineSpacing,
+        edgeInset,
+        direction,
+      });
+      if (location === undefined) {
+        return { rect: undefined, selectionRects: [] };
+      } else {
+        const { lineIndex, clusterIndex, type, block } = location;
+        const dx = edgeInset.left;
+        const dy = edgeInset.top + (fontSize + lineSpacing) * lineIndex;
+        const line = this.lines[lineIndex];
+        const cluster = line.clusters[clusterIndex];
+        const bounds = cluster.bounds?.scaled(scale);
+        if (bounds === undefined) {
+          return { rect: undefined, selectionRects: [] };
+        }
+        if (type === "left") {
+          return {
+            rect: new Rect(dx + bounds.x, dy + bounds.y, 0, bounds.height),
+            selectionRects: [],
+          };
+        } else {
+          return {
+            rect: new Rect(dx + bounds.maxX, dy + bounds.y, 0, bounds.height),
+            selectionRects: block
+              ? [
+                  new Rect(
+                    dx + bounds.x,
+                    dy + bounds.y,
+                    bounds.width,
+                    bounds.height,
+                  ),
+                ]
+              : [],
+          };
+        }
+      }
+    } else {
+      return { rect: undefined, selectionRects: [] };
     }
   }
 

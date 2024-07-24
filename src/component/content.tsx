@@ -1,8 +1,7 @@
 import React, { FC, MutableRefObject, useEffect, useRef } from "react";
-import { Content } from "../content";
+import { Content, Cursor } from "../content";
 import { EdgeInset, enumeratePath } from "../export";
 import { FontData } from "../font-data";
-import { Rect } from "../rect";
 import { useRefState } from "../hook";
 
 export const ContentComponent: FC<{
@@ -11,7 +10,7 @@ export const ContentComponent: FC<{
   fontSize: number;
   lineSpacing: number;
   edgeInset: EdgeInset;
-  cursor: Rect | undefined;
+  cursor: Cursor | undefined;
   cursorPadding: number;
 }> = ({
   content,
@@ -24,7 +23,7 @@ export const ContentComponent: FC<{
 }) => {
   const canvas = useRef<HTMLCanvasElement>(null);
   const dirty = useRef<boolean>(true);
-  const [cursor, setCursor] = useRefState<Rect | undefined>(cursor_);
+  const [cursor, setCursor] = useRefState<Cursor | undefined>(cursor_);
   const draw = () => {
     if (!content.current) {
       return;
@@ -36,6 +35,18 @@ export const ContentComponent: FC<{
     ctx.save();
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    const size = cursorPadding;
+    if (cursor.current) {
+      ctx.fillStyle = "rgba(0, 0, 255, 0.2)";
+      for (const rect of cursor.current.selectionRects) {
+        ctx.fillRect(
+          rect.x - size / 2,
+          rect.y - size,
+          rect.width + size,
+          rect.height + 2 * size,
+        );
+      }
+    }
     for (const path of enumeratePath({
       content: content.current,
       font,
@@ -45,14 +56,13 @@ export const ContentComponent: FC<{
     })) {
       path.draw(ctx);
     }
-    const size = cursorPadding;
-    if (cursor.current) {
+    if (cursor.current?.rect) {
       ctx.fillStyle = "rgba(0, 0, 255, 0.5)";
       ctx.fillRect(
-        cursor.current.x - size / 2,
-        cursor.current.y - size,
-        cursor.current.width + size,
-        cursor.current.height + 2 * size,
+        cursor.current.rect.x - size / 2,
+        cursor.current.rect.y - size,
+        cursor.current.rect.width + size,
+        cursor.current.rect.height + 2 * size,
       );
     }
     ctx.restore();
