@@ -2,6 +2,8 @@ import React, { FC, MutableRefObject, useEffect, useRef } from "react";
 import { Content } from "../content";
 import { EdgeInset, enumeratePath } from "../export";
 import { FontData } from "../font-data";
+import { Rect } from "../rect";
+import { useRefState } from "../hook";
 
 export const ContentComponent: FC<{
   content: MutableRefObject<Content | undefined>;
@@ -9,9 +11,20 @@ export const ContentComponent: FC<{
   fontSize: number;
   lineSpacing: number;
   edgeInset: EdgeInset;
-}> = ({ content, fontSize, font, lineSpacing, edgeInset }) => {
+  cursor: Rect | undefined;
+  cursorPadding: number;
+}> = ({
+  content,
+  fontSize,
+  font,
+  lineSpacing,
+  edgeInset,
+  cursor: cursor_,
+  cursorPadding,
+}) => {
   const canvas = useRef<HTMLCanvasElement>(null);
   const dirty = useRef<boolean>(true);
+  const [cursor, setCursor] = useRefState<Rect | undefined>(cursor_);
   const draw = () => {
     if (!content.current) {
       return;
@@ -32,18 +45,30 @@ export const ContentComponent: FC<{
     })) {
       path.draw(ctx);
     }
+    const size = cursorPadding;
+    if (cursor.current) {
+      ctx.fillStyle = "rgba(0, 0, 255, 0.5)";
+      ctx.fillRect(
+        cursor.current.x - size / 2,
+        cursor.current.y - size,
+        cursor.current.width + size,
+        cursor.current.height + 2 * size,
+      );
+    }
     ctx.restore();
   };
   useEffect(() => {
     dirty.current = true;
-  }, [content.current]);
+  }, [content.current, cursor.current]);
+  useEffect(() => {
+    setCursor(cursor_);
+  }, [cursor_]);
   useEffect(() => {
     let width = window.innerWidth;
     let height = window.innerHeight;
     let dpr = window.devicePixelRatio;
     let cw = canvas.current?.width;
     let ch = canvas.current?.height;
-    let last = Date.now();
     const update = () => {
       if (
         window.innerWidth !== width ||
@@ -62,7 +87,6 @@ export const ContentComponent: FC<{
           dpr = window.devicePixelRatio;
           cw = canvas.current?.width;
           ch = canvas.current?.height;
-          last = Date.now();
           dirty.current = false;
         } catch (e) {
           console.error(e);

@@ -5,4 +5,30 @@ export class Rect {
     readonly width: number,
     readonly height: number,
   ) {}
+
+  scaled(scale: number): Rect {
+    return new Rect(
+      this.x * scale,
+      this.y * scale,
+      this.width * scale,
+      this.height * scale,
+    );
+  }
+
+  get maxX(): number {
+    return this.x + this.width;
+  }
+
+  get maxY(): number {
+    return this.y + this.height;
+  }
+
+  inflated(size: number): Rect {
+    return new Rect(
+      this.x - size,
+      this.y - size,
+      this.width + 2 * size,
+      this.height + 2 * size,
+    );
+  }
 }

@@ -30,8 +30,7 @@ const stateVersion = 1;
 const padding = 8;
 const cursorPadding = 4;
 
-type Cursor = { rect: Rect; ranged: boolean };
-type Direction = "forward" | "backward";
+export type Direction = "forward" | "backward";
 type TextSelection = {
   start: number;
   end: number;
@@ -47,7 +46,7 @@ export const App: FC = ({}) => {
   const [fontSize, setFontSize] = useState<number>(48);
   const [lineSpacing, setLineSpacing] = useState<number>(12);
   const [font, setFont] = useState<FontData>();
-  const [cursor, setCursor] = useState<Cursor | undefined>();
+  const [cursor, setCursor] = useState<Rect | undefined>();
   const [focus, setFocus] = useState(false);
   const [textSelection, setTextSelection] = useState<TextSelection>({
     start: 0,
@@ -78,17 +77,18 @@ export const App: FC = ({}) => {
     if (!textarea.current) {
       return;
     }
-    const { value, selectionStart, selectionEnd, selectionDirection } =
-      textarea.current;
+    const { value, selectionStart, selectionEnd } = textarea.current;
+    let direction: Direction | undefined;
     if (selectionStart === selectionEnd) {
       const last =
         textSelection.direction === "forward"
           ? textSelection.end
           : textSelection.start;
+      direction = last < selectionStart ? "forward" : "backward";
       setTextSelection({
         start: selectionStart,
         end: selectionEnd,
-        direction: last < selectionStart ? "forward" : "backward",
+        direction,
       });
     } else {
       setTextSelection({
@@ -113,13 +113,21 @@ export const App: FC = ({}) => {
     } else {
       setTyping("");
     }
-    const c = content.current?.cursor({
-      fontSize,
-      selectionStart,
-      selectionEnd,
-    });
+    let c: Rect | undefined;
+    if (font) {
+      if (selectionStart === selectionEnd) {
+        c = content.current?.cursor({
+          location: selectionStart,
+          font,
+          fontSize,
+          lineSpacing,
+          edgeInset,
+          direction: direction ?? "forward",
+        });
+      }
+    }
     if (c) {
-      setCursor({ rect: c, ranged: selectionStart !== selectionEnd });
+      setCursor(c);
     } else {
       setCursor(undefined);
     }
@@ -457,18 +465,6 @@ export const App: FC = ({}) => {
               opacity: changed ? 1 : 0.5,
             }}
           >
-            {focus && cursor && (
-              <div
-                style={{
-                  position: "absolute",
-                  left: padding + cursor.rect.x - cursorPadding,
-                  top: padding + cursor.rect.y - cursorPadding,
-                  width: cursor.rect.width + 2 * cursorPadding,
-                  height: cursor.rect.height + 2 * cursorPadding,
-                  backgroundColor: "rgba(0, 0, 255, 0.2)",
-                }}
-              />
-            )}
             {content.current && font && (
               <ContentComponent
                 content={content}
@@ -476,18 +472,8 @@ export const App: FC = ({}) => {
                 font={font}
                 lineSpacing={lineSpacing}
                 edgeInset={edgeInset}
-              />
-            )}
-            {focus && cursor?.ranged === false && (
-              <div
-                style={{
-                  position: "absolute",
-                  left: padding + cursor.rect.x - cursorPadding,
-                  top: padding + cursor.rect.y - cursorPadding,
-                  width: cursor.rect.width + 2 * cursorPadding,
-                  height: cursor.rect.height + 2 * cursorPadding,
-                  borderRight: "solid 2px rgba(0, 0, 255, 0.5)",
-                }}
+                cursor={cursor}
+                cursorPadding={cursorPadding}
               />
             )}
           </div>

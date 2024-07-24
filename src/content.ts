@@ -1,19 +1,10 @@
-import { bufferFromText, enumerateGlyphs } from "./export";
+import { bufferFromText, EdgeInset, enumerateGlyphs } from "./export";
 import { FontData } from "./font-data";
 import { Rect } from "./rect";
 import { BoundingBox } from "./bounding-box";
-import { rangeIntersectsWith } from "./range";
 import { HarfBuzzBuffer } from "./harfbuzz";
 import { SignList } from "./sign-list";
-
-type Char = { char: string; index: number };
-
-type Cluster = {
-  index: number;
-  bounds?: Rect;
-};
-
-type Point = { x: number; y: number };
+import { Direction } from "./component/app";
 
 export class Content {
   readonly lines: ReadonlyArray<Line>;
@@ -37,97 +28,122 @@ export class Content {
   }
 
   cursor({
+    location,
+    font,
     fontSize,
-    selectionStart,
-    selectionEnd,
+    lineSpacing,
+    edgeInset,
+    direction,
   }: {
+    location: number;
+    font: FontData;
     fontSize: number;
-    selectionStart: number;
-    selectionEnd: number;
+    lineSpacing: number;
+    edgeInset: EdgeInset;
+    direction: Direction;
   }): Rect | undefined {
-    return undefined;
-    /*
-    let start: number | undefined;
-    let end: number | undefined;
-    let offset = 0;
-    if (selectionStart === selectionEnd) {
-      start = 0;
-      for (let i = 0; i < this.chars.length; i++) {
-        const char = this.chars[i];
-        if (char.index < selectionStart) {
-          start = offset;
-        } else {
-          break;
-        }
-        offset += char.char.length;
-      }
-      end = start;
-    } else {
-      for (let i = 0; i < this.chars.length; i++) {
-        const char = this.chars[i];
-        const from = char.index;
-        const to =
-          i + 1 < this.chars.length ? this.chars[i + 1].index : this.raw.length;
-        if (
-          start === undefined &&
-          from <= selectionStart &&
-          selectionStart < to
-        ) {
-          start = offset;
-        }
-        offset += char.char.length;
-        if (
-          start !== undefined &&
-          end === undefined &&
-          from <= selectionEnd &&
-          selectionEnd <= to
-        ) {
-          end = offset;
-          break;
-        }
-      }
-    }
-    if (start === undefined || end === undefined) {
-      return undefined;
-    }
-    const bounds = new BoundingBox();
-    for (let i = 0; i < this.clusters.length; i++) {
-      const cluster = this.clusters[i];
-      if (!cluster.bounds) {
+    const scale = fontSize / font.ot.unitsPerEm;
+    let lineIndex: number | undefined;
+    let type: "left" | "right" | undefined;
+    let clusterIndex: number | undefined;
+    for (let j = 0; j < this.lines.length; j++) {
+      const line = this.lines[j];
+      if (location < line.unicodeOffset) {
+        continue;
+      } else if (line.unicodeOffset + line.raw.length < location) {
         continue;
       }
-      const lowerBound = cluster.index;
-      const upperBound =
-        i + 1 < this.clusters.length
-          ? this.clusters[i + 1].index
-          : this.result.length;
-      if (
-        rangeIntersectsWith(
-          { lowerBound: start, upperBound: end },
-          { lowerBound, upperBound },
-        )
-      ) {
-        bounds.add(cluster.bounds);
+      if (location === line.unicodeOffset) {
+        lineIndex = j;
+        clusterIndex = 0;
+        type = "left";
+        break;
+      }
+      let nearest = -1;
+      for (let i = 0; i < line.chars.length; i++) {
+        const char = line.chars[i];
+        const from = line.unicodeOffset + char.rawOffset;
+        const to =
+          line.unicodeOffset +
+          (i + 1 < line.chars.length
+            ? line.chars[i + 1].rawOffset
+            : line.raw.length);
+        if (location < from && nearest < 0) {
+          nearest = i;
+        }
+        if (from === location && !char.ctrl) {
+          lineIndex = j;
+          type = "left";
+          clusterIndex = char.cluster;
+          break;
+        } else if (to === location && !char.ctrl) {
+          lineIndex = j;
+          clusterIndex = char.cluster;
+          type = "right";
+          break;
+        } else if (from < location && location < to) {
+          lineIndex = j;
+          if (location === from) {
+            type = "left";
+          } else {
+            type = "right";
+          }
+          clusterIndex = char.cluster;
+          break;
+        }
+      }
+      if (type === undefined) {
+        const char = line.chars[nearest];
+        if (direction === "forward") {
+          lineIndex = j;
+          clusterIndex = char.cluster;
+          type = "left";
+        } else {
+          lineIndex = j;
+          clusterIndex = Math.max(0, char.cluster - 1);
+          type = "right";
+        }
       }
     }
-    const rect = bounds.rect;
-    if (!rect) {
+    if (
+      lineIndex === undefined ||
+      clusterIndex === undefined ||
+      type === undefined
+    ) {
       return undefined;
     }
-    const scale = fontSize / this.unitsPerEm;
-    return new Rect(
-      rect.x * scale,
-      rect.y * scale,
-      rect.width * scale,
-      rect.height * scale,
-    );
-    */
+    const dx = edgeInset.left;
+    const dy = edgeInset.top + (fontSize + lineSpacing) * lineIndex;
+    const line = this.lines[lineIndex];
+    const cluster = line.clusters[clusterIndex];
+    const bounds = cluster.bounds?.scaled(scale);
+    if (bounds === undefined) {
+      return undefined;
+    }
+    if (type === "left") {
+      return new Rect(dx + bounds.x, dy + bounds.y, 0, bounds.height);
+    } else {
+      return new Rect(dx + bounds.maxX, dy + bounds.y, 0, bounds.height);
+    }
   }
 
   get plainText(): string {
     return this.lines.map((line) => line.plainText).join("\n");
   }
 }
+
+type CharBase = {
+  char: string;
+  rawOffset: number;
+  resultOffset: number;
+  ctrl: boolean;
+};
+type Char = CharBase & { cluster: number };
+
+type Cluster = {
+  resultOffset: number;
+  bounds?: Rect;
+};
 
 export class Line {
   readonly result: string;
@@ -138,24 +154,34 @@ export class Line {
   readonly buffer: HarfBuzzBuffer;
 
   constructor(
-    readonly offset: number,
+    readonly unicodeOffset: number,
     readonly raw: string,
     font: FontData,
   ) {
-    let chars: Char[] = [];
+    let chars: CharBase[] = [];
+    let offset = 0;
     for (let index = 0; index < raw.length; ) {
       const map = SignList.map(raw, index);
       if (map === undefined) {
-        chars.push({ char: raw.substring(index, index + 1), index: index });
+        chars.push({
+          char: raw.substring(index, index + 1),
+          rawOffset: index,
+          ctrl: false,
+          resultOffset: offset,
+        });
         index += 1;
       } else {
-        if (map[1].length > 0) {
-          chars.push({ char: map[1], index: index });
-        }
+        const ctrl = map[1].length === 0 || SignList.isFormatControl(map[1]);
+        chars.push({
+          char: map[1],
+          rawOffset: index,
+          resultOffset: offset,
+          ctrl,
+        });
         index = index + map[0].length;
+        offset += map[1].length;
       }
     }
-    this.chars = chars;
     this.result = chars.map((c) => c.char).join("");
     const e = new TextEncoder();
     const utf8 = e.encode(this.result);
@@ -173,7 +199,7 @@ export class Line {
       maxX = Math.max(maxX, bounds.x2);
       if (info.Cluster !== lastCluster) {
         const u16 = d.decode(utf8.slice(lastCluster, info.Cluster));
-        clusters.push({ index: index, bounds: bb.rect });
+        clusters.push({ resultOffset: index, bounds: bb.rect });
         index += u16.length;
         lastCluster = info.Cluster;
         bb = new BoundingBox();
@@ -189,9 +215,21 @@ export class Line {
     }
     this.buffer = buffer;
     if (lastCluster < utf8.length) {
-      clusters.push({ index: index, bounds: bb.rect });
+      clusters.push({ resultOffset: index, bounds: bb.rect });
     }
     this.clusters = clusters;
+    const chs: Char[] = [];
+    for (let i = 0; i < clusters.length; i++) {
+      const from = clusters[i].resultOffset;
+      const to =
+        i + 1 < clusters.length ? clusters[i + 1].resultOffset : raw.length;
+      for (const char of chars) {
+        if (from <= char.resultOffset && char.resultOffset < to) {
+          chs.push({ ...char, cluster: i });
+        }
+      }
+    }
+    this.chars = chs;
 
     const { ascender, descender, unitsPerEm } = font.ot;
     this.boundingBox = new Rect(0, 0, maxX, ascender - descender);

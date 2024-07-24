@@ -1522,4 +1522,12 @@ export class SignList {
     }
     return this._reverseMapping.get(sign);
   }
+
+  static isFormatControl(char: string): boolean {
+    const cp = char.codePointAt(0);
+    if (cp === undefined) {
+      return false;
+    }
+    return 0x13430 <= cp && cp <= 0x13455;
+  }
 }
