@@ -241,7 +241,7 @@ body * {
   top: calc((100vh - var(--aboutHeight)) / 2);
   background-color: white;
   border-radius: 8px;
-  cursor: default;
+  cursor: auto;
   overflow-y: scroll;
 }
 
@@ -255,9 +255,11 @@ body * {
 .aboutHeader {
   color: black;
   font-weight: bold;
+  user-select: text;
 }
 
 .aboutSection {
+  user-select: text;
 }
 
 .aboutSpacer {
