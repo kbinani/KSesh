@@ -23,6 +23,7 @@ import { FontData } from "../font-data";
 import { staticData } from "../static-data";
 import { useRefState } from "../hook";
 import { SignList } from "../sign-list";
+import { About } from "./about";
 
 const placeholder = "Y3 Y1A";
 const stateVersion = 1;
@@ -52,6 +53,7 @@ export const App: FC = ({}) => {
     end: 0,
     direction: "forward",
   });
+  const [isAboutVisible, setAboutVisible] = useState(true);
   const main = useRef<HTMLDivElement>(null);
   const textarea = useRef<HTMLTextAreaElement>(null);
   const seshA = useRef<HTMLDivElement>(null);
@@ -347,17 +349,22 @@ export const App: FC = ({}) => {
   return (
     <div ref={main} className="main mainInit">
       <div className="header">
-        W
         <div
-          className="seshContainer"
-          onMouseEnter={onMouseEnter}
-          onMouseLeave={onMouseLeave}
+          style={{ display: "flex", cursor: "pointer" }}
+          onClick={() => setAboutVisible(true)}
         >
-          <div ref={seshA} className="seshA">
-            Sesh
-          </div>
-          <div ref={seshB} className="hieroglyphs seshB seshBInit">
-            𓏞𓏜
+          <div>W</div>
+          <div
+            className="seshContainer"
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}
+          >
+            <div ref={seshA} className="seshA">
+              Sesh
+            </div>
+            <div ref={seshB} className="hieroglyphs seshB seshBInit">
+              𓏞𓏜
+            </div>
           </div>
         </div>
         <div style={{ width: "20px" }} />
@@ -533,6 +540,7 @@ export const App: FC = ({}) => {
           </div>
         </div>
       </div>
+      {isAboutVisible && <About onClose={() => setAboutVisible(false)} />}
     </div>
   );
 };

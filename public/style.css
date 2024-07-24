@@ -216,3 +216,50 @@ body * {
   border: none;
   padding: 0;
 }
+
+:root {
+  --aboutWidth: 80vw;
+  --aboutHeight: 80vh;
+}
+
+.about {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  margin: auto;
+  cursor: pointer;
+}
+
+.aboutContent {
+  position: absolute;
+  width: var(--aboutWidth);
+  height: var(--aboutHeight);
+  left: calc((100vw - var(--aboutWidth)) / 2);
+  top: calc((100vh - var(--aboutHeight)) / 2);
+  background-color: white;
+  border-radius: 8px;
+  cursor: default;
+  overflow-y: scroll;
+}
+
+.aboutContainer {
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  margin: 30px;
+}
+
+.aboutHeader {
+  color: black;
+  font-weight: bold;
+}
+
+.aboutSection {
+}
+
+.aboutSpacer {
+  height: 14px;
+}
