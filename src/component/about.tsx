@@ -155,6 +155,7 @@ SOFTWARE.`}
           />
         </div>
       </div>
+      <div className="aboutCloseButton" onClick={onClose} />
     </div>
   );
 };

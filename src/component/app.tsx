@@ -53,7 +53,7 @@ export const App: FC = ({}) => {
     end: 0,
     direction: "forward",
   });
-  const [isAboutVisible, setAboutVisible] = useState(true);
+  const [isAboutVisible, setAboutVisible] = useState(false);
   const main = useRef<HTMLDivElement>(null);
   const textarea = useRef<HTMLTextAreaElement>(null);
   const seshA = useRef<HTMLDivElement>(null);
