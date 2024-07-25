@@ -35,7 +35,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
-      - run: |
+      - name: Build
+        env:
+          KSESH_VERSION: ${{ github.ref_name }}
+        run: |
           npm install
           npm run build
       - uses: actions/upload-pages-artifact@v3

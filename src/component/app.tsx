@@ -25,6 +25,9 @@ import { useRefState } from "../hook";
 import { SignList } from "../sign-list";
 import { About } from "./about";
 
+//@ts-ignore
+export const kAppVersion: string = KSESH_VERSION;
+
 const placeholder = "Y3 Y1A";
 const stateVersion = 1;
 const padding = 8;
@@ -425,6 +428,8 @@ export const App: FC = ({}) => {
             <div className="menuBarItemInner">Text</div>
           </div>
         </div>
+        <div style={{ flexGrow: 1 }} />
+        <div style={{ marginRight: 4 }}>v{kAppVersion}</div>
       </div>
       <div style={{ display: "flex", height: "50vh" }}>
         <div style={{ display: "flex", width: "50%" }}>
