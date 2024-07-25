@@ -21,11 +21,11 @@ export const About: FC<{ onClose: () => void }> = ({ onClose }) => {
     <div className="about" onClick={onClick}>
       <div className="aboutContent">
         <div className="aboutContainer">
-          <div className="aboutHeader">About WSesh</div>
+          <div className="aboutHeader">About KSesh</div>
           <div className="aboutSpacer" />
           <Pre
             text={`
-WSesh: An Online and Interactive Hieroglyphic Editor
+KSesh: An Online and Interactive Hieroglyphic Editor
 
 Copyright (C) 2024 kbinani
 

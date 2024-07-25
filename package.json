@@ -1,7 +1,7 @@
 {
-  "name": "wsesh",
+  "name": "KSesh",
   "version": "0.0.0",
-  "repository": "https://github.com/kbinani/WSesh.git",
+  "repository": "https://github.com/kbinani/KSesh.git",
   "scripts": {
     "build": "esbuild src/component/index.tsx --bundle --outfile=public/main.js --loader:.wasm=binary --loader:.ttf=binary --minify --sourcemap --external:fs --external:path",
     "fmt": "prettier --write 'src/**/*.ts' 'src/**/*.tsx' 'public/**/*.css'",
@@ -9,8 +9,8 @@
     "dev": "npm run build -- --servedir=public"
   },
   "author": "kbinani <kbinani.bt@mail.com>",
-  "license": "MIT",
-  "description": "An Online Hieroglyphic Editor",
+  "license": "AGPL-3.0-or-later",
+  "description": "An Online and Interactive Hieroglyphic Editor",
   "devDependencies": {
     "@types/blob-stream": "^0.1.33",
     "@types/opentype.js": "^1.3.8",

@@ -353,7 +353,7 @@ export const App: FC = ({}) => {
           style={{ display: "flex", cursor: "pointer" }}
           onClick={() => setAboutVisible(true)}
         >
-          <div>W</div>
+          <div>K</div>
           <div
             className="seshContainer"
             onMouseEnter={onMouseEnter}
