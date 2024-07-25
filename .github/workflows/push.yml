@@ -22,10 +22,20 @@ jobs:
   deploy:
     needs: test
     permissions:
-      contents: write
+      contents: read
+      pages: write
+      id-token: write
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: peaceiris/actions-gh-pages@v4
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - run: |
+          npm install
+          npm run build
+      - uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
+          path: './public'
+      - uses: actions/deploy-pages@v4
