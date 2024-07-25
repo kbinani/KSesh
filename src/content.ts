@@ -94,7 +94,7 @@ export class Content {
           break;
         }
       }
-      if (type === undefined) {
+      if (type === undefined && nearest >= 0) {
         const char = line.chars[nearest];
         if (direction === "forward") {
           lineIndex = j;
@@ -149,6 +149,12 @@ export class Content {
         const dy = edgeInset.top + (fontSize + lineSpacing) * lineIndex;
         const line = this.lines[lineIndex];
         const cluster = line.clusters[clusterIndex];
+        if (cluster === undefined) {
+          return {
+            rect: new Rect(dx, dy, 0, fontSize),
+            selectionRects: [],
+          };
+        }
         const bounds = cluster.bounds?.scaled(scale);
         if (bounds === undefined) {
           return { rect: undefined, selectionRects: [] };
