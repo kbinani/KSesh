@@ -1,9 +1,10 @@
 import React, { FC, MutableRefObject, useEffect, useRef } from "react";
 import { Content, Cursor } from "../content";
-import { EdgeInset, enumeratePath } from "../export";
+import { enumeratePath } from "../export";
 import { FontData } from "../font-data";
 import { useRefState } from "../hook";
 import { Direction } from "./app";
+import { EdgeInset } from "../edge-inset";
 
 export const ContentComponent: FC<{
   content: MutableRefObject<Content | undefined>;

@@ -1,4 +1,5 @@
-import opentype, { parse } from "opentype.js";
+//@ts-ignore
+import { type opentype, parse } from "opentype.js/dist/opentype.module.js";
 import { HarfBuzzBlob, HarfBuzzFace, HarfBuzzFont } from "./harfbuzz";
 
 export class FontData {

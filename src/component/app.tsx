@@ -9,21 +9,13 @@ import {
 } from "react";
 import { ContentComponent } from "./content";
 import { Content, Cursor } from "../content";
-import {
-  base64FromBuffer,
-  download,
-  EdgeInset,
-  pdf,
-  png,
-  svg,
-  writeClipboard,
-} from "../export";
-import { loadHarfbuzz } from "../harfbuzz";
+import { download, pdf, png, svg, writeClipboard } from "../export";
 import { FontData } from "../font-data";
-import { staticData } from "../static-data";
 import { useRefState } from "../hook";
 import { SignList } from "../sign-list";
 import { About } from "./about";
+import { init } from "../init";
+import { EdgeInset } from "../edge-inset";
 
 //@ts-ignore
 export const kAppVersion: string = KSESH_VERSION;
@@ -310,21 +302,17 @@ export const App: FC = ({}) => {
       textarea.current.value = raw;
     }
     onResize();
-    const base64String = base64FromBuffer(staticData.harfbuzz);
     const controller = new AbortController();
-    Promise.all([
-      loadHarfbuzz("data:application/wasm;base64," + base64String),
-      document.fonts.load("48px 'Egyptian Text Proto'", "𓏞𓏜"),
-    ])
-      .then(() => {
+    init()
+      .then((font) => {
         if (controller.signal.aborted) {
           return;
         }
+        setFont(font);
         if (main.current) {
           main.current.classList.remove("mainInit");
           main.current.classList.add("mainFadeIn");
         }
-        setFont(new FontData(staticData.eot));
       })
       .catch((e) => console.error(e));
     window.addEventListener("resize", onResize);

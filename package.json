@@ -1,14 +1,14 @@
 {
-  "name": "KSesh",
+  "name": "ksesh",
   "version": "0.0.0",
   "repository": "https://github.com/kbinani/KSesh.git",
   "scripts": {
-    "build": "esbuild --define:KSESH_VERSION=\\\"$KSESH_VERSION\\\" src/component/index.tsx --bundle --outfile=public/main.js --loader:.wasm=binary --loader:.ttf=binary --minify --sourcemap --external:fs --external:path",
+    "build": "esbuild --define:KSESH_VERSION=\\\"$KSESH_VERSION\\\" src/component/index.tsx --bundle --outfile=public/main.js --minify --sourcemap --external:fs --external:path",
     "fmt": "prettier --write 'src/**/*.ts' 'src/**/*.tsx' 'public/**/*.css'",
     "test": "vitest run",
     "dev": "npm run build -- --servedir=public"
   },
-  "author": "kbinani <kbinani.bt@mail.com>",
+  "author": "kbinani <kbinani.bt@gmail.com>",
   "license": "AGPL-3.0-or-later",
   "description": "An Online and Interactive Hieroglyphic Editor",
   "devDependencies": {
@@ -19,8 +19,10 @@
     "@types/react-dom": "^18.3.0",
     "esbuild": "^0.23.0",
     "prettier": "^3.3.3",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.16.2",
     "typescript": "^5.5.3",
-    "vitest": "^2.0.3"
+    "vitest": "^2.0.4"
   },
   "dependencies": {
     "blob-stream": "^0.1.3",

@@ -1,8 +1,8 @@
-import { describe, expect, test } from "vitest";
 import { SignList } from "./sign-list";
+import { describe, expect, test } from "vitest";
 
-describe("sign-list", () => {
-  test("mapping", () => {
+describe("sign-list", async () => {
+  test("mapping", async () => {
     const keys = new Set<string>();
     for (const s of SignList.special) {
       const found = SignList.map(s[0]);

@@ -7,22 +7,10 @@ import {
   HB_BUFFER_CLUSTER_LEVEL_CHARACTERS,
   HB_TAG,
 } from "./harfbuzz";
+import { EdgeInset } from "./edge-inset";
 
 const PDFDocument = require("./pdfkit.standalone.js") as PDFKit.PDFDocument;
 const blobStream = require("../node_modules/blob-stream/.js");
-
-export type EdgeInset = {
-  top: number;
-  left: number;
-  bottom: number;
-  right: number;
-};
-
-export function base64FromBuffer(buffer: Uint8Array): string {
-  return btoa(
-    buffer.reduce((data, byte) => data + String.fromCharCode(byte), ""),
-  );
-}
 
 export function download(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
