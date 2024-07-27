@@ -19,8 +19,10 @@ jobs:
           key: node-modules-${{ hashFiles('package-lock.json') }}
           restore-keys: |
             node-modules-
-      - run: npm install
-      - run: npm run test
+      - run: |
+          npm install
+          make
+          npm run test
   deploy:
     needs: test
     permissions:
