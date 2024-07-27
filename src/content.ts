@@ -7,12 +7,10 @@ import { SignList } from "./sign-list";
 import { Direction } from "./component/app";
 
 export type Cursor = { rect: Rect | undefined; selectionRects: Rect[] };
-type CursorLocation = {
-  lineIndex: number;
-  clusterIndex: number;
-  type: "right" | "left";
-  block: boolean;
-};
+type CursorLocation =
+  | { type: "left"; lineIndex: number; clusterIndex: number }
+  | { type: "right"; lineIndex: number; clusterIndex: number; block: boolean }
+  | { type: "end"; lineIndex: number };
 
 export class Content {
   readonly lines: ReadonlyArray<Line>;
@@ -42,80 +40,139 @@ export class Content {
     location: number;
     direction: Direction;
   }): CursorLocation | undefined {
-    let lineIndex: number | undefined;
-    let type: "left" | "right" | undefined;
-    let clusterIndex: number | undefined;
-    let block = false;
-    for (let j = 0; j < this.lines.length; j++) {
-      const line = this.lines[j];
-      if (location < line.unicodeOffset) {
-        continue;
-      } else if (line.unicodeOffset + line.raw.length < location) {
-        continue;
+    const lineIndex = this.lines.findIndex(
+      (line) =>
+        line.rawOffset <= location &&
+        location <= line.rawOffset + line.raw.length,
+    );
+    if (lineIndex < 0) {
+      return undefined;
+    }
+    const line = this.lines[lineIndex];
+    if (location === line.rawOffset) {
+      return { lineIndex, clusterIndex: 0, type: "left" };
+    }
+    let charIndex = -1;
+    for (let i = 0; i < line.chars.length; i++) {
+      const char = line.chars[i];
+      const from = line.rawOffset + char.rawOffset;
+      let to: number;
+      if (i + 1 < line.chars.length) {
+        to = line.chars[i + 1].rawOffset;
+      } else {
+        to = line.raw.length;
       }
-      if (location === line.unicodeOffset) {
-        lineIndex = j;
-        clusterIndex = 0;
-        type = "left";
+      to += line.rawOffset;
+      if (from <= location && location < to) {
+        charIndex = i;
         break;
       }
-      let nearest = -1;
-      for (let i = 0; i < line.chars.length; i++) {
-        const char = line.chars[i];
-        const from = line.unicodeOffset + char.rawOffset;
-        const to =
-          line.unicodeOffset +
-          (i + 1 < line.chars.length
-            ? line.chars[i + 1].rawOffset
-            : line.raw.length);
-        if (location < from && nearest < 0) {
-          nearest = i;
-        }
-        if (from === location && !char.ctrl) {
-          lineIndex = j;
-          type = "left";
-          clusterIndex = char.cluster;
-          break;
-        } else if (to === location && !char.ctrl) {
-          lineIndex = j;
-          clusterIndex = char.cluster;
-          type = "right";
-          block = true;
-          break;
-        } else if (from < location && location < to) {
-          lineIndex = j;
-          if (location === from) {
-            type = "left";
-          } else {
-            type = "right";
+    }
+    const char = line.chars[charIndex];
+    if (char === undefined) {
+      return { lineIndex, type: "end" };
+    }
+    let firstCharIndex = charIndex;
+    for (let i = charIndex; i >= 0; i--) {
+      const ch = line.chars[i];
+      if (ch.cluster === char.cluster) {
+        firstCharIndex = i;
+      } else if (ch.cluster < char.cluster) {
+        break;
+      }
+    }
+    let lastCharIndex = charIndex;
+    for (let i = charIndex; i < line.chars.length; i++) {
+      const ch = line.chars[i];
+      if (ch.cluster === char.cluster) {
+        lastCharIndex = i;
+      } else if (ch.cluster > char.cluster) {
+        break;
+      }
+    }
+    let startCharIndex = -1;
+    for (let i = firstCharIndex; i <= lastCharIndex; i++) {
+      const ch = line.chars[i];
+      if (ch.sign) {
+        startCharIndex = i;
+        break;
+      }
+    }
+    if (startCharIndex < 0) {
+      return;
+    }
+    if (char.cluster > 0) {
+      for (let i = firstCharIndex - 1; i >= 0; i--) {
+        const ch = line.chars[i];
+        if (ch.sign && !ch.ctrl) {
+          if (location === line.rawOffset + ch.rawOffset + ch.raw.length) {
+            return {
+              lineIndex,
+              clusterIndex: ch.cluster,
+              type: "right",
+              block: true,
+            };
           }
-          clusterIndex = char.cluster;
-          block = true;
-          break;
-        }
-      }
-      if (type === undefined && nearest >= 0) {
-        const char = line.chars[nearest];
-        if (direction === "forward") {
-          lineIndex = j;
-          clusterIndex = char.cluster;
-          type = "left";
-        } else {
-          lineIndex = j;
-          clusterIndex = Math.max(0, char.cluster - 1);
-          type = "right";
         }
       }
     }
+    const start = line.chars[startCharIndex];
     if (
-      lineIndex === undefined ||
-      clusterIndex === undefined ||
-      type === undefined
+      line.rawOffset + start.rawOffset < location &&
+      location <= line.rawOffset + start.rawOffset + start.raw.length
     ) {
-      return undefined;
-    } else {
-      return { lineIndex, clusterIndex, type, block };
+      return {
+        lineIndex,
+        clusterIndex: start.cluster,
+        type: "right",
+        block: true,
+      };
     }
+    if (line.rawOffset + start.rawOffset + start.raw.length < location) {
+      if (direction === "backward") {
+        return {
+          lineIndex,
+          clusterIndex: char.cluster,
+          type: "right",
+          block: false,
+        };
+      } else if (line.clusters.length - 1 === char.cluster) {
+        return { lineIndex, type: "end" };
+      } else {
+        for (let i = lastCharIndex + 1; i < line.chars.length; i++) {
+          const ch = line.chars[i];
+          if (ch.sign) {
+            return { lineIndex, clusterIndex: ch.cluster, type: "left" };
+          }
+        }
+      }
+    }
+    if (charIndex <= startCharIndex) {
+      if (direction === "forward" || char.cluster === 0) {
+        return { lineIndex, clusterIndex: char.cluster, type: "left" };
+      }
+    }
+    if (direction === "forward") {
+      for (let i = charIndex + 1; i < line.chars.length; i++) {
+        const ch = line.chars[i];
+        if (ch.sign) {
+          return { lineIndex, clusterIndex: ch.cluster, type: "left" };
+        }
+      }
+    } else {
+      for (let i = charIndex - 1; i >= 0; i--) {
+        const ch = line.chars[i];
+        if (ch.sign) {
+          return {
+            lineIndex,
+            clusterIndex: ch.cluster,
+            type: "right",
+            block: false,
+          };
+        }
+      }
+    }
+    return undefined;
   }
 
   cursor({
@@ -144,40 +201,64 @@ export class Content {
       if (location === undefined) {
         return { rect: undefined, selectionRects: [] };
       } else {
-        const { lineIndex, clusterIndex, type, block } = location;
-        const dx = edgeInset.left;
-        const dy = edgeInset.top + (fontSize + lineSpacing) * lineIndex;
-        const line = this.lines[lineIndex];
-        const cluster = line.clusters[clusterIndex];
-        if (cluster === undefined) {
-          return {
-            rect: new Rect(dx, dy, 0, fontSize),
-            selectionRects: [],
-          };
-        }
-        const bounds = cluster.bounds?.scaled(scale);
-        if (bounds === undefined) {
-          return { rect: undefined, selectionRects: [] };
-        }
-        if (type === "left") {
-          return {
-            rect: new Rect(dx + bounds.x, dy + bounds.y, 0, bounds.height),
-            selectionRects: [],
-          };
+        if (location.type === "end") {
+          const { lineIndex } = location;
+          const dx = edgeInset.left;
+          const dy = edgeInset.top + (fontSize + lineSpacing) * lineIndex;
+          const line = this.lines[lineIndex];
+          const bounds = line.boundingBox?.scaled(scale);
+          if (bounds === undefined) {
+            return {
+              rect: new Rect(dx, dy, 0, fontSize),
+              selectionRects: [],
+            };
+          } else {
+            return {
+              rect: new Rect(
+                dx + bounds.x + bounds.width,
+                dy + bounds.y,
+                0,
+                bounds.height,
+              ),
+              selectionRects: [],
+            };
+          }
         } else {
-          return {
-            rect: new Rect(dx + bounds.maxX, dy + bounds.y, 0, bounds.height),
-            selectionRects: block
-              ? [
-                  new Rect(
-                    dx + bounds.x,
-                    dy + bounds.y,
-                    bounds.width,
-                    bounds.height,
-                  ),
-                ]
-              : [],
-          };
+          const { lineIndex, clusterIndex, type } = location;
+          const dx = edgeInset.left;
+          const dy = edgeInset.top + (fontSize + lineSpacing) * lineIndex;
+          const line = this.lines[lineIndex];
+          const cluster = line.clusters[clusterIndex];
+          if (cluster === undefined) {
+            return {
+              rect: new Rect(dx, dy, 0, fontSize),
+              selectionRects: [],
+            };
+          }
+          const bounds = cluster.bounds?.scaled(scale);
+          if (bounds === undefined) {
+            return { rect: undefined, selectionRects: [] };
+          }
+          if (type === "left") {
+            return {
+              rect: new Rect(dx + bounds.x, dy + bounds.y, 0, bounds.height),
+              selectionRects: [],
+            };
+          } else {
+            return {
+              rect: new Rect(dx + bounds.maxX, dy + bounds.y, 0, bounds.height),
+              selectionRects: location.block
+                ? [
+                    new Rect(
+                      dx + bounds.x,
+                      dy + bounds.y,
+                      bounds.width,
+                      bounds.height,
+                    ),
+                  ]
+                : [],
+            };
+          }
         }
       }
     } else {
@@ -193,11 +274,17 @@ export class Content {
       if (startLocation !== undefined && endLocation !== undefined) {
         const start = {
           line: startLocation.lineIndex,
-          cluster: startLocation.clusterIndex,
+          cluster:
+            startLocation.type === "end"
+              ? Number.MAX_SAFE_INTEGER
+              : startLocation.clusterIndex,
         };
         const end = {
           line: endLocation.lineIndex,
-          cluster: endLocation.clusterIndex,
+          cluster:
+            endLocation.type === "end"
+              ? Number.MAX_SAFE_INTEGER
+              : endLocation.clusterIndex,
         };
         const dx = edgeInset.left;
         for (let i = 0; i < this.lines.length; i++) {
@@ -261,9 +348,11 @@ function compareLineAndCluster(
 
 type CharBase = {
   char: string;
+  raw: string;
   rawOffset: number;
   resultOffset: number;
   ctrl: boolean;
+  sign: boolean;
 };
 type Char = CharBase & { cluster: number };
 
@@ -281,7 +370,7 @@ export class Line {
   readonly buffer: HarfBuzzBuffer;
 
   constructor(
-    readonly unicodeOffset: number,
+    readonly rawOffset: number,
     readonly raw: string,
     font: FontData,
   ) {
@@ -292,18 +381,23 @@ export class Line {
       if (map === undefined) {
         chars.push({
           char: raw.substring(index, index + 1),
+          raw: raw.substring(index, index + 1),
           rawOffset: index,
           ctrl: false,
           resultOffset: offset,
+          sign: false,
         });
         index += 1;
       } else {
         const ctrl = map[1].length === 0 || SignList.isFormatControl(map[1]);
+        const sign = SignList.isSign(map[1]);
         chars.push({
           char: map[1],
+          raw: map[0],
           rawOffset: index,
           resultOffset: offset,
           ctrl,
+          sign,
         });
         index = index + map[0].length;
         offset += map[1].length;
@@ -349,7 +443,9 @@ export class Line {
     for (let i = 0; i < clusters.length; i++) {
       const from = clusters[i].resultOffset;
       const to =
-        i + 1 < clusters.length ? clusters[i + 1].resultOffset : raw.length;
+        i + 1 < clusters.length
+          ? clusters[i + 1].resultOffset
+          : this.result.length;
       for (const char of chars) {
         if (from <= char.resultOffset && char.resultOffset < to) {
           chs.push({ ...char, cluster: i });

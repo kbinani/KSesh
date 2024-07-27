@@ -1516,6 +1516,9 @@ export class SignList {
   static mapReverse(sign: string): string[] | undefined {
     if (this._reverseMapping.size === 0) {
       for (const [write, sign] of this.special) {
+        if (sign === "") {
+          continue;
+        }
         const current: string[] = this._reverseMapping.get(sign) ?? [];
         this._reverseMapping.set(sign, [...current, write]);
       }
@@ -1529,5 +1532,24 @@ export class SignList {
       return false;
     }
     return 0x13430 <= cp && cp <= 0x13455;
+  }
+
+  private static _whitespaces: Set<string> | undefined;
+  static isWhitespace(char: string): boolean {
+    let list = this._whitespaces;
+    if (list === undefined) {
+      list = new Set<string>();
+      for (const [write, sign] of this.special) {
+        if (sign === "") {
+          list.add(write);
+        }
+      }
+      this._whitespaces = list;
+    }
+    return list.has(char);
+  }
+
+  static isSign(char: string): boolean {
+    return this._reverseMapping.has(char);
   }
 }
