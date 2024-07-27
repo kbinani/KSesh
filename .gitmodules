@@ -1,0 +1,3 @@
+[submodule "deps/font-tools"]
+	path = deps/font-tools
+	url = https://github.com/microsoft/font-tools.git
