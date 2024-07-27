@@ -398,8 +398,12 @@ export class Content {
     }
   }
 
-  get plainText(): string {
-    return this.lines.map((line) => line.plainText).join("\n");
+  get textWithControls(): string {
+    return this.lines.map((line) => line.result).join("\n");
+  }
+
+  get textWithoutControls(): string {
+    return this.lines.map((line) => line.textWithoutControls).join("\n");
   }
 }
 
@@ -416,6 +420,7 @@ function compareLineAndCluster(
 
 type CharBase = {
   char: string;
+  charPlain?: string;
   raw: string;
   rawOffset: number;
   resultOffset: number;
@@ -486,6 +491,71 @@ export class Line {
         }
       }
     }
+    for (let i = 0; i < chars.length; i++) {
+      if (chars[i].char !== "&") {
+        continue;
+      }
+      if (i === 0 || !chars[i - 1].sign) {
+        continue;
+      }
+      if (i + 1 >= chars.length || !chars[i + 1].sign) {
+        continue;
+      }
+      const left = chars[i - 1];
+      const center = chars[i];
+      const right = chars[i + 1];
+      const type = SignList.insertionType(left.char, right.char);
+      switch (type) {
+        case "topStart":
+          chars[i - 1] = { ...left, char: right.char, charPlain: left.char };
+          chars[i] = { ...center, char: SignList.topStartInsertion };
+          chars[i + 1] = { ...right, char: left.char, charPlain: right.char };
+          break;
+        case "bottomStart":
+          chars[i - 1] = { ...left, char: right.char, charPlain: left.char };
+          chars[i] = { ...center, char: SignList.bottomStartInsertion };
+          chars[i + 1] = { ...right, char: left.char, charPlain: right.char };
+          break;
+        case "topEnd":
+          chars[i] = {
+            ...center,
+            char: SignList.topEndInsertion,
+            charPlain: "",
+          };
+          break;
+        case "bottomEnd":
+          chars[i] = {
+            ...center,
+            char: SignList.bottomEndInsertion,
+            charPlain: "",
+          };
+          break;
+      }
+      if (type === "topStart" || type === "bottomStart") {
+        if (
+          i + 3 < chars.length &&
+          chars[i + 2].char === "&" &&
+          chars[i + 3].sign
+        ) {
+          const t = SignList.insertionType(right.char, chars[i + 3].char);
+          switch (t) {
+            case "topEnd":
+              chars[i + 2] = {
+                ...chars[i + 2],
+                char: SignList.topEndInsertion,
+              };
+              break;
+            case "bottomEnd":
+              chars[i + 2] = {
+                ...chars[i + 2],
+                char: SignList.bottomEndInsertion,
+              };
+              break;
+          }
+          i += 3;
+        }
+      }
+    }
     this.result = chars.map((c) => c.char).join("");
     const e = new TextEncoder();
     const utf8 = e.encode(this.result);
@@ -546,8 +616,8 @@ export class Line {
     this.buffer.destroy();
   }
 
-  get plainText(): string {
-    let ret = this.result;
+  get textWithoutControls(): string {
+    let ret = this.chars.map((ch) => ch.charPlain ?? ch.char).join("");
     for (let code = 0x13430; code <= 0x13455; code++) {
       ret = ret.replaceAll(String.fromCodePoint(code), "");
     }

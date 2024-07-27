@@ -1,3 +1,6 @@
+import { Insertion } from "./insertion";
+import { insertions } from "./insertions";
+
 export class SignList {
   private constructor() {}
 
@@ -1617,4 +1620,55 @@ export class SignList {
     "𓍺",
     "𓍻",
   ];
+
+  static readonly topStartInsertion = "\u{13432}";
+  static readonly bottomStartInsertion = "\u{13433}";
+  static readonly topEndInsertion = "\u{13434}";
+  static readonly bottomEndInsertion = "\u{13435}";
+  private static _insertions: Map<string, Insertion>;
+  private static ensureInsertions(): ReadonlyMap<string, Insertion> {
+    if (this._insertions === undefined) {
+      const i = new Map<string, Insertion>();
+      for (const key of Object.keys(insertions)) {
+        const sign = this.map(key.toUpperCase());
+        if (sign === undefined) {
+          continue;
+        }
+        const s = sign[1];
+        if (s === "𓅱") {
+          const v = insertions[key];
+          delete v["be"];
+          i.set(s, { ...v, te: { "46": "22" } });
+        } else {
+          i.set(s, insertions[key]);
+        }
+      }
+      this._insertions = i;
+    }
+    return this._insertions;
+  }
+  static insertionType(
+    left: string,
+    right: string,
+  ): "bottomStart" | "topStart" | "bottomEnd" | "topEnd" | undefined {
+    const insertions = this.ensureInsertions();
+    const l = insertions.get(left);
+    if (l !== undefined) {
+      if (l.be !== undefined) {
+        return "bottomEnd";
+      }
+      if (l.te !== undefined) {
+        return "topEnd";
+      }
+    }
+    const r = insertions.get(right);
+    if (r !== undefined) {
+      if (r.bs !== undefined) {
+        return "bottomStart";
+      }
+      if (r.ts !== undefined) {
+        return "topStart";
+      }
+    }
+  }
 }

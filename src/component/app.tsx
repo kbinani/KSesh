@@ -265,21 +265,22 @@ export const App: FC = ({}) => {
     });
     writeClipboard(blob);
   };
-  const onClickCopyPlainUnicode = () => {
+  const onClickCopyTextWithoutControls = () => {
     if (font === undefined || content.current === undefined) {
       return;
     }
-    const blob = new Blob([content.current.plainText], { type: "text/plain" });
+    const blob = new Blob([content.current.textWithoutControls], {
+      type: "text/plain",
+    });
     writeClipboard(blob);
   };
-  const onClickCopyUnicode = () => {
+  const onClickCopyTextWithControls = () => {
     if (font === undefined || content.current === undefined) {
       return;
     }
-    const blob = new Blob(
-      [content.current.lines.map((line) => line.plainText).join("\n")],
-      { type: "text/plain" },
-    );
+    const blob = new Blob([content.current.textWithControls], {
+      type: "text/plain",
+    });
     writeClipboard(blob);
   };
   const onCursorLocationChange = (location: number, direction: Direction) => {
@@ -414,7 +415,7 @@ export const App: FC = ({}) => {
           </div>
           <div
             className="menuBarItem"
-            onClick={onClickCopyPlainUnicode}
+            onClick={onClickCopyTextWithoutControls}
             data-enabled={font !== undefined}
             title={
               "Copy the hieroglyph text without Egyptian Hieroglyph Format Controls"
@@ -424,7 +425,7 @@ export const App: FC = ({}) => {
           </div>
           <div
             className="menuBarItem"
-            onClick={onClickCopyUnicode}
+            onClick={onClickCopyTextWithControls}
             data-enabled={font !== undefined}
             title={
               "Copy the hieroglyph text with Egyptian Hieroglyph Format Controls"

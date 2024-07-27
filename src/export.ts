@@ -182,7 +182,7 @@ export function svg({
 
   root.setAttribute("xmlns", ns);
   root.setAttribute("viewBox", `0 0 ${width} ${height}`);
-  root.setAttribute("data-text", content.plainText);
+  root.setAttribute("data-text", content.textWithoutControls);
   root.setAttribute("data-raw", content.raw);
 
   return new Blob([root.outerHTML], { type: "image/svg+xml" });
