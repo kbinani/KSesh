@@ -1114,6 +1114,15 @@ export class SignList {
     ["\\shading234", "\u{13454}"], ["\\shading243", "\u{13454}"], ["\\shading324", "\u{13454}"], ["\\shading342", "\u{13454}"], ["\\shading423", "\u{13454}"], ["\\shading432", "\u{13454}"],
     ["\\shading1234", "\u{13455}"], ["\\shading1243", "\u{13455}"], ["\\shading1324", "\u{13455}"], ["\\shading1342", "\u{13455}"], ["\\shading1423", "\u{13455}"], ["\\shading1432", "\u{13455}"], ["\\shading2134", "\u{13455}"], ["\\shading2143", "\u{13455}"], ["\\shading2314", "\u{13455}"], ["\\shading2341", "\u{13455}"], ["\\shading2413", "\u{13455}"], ["\\shading2431", "\u{13455}"], ["\\shading3124", "\u{13455}"], ["\\shading3142", "\u{13455}"], ["\\shading3214", "\u{13455}"], ["\\shading3241", "\u{13455}"], ["\\shading3412", "\u{13455}"], ["\\shading3421", "\u{13455}"], ["\\shading4123", "\u{13455}"], ["\\shading4132", "\u{13455}"], ["\\shading4213", "\u{13455}"], ["\\shading4231", "\u{13455}"], ["\\shading4312", "\u{13455}"], ["\\shading4321", "\u{13455}"],
     ["\\", "\u{13440}"], // EGYPTIAN HIEROGLYPH MIRROR HORIZONTALLY
+    ["<", "𓍹\u{1343c}"], ["<1", "𓍹\u{1343c}"], ["<2", "𓍹\u{1343c}"], // EGYPTIAN HIEROGLYPH BEGIN ENCLOSURE
+    [">", "\u{1343d}𓍺"], ["1>", "\u{1343d}𓍺"], ["2>", "\u{1343d}𓍺"], // EGYPTIAN HIEROGLYPH END ENCLOSURE
+    ["<h1", "𓉘\u{1343c}"], ["<H1", "𓉘\u{1343c}"],
+    ["h1>", "\u{1343d}𓉝"], ["H1>", "\u{1343d}𓉝"],
+    ["<h2", "𓉙\u{1343c}"], ["<H2", "𓉙\u{1343c}"],
+    ["h2>", "\u{1343d}𓉜"], ["H2>", "\u{1343d}𓉜"],
+    ["<h3", "𓉚\u{1343c}"], ["<H3", "𓉚\u{1343c}"],
+    ["h3>", "\u{1343d}𓉛"], ["H3>", "\u{1343d}𓉛"],
+    ["<f", "𓊈\u{1343e}"], ["<F", "𓊈\u{1343e}"],
     [" ", ""],
     ["-", ""],
     ["A", "𓄿"], // G1
@@ -1588,4 +1597,22 @@ export class SignList {
   static isSign(char: string): boolean {
     return this._reverseMapping.has(char);
   }
+
+  static readonly enclosureBeginning: ReadonlyArray<string> = [
+    "𓉘",
+    "𓉙",
+    "𓉚",
+    "𓊆",
+    "𓊈",
+    "𓍹",
+  ];
+  static readonly enclosureTerminal: ReadonlyArray<string> = [
+    "𓉛",
+    "𓉜",
+    "𓉝",
+    "𓊇",
+    "𓊉",
+    "𓍺",
+    "𓍻",
+  ];
 }

@@ -471,6 +471,21 @@ export class Line {
         offset += map[1].length;
       }
     }
+    for (let i = 0; i < chars.length; i++) {
+      if (chars[i].char.startsWith("𓊈")) {
+        for (let j = i + 1; j < chars.length; j++) {
+          const ch = chars[j];
+          if (SignList.enclosureBeginning.some((c) => ch.char.startsWith(c))) {
+            break;
+          } else if (
+            SignList.enclosureTerminal.some((c) => ch.char.endsWith(c))
+          ) {
+            ch.char = "\u{1343d}𓊉";
+            break;
+          }
+        }
+      }
+    }
     this.result = chars.map((c) => c.char).join("");
     const e = new TextEncoder();
     const utf8 = e.encode(this.result);
