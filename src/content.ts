@@ -1,10 +1,11 @@
-import { bufferFromText, EdgeInset, enumerateGlyphs } from "./export";
+import { bufferFromText, enumerateGlyphs } from "./export";
 import { FontData } from "./font-data";
 import { Rect } from "./rect";
 import { BoundingBox } from "./bounding-box";
 import { HarfBuzzBuffer } from "./harfbuzz";
 import { SignList } from "./sign-list";
 import { Direction } from "./component/app";
+import { EdgeInset } from "./edge-inset";
 
 export type Cursor = { rect: Rect | undefined; selectionRects: Rect[] };
 type CursorLocation =
@@ -101,7 +102,7 @@ export class Content {
     return nearest;
   }
 
-  private cursorLocation({
+  cursorLocation({
     location,
     direction,
   }: {
@@ -126,7 +127,7 @@ export class Content {
       const from = line.rawOffset + char.rawOffset;
       let to: number;
       if (i + 1 < line.chars.length) {
-        to = line.chars[i + 1].rawOffset;
+        to = line.chars[i + 1].rawOffset + line.chars[i + 1].raw.length;
       } else {
         to = line.raw.length;
       }

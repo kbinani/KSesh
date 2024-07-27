@@ -1562,8 +1562,7 @@ export class SignList {
   }
 
   private static _reverseMapping = new Map<string, string[]>();
-
-  static mapReverse(sign: string): string[] | undefined {
+  private static ensureReverseMapping(): ReadonlyMap<string, string[]> {
     if (this._reverseMapping.size === 0) {
       for (const [write, sign] of this.special) {
         if (sign === "") {
@@ -1573,7 +1572,10 @@ export class SignList {
         this._reverseMapping.set(sign, [...current, write]);
       }
     }
-    return this._reverseMapping.get(sign);
+    return this._reverseMapping;
+  }
+  static mapReverse(sign: string): string[] | undefined {
+    return this.ensureReverseMapping().get(sign);
   }
 
   static isFormatControl(char: string): boolean {
@@ -1599,8 +1601,14 @@ export class SignList {
     return list.has(char);
   }
 
+  private static _allSigns = new Set<string>();
   static isSign(char: string): boolean {
-    return this._reverseMapping.has(char);
+    if (this._allSigns.size === 0) {
+      for (const [write, sign] of this.signs) {
+        this._allSigns.add(sign);
+      }
+    }
+    return this._allSigns.has(char);
   }
 
   static readonly enclosureBeginning: ReadonlyArray<string> = [

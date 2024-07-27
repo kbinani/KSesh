@@ -3,7 +3,12 @@ import { staticData } from "./static-data";
 import { FontData } from "./font-data";
 import { bufferFromBase64 } from "./base64";
 
+let font: FontData | undefined;
+
 export async function init(): Promise<FontData> {
+  if (font !== undefined) {
+    return font;
+  }
   const promises: Promise<void>[] = [];
   promises.push(
     loadHarfbuzz("data:application/wasm;base64," + staticData.harfbuzz),
@@ -19,5 +24,7 @@ export async function init(): Promise<FontData> {
     );
   }
   await Promise.all(promises);
-  return new FontData(bufferFromBase64(staticData.eot));
+  const f = new FontData(bufferFromBase64(staticData.eot));
+  font = f;
+  return f;
 }
