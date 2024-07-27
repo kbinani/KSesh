@@ -40,7 +40,7 @@ jobs:
           KSESH_VERSION: ${{ github.ref_name }}
         run: |
           npm install
-          npm run build
+          make
       - uses: actions/upload-pages-artifact@v3
         with:
           path: './public'
