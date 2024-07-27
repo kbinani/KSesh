@@ -285,3 +285,7 @@ body * {
 .aboutSpacer {
   height: 14px;
 }
+
+.contentCanvas {
+  cursor: text;
+}

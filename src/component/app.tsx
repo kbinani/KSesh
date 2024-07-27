@@ -50,8 +50,7 @@ export const App: FC = ({}) => {
   const [lineSpacing, setLineSpacing] = useState<number>(12);
   const [font, setFont] = useState<FontData>();
   const [cursor, setCursor] = useState<Cursor>();
-  const [focus, setFocus] = useState(false);
-  const [textSelection, setTextSelection] = useState<TextSelection>({
+  const [textSelection, setTextSelection] = useRefState<TextSelection>({
     start: 0,
     end: 0,
     direction: "forward",
@@ -77,6 +76,45 @@ export const App: FC = ({}) => {
     setChanged(true);
     setActiveSignListTab("typing");
   };
+  const updateCursor = () => {
+    if (!textarea.current) {
+      return;
+    }
+    const { value } = textarea.current;
+    const { start, end, direction } = textSelection.current;
+    const s = value.substring(0, start);
+    let found = -1;
+    for (let i = s.length - 1; i >= 0; i--) {
+      const c = s[i];
+      if (!/[0-9]/.test(c)) {
+        found = i;
+        break;
+      }
+    }
+    const search = s.substring(found) + value.substring(start, end);
+    if (/^[A-Z]/.test(search)) {
+      setTyping(search);
+    } else {
+      setTyping("");
+    }
+    let c: Cursor | undefined;
+    if (font) {
+      c = content.current?.cursor({
+        selectionStart: start,
+        selectionEnd: end,
+        font,
+        fontSize,
+        lineSpacing,
+        edgeInset,
+        direction: direction ?? "forward",
+      });
+    }
+    if (c) {
+      setCursor(c);
+    } else {
+      setCursor(undefined);
+    }
+  };
   const onSelect = (ev: SyntheticEvent<HTMLTextAreaElement>) => {
     if (!textarea.current) {
       return;
@@ -85,9 +123,9 @@ export const App: FC = ({}) => {
     let direction: Direction | undefined;
     if (selectionStart === selectionEnd) {
       const last =
-        textSelection.direction === "forward"
-          ? textSelection.end
-          : textSelection.start;
+        textSelection.current.direction === "forward"
+          ? textSelection.current.end
+          : textSelection.current.start;
       direction = last < selectionStart ? "forward" : "backward";
       setTextSelection({
         start: selectionStart,
@@ -101,39 +139,7 @@ export const App: FC = ({}) => {
         direction: undefined,
       });
     }
-    const s = value.substring(0, selectionStart);
-    let found = -1;
-    for (let i = s.length - 1; i >= 0; i--) {
-      const c = s[i];
-      if (!/[0-9]/.test(c)) {
-        found = i;
-        break;
-      }
-    }
-    const search =
-      s.substring(found) + value.substring(selectionStart, selectionEnd);
-    if (/^[A-Z]/.test(search)) {
-      setTyping(search);
-    } else {
-      setTyping("");
-    }
-    let c: Cursor | undefined;
-    if (font) {
-      c = content.current?.cursor({
-        selectionStart,
-        selectionEnd,
-        font,
-        fontSize,
-        lineSpacing,
-        edgeInset,
-        direction: direction ?? "forward",
-      });
-    }
-    if (c) {
-      setCursor(c);
-    } else {
-      setCursor(undefined);
-    }
+    updateCursor();
   };
   const onClickSign = (id: string, sign: string) => {
     if (!textarea.current || font === undefined) {
@@ -276,11 +282,10 @@ export const App: FC = ({}) => {
     );
     writeClipboard(blob);
   };
-  const onFocus = () => {
-    setFocus(true);
-  };
-  const onBlur = () => {
-    setFocus(false);
+  const onCursorLocationChange = (location: number, direction: Direction) => {
+    textarea.current?.focus();
+    textarea.current?.setSelectionRange(location, location);
+    setTextSelection({ start: location, end: location, direction });
   };
   useEffect(() => {
     const s = window.history.state;
@@ -442,8 +447,6 @@ export const App: FC = ({}) => {
               placeholder={changed ? undefined : placeholder}
               onChange={onChange}
               onSelect={onSelect}
-              onFocus={onFocus}
-              onBlur={onBlur}
             />
           </div>
         </div>
@@ -468,8 +471,9 @@ export const App: FC = ({}) => {
                 font={font}
                 lineSpacing={lineSpacing}
                 edgeInset={edgeInset}
-                cursor={focus ? cursor : undefined}
+                cursor={cursor}
                 cursorPadding={cursorPadding}
+                onCursorLocationChange={onCursorLocationChange}
               />
             )}
           </div>

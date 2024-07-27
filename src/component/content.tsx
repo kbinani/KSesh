@@ -3,6 +3,7 @@ import { Content, Cursor } from "../content";
 import { EdgeInset, enumeratePath } from "../export";
 import { FontData } from "../font-data";
 import { useRefState } from "../hook";
+import { Direction } from "./app";
 
 export const ContentComponent: FC<{
   content: MutableRefObject<Content | undefined>;
@@ -12,6 +13,7 @@ export const ContentComponent: FC<{
   edgeInset: EdgeInset;
   cursor: Cursor | undefined;
   cursorPadding: number;
+  onCursorLocationChange: (location: number, direction: Direction) => void;
 }> = ({
   content,
   fontSize,
@@ -20,6 +22,7 @@ export const ContentComponent: FC<{
   edgeInset,
   cursor: cursor_,
   cursorPadding,
+  onCursorLocationChange,
 }) => {
   const canvas = useRef<HTMLCanvasElement>(null);
   const dirty = useRef<boolean>(true);
@@ -67,6 +70,27 @@ export const ContentComponent: FC<{
     }
     ctx.restore();
   };
+  const onMouseDown = (ev: MouseEvent) => {
+    ev.preventDefault();
+    const c = content.current;
+    if (!c) {
+      return;
+    }
+    const bounds = canvas.current?.getBoundingClientRect();
+    if (!bounds) {
+      return;
+    }
+    const x = ev.clientX - bounds.x;
+    const y = ev.clientY - bounds.y;
+    const { location, direction } = c.closestPosition({
+      point: { x, y },
+      font,
+      fontSize,
+      lineSpacing,
+      edgeInset,
+    });
+    onCursorLocationChange(location, direction);
+  };
   useEffect(() => {
     dirty.current = true;
   }, [content.current, cursor.current]);
@@ -104,10 +128,15 @@ export const ContentComponent: FC<{
       }
       requestAnimationFrame(update);
     };
+    canvas.current?.addEventListener("mousedown", onMouseDown);
     requestAnimationFrame(update);
+    return () => {
+      canvas.current?.removeEventListener("mousedown", onMouseDown);
+    };
   }, []);
   return (
     <canvas
+      className="contentCanvas"
       ref={canvas}
       width={(window.innerWidth * window.devicePixelRatio) / 2}
       height={(window.innerHeight * window.devicePixelRatio) / 2}

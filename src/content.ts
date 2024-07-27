@@ -11,6 +11,7 @@ type CursorLocation =
   | { type: "left"; lineIndex: number; clusterIndex: number }
   | { type: "right"; lineIndex: number; clusterIndex: number; block: boolean }
   | { type: "end"; lineIndex: number };
+export type Point = { x: number; y: number };
 
 export class Content {
   readonly lines: ReadonlyArray<Line>;
@@ -31,6 +32,73 @@ export class Content {
 
   destroy() {
     this.lines.forEach((line) => line.destroy());
+  }
+
+  closestPosition({
+    point,
+    font,
+    fontSize,
+    lineSpacing,
+    edgeInset,
+  }: {
+    point: Point;
+    font: FontData;
+    fontSize: number;
+    lineSpacing: number;
+    edgeInset: EdgeInset;
+  }): { location: number; direction: Direction } {
+    if (this.lines.length === 0) {
+      return { location: 0, direction: "forward" };
+    }
+    let lineIndex: number;
+    if (point.y <= edgeInset.top + fontSize + lineSpacing / 2) {
+      lineIndex = 0;
+    } else {
+      const dy = point.y - (edgeInset.top + fontSize + lineSpacing / 2);
+      lineIndex = Math.min(
+        1 + Math.floor(dy / (fontSize + lineSpacing)),
+        this.lines.length - 1,
+      );
+    }
+    const line = this.lines[lineIndex];
+    let minDistance = Number.MAX_VALUE;
+    let nearest: { location: number; direction: Direction } = {
+      location: line.rawOffset,
+      direction: "forward",
+    };
+    for (let i = 0; i < line.chars.length; i++) {
+      const ch = line.chars[i];
+      if (!ch.sign) {
+        continue;
+      }
+      const start = line.rawOffset + ch.rawOffset;
+      const end = line.rawOffset + ch.rawOffset + ch.raw.length;
+      const test: { location: number; direction: Direction }[] = [
+        { location: start, direction: "forward" },
+        { location: end, direction: "backward" },
+      ];
+      for (const { location, direction } of test) {
+        const { rect } = this.cursor({
+          selectionStart: location,
+          selectionEnd: location,
+          direction,
+          font,
+          fontSize,
+          lineSpacing,
+          edgeInset,
+        });
+        if (!rect) {
+          continue;
+        }
+        const center = rect.center;
+        const distance = Math.hypot(point.x - center.x, point.y - center.y);
+        if (distance <= minDistance) {
+          minDistance = distance;
+          nearest = { location, direction };
+        }
+      }
+    }
+    return nearest;
   }
 
   private cursorLocation({

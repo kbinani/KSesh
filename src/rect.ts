@@ -1,3 +1,5 @@
+import { Point } from "./content";
+
 export class Rect {
   constructor(
     readonly x: number,
@@ -30,5 +32,9 @@ export class Rect {
       this.width + 2 * size,
       this.height + 2 * size,
     );
+  }
+
+  get center(): Point {
+    return { x: this.x + this.width * 0.5, y: this.y + this.height * 0.5 };
   }
 }
