@@ -1123,6 +1123,8 @@ export class SignList {
     ["<h3", "𓉚\u{1343c}"], ["<H3", "𓉚\u{1343c}"],
     ["h3>", "\u{1343d}𓉛"], ["H3>", "\u{1343d}𓉛"],
     ["<f", "𓊈\u{1343e}"], ["<F", "𓊈\u{1343e}"],
+    ["(", "\u{13437}"], // EGYPTIAN HIEROGLYPH BEGIN SEGMENT
+    [")", "\u{13438}"], // EGYPTIAN HIEROGLYPH END SEGMENT
     [" ", ""],
     ["-", ""],
     ["A", "𓄿"], // G1
