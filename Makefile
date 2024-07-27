@@ -4,7 +4,7 @@ all: public/eot.ttf public/main.js
 public/eot.ttf: deps/font-tools/EgyptianOpenType/font/eot.ttf
 	cp $< $@
 
-public/main.js: src/**/*.ts src/**/*.tsx src/**/*.js tsconfig.json package.json
+public/main.js: src/*.ts src/insertions.ts src/component/*.tsx src/*.js tsconfig.json package.json
 	npm run build
 
 src/insertions.ts: deps/font-tools/EgyptianOpenType/insertions.py
