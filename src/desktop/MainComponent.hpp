@@ -2,7 +2,7 @@
 
 namespace ksesh {
 
-class MainComponent : public juce::Component {
+class MainComponent : public juce::Component, public TextEditorComponent::Delegate {
   enum {
     resizerSize = 8,
   };
@@ -14,6 +14,7 @@ public:
 
     fTextEditor = std::make_unique<TextEditorComponent>();
     fTextEditor->setBounds(0, 0, width / 2 - resizerSize / 2, height / 2 - resizerSize / 2);
+    fTextEditor->fDelegate = this;
 
     fHieroglyph = std::make_unique<HieroglyphComponent>(typeface);
     fHieroglyph->setBounds(width / 2 + resizerSize / 2, 0, width / 2 - resizerSize / 2, height / 2 - resizerSize / 2);
@@ -35,6 +36,9 @@ public:
     int const width = getWidth();
     int const height = getHeight();
     fHorizontalSplitter->setBounds(0, 0, width, height);
+  }
+
+  void textEditorComponentDidChangeText(juce::String const &text) override {
   }
 
 private:
