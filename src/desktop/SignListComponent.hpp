@@ -4,7 +4,7 @@ namespace ksesh {
 
 class SignListComponent : public juce::Component {
 public:
-  SignListComponent() {
+  explicit SignListComponent(juce::Typeface::Ptr typeface) : fTypeface(typeface) {
   }
 
   void paint(juce::Graphics &g) override {
@@ -12,6 +12,8 @@ public:
   }
 
 private:
+  juce::Typeface::Ptr fTypeface;
+
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SignListComponent)
 };
 

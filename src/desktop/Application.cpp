@@ -4,6 +4,7 @@
 #include <juce_graphics/fonts/harfbuzz/hb.hh>
 
 // clang-format off
+#include "BinaryData.hpp"
 #include "HieroglyphComponent.hpp"
 #include "TextEditorComponent.hpp"
 #include "SignListComponent.hpp"
@@ -31,11 +32,12 @@ public:
   }
 
   void initialise(juce::String const &) override {
-    mainWindow.reset(new MainWindow(getApplicationName()));
+    fTypeface = juce::Typeface::createSystemTypefaceFor(BinaryData::eot_ttf, BinaryData::eot_ttfSize);
+    fMainWindow = std::make_unique<MainWindow>(getApplicationName(), fTypeface);
   }
 
   void shutdown() override {
-    mainWindow = nullptr;
+    fMainWindow = nullptr;
   }
 
   void systemRequestedQuit() override {
@@ -46,7 +48,8 @@ public:
   }
 
 private:
-  std::unique_ptr<MainWindow> mainWindow;
+  std::unique_ptr<MainWindow> fMainWindow;
+  juce::Typeface::Ptr fTypeface;
 };
 
 } // namespace ksesh

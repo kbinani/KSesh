@@ -8,20 +8,20 @@ class MainComponent : public juce::Component {
   };
 
 public:
-  MainComponent() {
+  explicit MainComponent(juce::Typeface::Ptr typeface) {
     int const width = 1280;
     int const height = 720;
 
     fTextEditor = std::make_unique<TextEditorComponent>();
     fTextEditor->setBounds(0, 0, width / 2 - resizerSize / 2, height / 2 - resizerSize / 2);
 
-    fHieroglyph = std::make_unique<HieroglyphComponent>();
+    fHieroglyph = std::make_unique<HieroglyphComponent>(typeface);
     fHieroglyph->setBounds(width / 2 + resizerSize / 2, 0, width / 2 - resizerSize / 2, height / 2 - resizerSize / 2);
 
     fVerticalSplitter = std::make_unique<SplitterComponent>(fTextEditor.get(), fHieroglyph.get(), true);
     fVerticalSplitter->setBounds(width / 2 - resizerSize / 2, 0, resizerSize, height / 2 - resizerSize / 2);
 
-    fSignList = std::make_unique<SignListComponent>();
+    fSignList = std::make_unique<SignListComponent>(typeface);
     fSignList->setBounds(0, height / 2 + resizerSize / 2, width, height / 2 - resizerSize / 2);
 
     fHorizontalSplitter = std::make_unique<SplitterComponent>(fVerticalSplitter.get(), fSignList.get(), false);
