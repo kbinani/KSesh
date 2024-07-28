@@ -5,3 +5,5 @@ node_modules
 *.ttf
 /src/insertions.ts
 /src/static-data.ts
+/xcode
+/build
