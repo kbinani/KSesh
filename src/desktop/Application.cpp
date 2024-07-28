@@ -3,8 +3,14 @@
 
 #include <juce_graphics/fonts/harfbuzz/hb.hh>
 
+#include <iostream>
+
+#pragma GCC diagnostic ignored "-Wunused-variable"
+
 // clang-format off
 #include "BinaryData.hpp"
+#include "SignList.hpp"
+#include "Content.hpp"
 #include "HieroglyphComponent.hpp"
 #include "TextEditorComponent.hpp"
 #include "SignListComponent.hpp"
@@ -32,8 +38,18 @@ public:
   }
 
   void initialise(juce::String const &) override {
-    fTypeface = juce::Typeface::createSystemTypefaceFor(BinaryData::eot_ttf, BinaryData::eot_ttfSize);
-    fMainWindow = std::make_unique<MainWindow>(getApplicationName(), fTypeface);
+    auto typeface = juce::Typeface::createSystemTypefaceFor(BinaryData::eot_ttf, BinaryData::eot_ttfSize);
+    auto blob = hb_blob_create(BinaryData::eot_ttf,
+                               BinaryData::eot_ttfSize,
+                               HB_MEMORY_MODE_READONLY,
+                               nullptr,
+                               nullptr);
+    hb_face_t *face = hb_face_create(blob, 0);
+    hb_font_t *font = hb_font_create(face);
+    fFont = std::make_unique<FontData>(font, juce::Font(juce::FontOptions(typeface)));
+    hb_face_destroy(face);
+    hb_blob_destroy(blob);
+    fMainWindow = std::make_unique<MainWindow>(getApplicationName(), *fFont);
   }
 
   void shutdown() override {
@@ -49,7 +65,7 @@ public:
 
 private:
   std::unique_ptr<MainWindow> fMainWindow;
-  juce::Typeface::Ptr fTypeface;
+  std::unique_ptr<FontData> fFont;
 };
 
 } // namespace ksesh

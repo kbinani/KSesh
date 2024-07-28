@@ -8,7 +8,7 @@ class MainComponent : public juce::Component, public TextEditorComponent::Delega
   };
 
 public:
-  explicit MainComponent(juce::Typeface::Ptr typeface) {
+  explicit MainComponent(FontData const &font) : fFont(font) {
     int const width = 1280;
     int const height = 720;
 
@@ -16,13 +16,13 @@ public:
     fTextEditor->setBounds(0, 0, width / 2 - resizerSize / 2, height / 2 - resizerSize / 2);
     fTextEditor->fDelegate = this;
 
-    fHieroglyph = std::make_unique<HieroglyphComponent>(typeface);
+    fHieroglyph = std::make_unique<HieroglyphComponent>(font);
     fHieroglyph->setBounds(width / 2 + resizerSize / 2, 0, width / 2 - resizerSize / 2, height / 2 - resizerSize / 2);
 
     fVerticalSplitter = std::make_unique<SplitterComponent>(fTextEditor.get(), fHieroglyph.get(), true);
     fVerticalSplitter->setBounds(width / 2 - resizerSize / 2, 0, resizerSize, height / 2 - resizerSize / 2);
 
-    fSignList = std::make_unique<SignListComponent>(typeface);
+    fSignList = std::make_unique<SignListComponent>(font);
     fSignList->setBounds(0, height / 2 + resizerSize / 2, width, height / 2 - resizerSize / 2);
 
     fHorizontalSplitter = std::make_unique<SplitterComponent>(fVerticalSplitter.get(), fSignList.get(), false);
@@ -39,6 +39,9 @@ public:
   }
 
   void textEditorComponentDidChangeText(juce::String const &text) override {
+    std::u32string str((char32_t const *)text.toUTF32().getAddress());
+    auto c = std::make_shared<Content>(str, fFont);
+    fHieroglyph->setContent(c);
   }
 
 private:
@@ -47,6 +50,7 @@ private:
   std::unique_ptr<TextEditorComponent> fTextEditor;
   std::unique_ptr<HieroglyphComponent> fHieroglyph;
   std::unique_ptr<SignListComponent> fSignList;
+  FontData const &fFont;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };

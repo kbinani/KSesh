@@ -62,6 +62,9 @@ list(APPEND ksesh_files
   src/desktop/TextEditorComponent.hpp
   src/desktop/HieroglyphComponent.hpp
   src/desktop/SplitterComponent.hpp
+  src/desktop/Content.hpp
+  src/desktop/SignList.hpp
+  src/desktop/SignList.cpp
 )
 if (APPLE)
   list(APPEND ksesh_files src/desktop/Application.mm)
