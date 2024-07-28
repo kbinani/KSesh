@@ -3,7 +3,14 @@
 
 #include <juce_graphics/fonts/harfbuzz/hb.hh>
 
+// clang-format off
+#include "HieroglyphComponent.hpp"
+#include "TextEditorComponent.hpp"
+#include "SignListComponent.hpp"
+#include "SplitterComponent.hpp"
+#include "MainComponent.hpp"
 #include "MainWindow.hpp"
+// clang-format on
 
 namespace ksesh {
 
@@ -20,13 +27,10 @@ public:
   }
 
   bool moreThanOneInstanceAllowed() override {
-    return false;
+    return true;
   }
 
   void initialise(juce::String const &) override {
-    hb_buffer_t *buf = hb_buffer_create();
-    hb_buffer_destroy(buf);
-
     mainWindow.reset(new MainWindow(getApplicationName()));
   }
 

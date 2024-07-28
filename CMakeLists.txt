@@ -57,6 +57,11 @@ juce_add_gui_app(ksesh
 
 list(APPEND ksesh_files
   src/desktop/MainWindow.hpp
+  src/desktop/MainComponent.hpp
+  src/desktop/SignListComponent.hpp
+  src/desktop/TextEditorComponent.hpp
+  src/desktop/HieroglyphComponent.hpp
+  src/desktop/SplitterComponent.hpp
 )
 if (APPLE)
   list(APPEND ksesh_files src/desktop/Application.mm)
