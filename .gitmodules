@@ -1,3 +1,6 @@
 [submodule "deps/font-tools"]
 	path = deps/font-tools
 	url = https://github.com/microsoft/font-tools.git
+[submodule "deps/JUCE"]
+	path = deps/JUCE
+	url = https://github.com/kbinani/JUCE.git
