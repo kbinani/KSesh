@@ -158,8 +158,7 @@ public:
     for (auto const &it : chars) {
       result += it.ch;
     }
-    juce::String u(juce::CharPointer_UTF32((wchar_t *)result.c_str()), juce::CharPointer_UTF32((wchar_t *)(result.data() + result.size())));
-    u8string utf8((char8_t const *)u.toRawUTF8());
+    u8string utf8 = U8StringFromU32String(result);
 
     HbBufferUniquePtr buffer(hb_buffer_create());
     hb_buffer_add_utf8(buffer.get(), (char const *)utf8.c_str(), -1, 0, -1);
@@ -202,9 +201,7 @@ public:
       juce::Path path = Harfbuzz::CreatePath(info.glyphId, font);
       juce::Rectangle<float> bounds = path.getBounds();
       if (info.cluster != lastCluster) {
-        auto u8 = utf8.substr(lastCluster, info.cluster - lastCluster);
-        auto u = juce::String::fromUTF8(u8.c_str());
-        u32string u32((char32_t const *)u.toUTF32().getAddress());
+        auto u32 = U32StringFromU8string(utf8.substr(lastCluster, info.cluster - lastCluster));
         clusters.push_back(Cluster(index, bb));
         index += u32.size();
         lastCluster = info.cluster;

@@ -39,7 +39,7 @@ public:
   }
 
   void textEditorComponentDidChangeText(juce::String const &text) override {
-    std::u32string str((char32_t const *)text.toUTF32().getAddress());
+    auto str = U32StringFromJuceString(text);
     auto c = std::make_shared<Content>(str, fFont);
     fHieroglyph->setContent(c);
   }

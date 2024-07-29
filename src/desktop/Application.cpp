@@ -6,6 +6,7 @@
 #pragma GCC diagnostic ignored "-Wunused-variable"
 
 // clang-format off
+#include "String.hpp"
 #include "Harfbuzz.hpp"
 #include "BinaryData.hpp"
 #include "SignList.hpp"
