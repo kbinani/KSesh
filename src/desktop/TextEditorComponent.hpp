@@ -13,7 +13,7 @@ public:
   TextEditorComponent() {
     fEditor = std::make_unique<juce::TextEditor>();
     fEditor->setMultiLine(true);
-    fEditor->setFont(juce::Font(juce::FontOptions(16)));
+    fEditor->setFont(juce::Font(juce::FontOptions(24)));
     fEditor->setReturnKeyStartsNewLine(true);
     fEditor->onTextChange = [this]() {
       this->onTextChange();
