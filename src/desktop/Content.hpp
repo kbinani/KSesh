@@ -16,7 +16,8 @@ struct CharBase {
            int rawOffset,
            int resultOffset,
            bool ctrl,
-           bool sign) : ch(ch), raw(raw), rawOffset(rawOffset), resultOffset(resultOffset), ctrl(ctrl), sign(sign) {
+           bool sign,
+           std::optional<std::u32string> charPlain = std::nullopt) : ch(ch), charPlain(charPlain), raw(raw), rawOffset(rawOffset), resultOffset(resultOffset), ctrl(ctrl), sign(sign) {
   }
 };
 
@@ -46,10 +47,10 @@ public:
     vector<CharBase> chars;
     int offset = 0;
     for (size_t index = 0; index < raw.size();) {
-      auto map = SignList::map(raw, index);
+      auto map = SignList::Map(raw, index);
       if (map) {
-        bool ctrl = map->second.size() == 0 || SignList::isFormatControl(map->second);
-        bool sign = SignList::isSign(map->second);
+        bool ctrl = map->second.size() == 0 || SignList::IsFormatControl(map->second);
+        bool sign = SignList::IsSign(map->second);
         chars.push_back(CharBase(map->second,
                                  map->first,
                                  index,
@@ -88,73 +89,40 @@ public:
         }
       }
     }
-#if 0
-    for (let i = 0; i < chars.length; i++) {
-      if (chars[i].char !== "&") {
+    for (size_t i = 1; i + 1 < chars.size(); i++) {
+      if (!chars[i - 1].sign || chars[i].ch != U"&" || !chars[i + 1].sign) {
         continue;
       }
-      if (i === 0 || !chars[i - 1].sign) {
-        continue;
+      auto left = chars[i - 1];
+      auto center = chars[i];
+      auto right = chars[i + 1];
+      auto type = SignList::InsertionType(left.ch, right.ch);
+      if (type == Insertions::Type::TopStart) {
+        chars[i - 1] = CharBase(right.ch, left.raw, left.rawOffset, left.resultOffset, left.ctrl, left.sign, left.ch);
+        chars[i] = CharBase(SignList::topStartInsertion, center.raw, center.rawOffset, center.resultOffset, center.ctrl, center.sign, U"");
+        chars[i + 1] = CharBase(left.ch, right.raw, right.rawOffset, right.resultOffset, right.ctrl, right.sign, right.ch);
+      } else if (type == Insertions::Type::BottomStart) {
+        chars[i - 1] = CharBase(right.ch, left.raw, left.rawOffset, left.resultOffset, left.ctrl, left.sign, left.ch);
+        chars[i] = CharBase(SignList::bottomStartInsertion, center.raw, center.rawOffset, center.resultOffset, center.ctrl, center.sign, U"");
+        chars[i + 1] = CharBase(left.ch, right.raw, right.rawOffset, right.resultOffset, right.ctrl, right.sign, right.ch);
+      } else if (type == Insertions::Type::TopEnd) {
+        chars[i] = CharBase(SignList::topEndInsertion, center.raw, center.rawOffset, center.resultOffset, center.ctrl, center.sign, U"");
+      } else if (type == Insertions::Type::BottomEnd) {
+        chars[i] = CharBase(SignList::bottomEndInsertion, center.raw, center.rawOffset, center.resultOffset, center.ctrl, center.sign, U"");
       }
-      if (i + 1 >= chars.length || !chars[i + 1].sign) {
-        continue;
-      }
-      const left = chars[i - 1];
-      const center = chars[i];
-      const right = chars[i + 1];
-      const type = SignList.insertionType(left.char, right.char);
-      switch (type) {
-        case "topStart":
-          chars[i - 1] = { ...left, char: right.char, charPlain: left.char };
-          chars[i] = { ...center, char: SignList.topStartInsertion };
-          chars[i + 1] = { ...right, char: left.char, charPlain: right.char };
-          break;
-        case "bottomStart":
-          chars[i - 1] = { ...left, char: right.char, charPlain: left.char };
-          chars[i] = { ...center, char: SignList.bottomStartInsertion };
-          chars[i + 1] = { ...right, char: left.char, charPlain: right.char };
-          break;
-        case "topEnd":
-          chars[i] = {
-            ...center,
-            char: SignList.topEndInsertion,
-            charPlain: "",
-          };
-          break;
-        case "bottomEnd":
-          chars[i] = {
-            ...center,
-            char: SignList.bottomEndInsertion,
-            charPlain: "",
-          };
-          break;
-      }
-      if (type === "topStart" || type === "bottomStart") {
-        if (
-          i + 3 < chars.length &&
-          chars[i + 2].char === "&" &&
-          chars[i + 3].sign
-        ) {
-          const t = SignList.insertionType(right.char, chars[i + 3].char);
-          switch (t) {
-            case "topEnd":
-              chars[i + 2] = {
-                ...chars[i + 2],
-                char: SignList.topEndInsertion,
-              };
-              break;
-            case "bottomEnd":
-              chars[i + 2] = {
-                ...chars[i + 2],
-                char: SignList.bottomEndInsertion,
-              };
-              break;
+      if (type == Insertions::Type::TopStart || type == Insertions::Type::BottomStart) {
+        if (i + 3 < chars.size() && chars[i + 2].ch == U"&" && chars[i + 3].sign) {
+          auto o = chars[i + 2];
+          auto t = SignList::InsertionType(right.ch, chars[i + 3].ch);
+          if (t == Insertions::Type::TopEnd) {
+            chars[i + 2] = CharBase(SignList::topEndInsertion, o.raw, o.rawOffset, o.resultOffset, o.ctrl, o.sign, U"");
+          } else if (t == Insertions::Type::BottomEnd) {
+            chars[i + 2] = CharBase(SignList::bottomEndInsertion, o.raw, o.rawOffset, o.resultOffset, o.ctrl, o.sign, U"");
           }
           i += 3;
         }
       }
     }
-#endif
     for (auto const &it : chars) {
       result += it.ch;
     }

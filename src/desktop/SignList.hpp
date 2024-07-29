@@ -5,7 +5,7 @@ namespace ksesh {
 class SignList {
   using Entry = std::pair<std::u32string, std::u32string>;
 
-  static std::vector<Entry> const *createSigns() {
+  static std::vector<Entry> const *CreateSigns() {
     using namespace std;
     using namespace std::literals::string_literals;
     auto s = new vector<Entry>();
@@ -1084,19 +1084,19 @@ class SignList {
     return s;
   }
 
-  static std::vector<Entry> const &signs() {
+  static std::vector<Entry> const &Signs() {
     using namespace std;
-    static unique_ptr<vector<Entry> const> const s(createSigns());
+    static unique_ptr<vector<Entry> const> const s(CreateSigns());
     return *s;
   }
 
-  static std::vector<Entry> const &special() {
+  static std::vector<Entry> const &Special() {
     using namespace std;
-    static unique_ptr<vector<Entry> const> const s(createSpecial());
+    static unique_ptr<vector<Entry> const> const s(CreateSpecial());
     return *s;
   }
 
-  static std::vector<Entry> const *createSpecial() {
+  static std::vector<Entry> const *CreateSpecial() {
     using namespace std;
     auto s = new vector<Entry>();
     // clang-format off
@@ -1104,8 +1104,8 @@ class SignList {
     I(U"*"s, U"\U00013431"s); // EGYPTIAN HIEROGLYPH HORIZONTAL JOINER
     I(U".."s, U"\U00013441"s); // EGYPTIAN HIEROGLYPH FULL BLANK
     I(U"."s, U" "s);
-    I(U"//"s, U"\U00013441}\u13455"s);
-    I(U"v/"s, U"\U00013445}\ufe00"s);
+    I(U"//"s, U"\U00013441\U00013455"s);
+    I(U"v/"s, U"\U00013445\U0000fe00"s);
     I(U"#1"s, U"\U00013447"s);
     I(U"#2"s, U"\U0001344a"s);
     I(U"#3"s, U"\U00013448"s);
@@ -1137,15 +1137,15 @@ class SignList {
     I(U"\\shading234"s, U"\U00013454"s); I(U"\\shading243"s, U"\U00013454"s); I(U"\\shading324"s, U"\U00013454"s); I(U"\\shading342"s, U"\U00013454"s); I(U"\\shading423"s, U"\U00013454"s); I(U"\\shading432"s, U"\U00013454"s);
     I(U"\\shading1234"s, U"\U00013455"s); I(U"\\shading1243"s, U"\U00013455"s); I(U"\\shading1324"s, U"\U00013455"s); I(U"\\shading1342"s, U"\U00013455"s); I(U"\\shading1423"s, U"\U00013455"s); I(U"\\shading1432"s, U"\U00013455"s); I(U"\\shading2134"s, U"\U00013455"s); I(U"\\shading2143"s, U"\U00013455"s); I(U"\\shading2314"s, U"\U00013455"s); I(U"\\shading2341"s, U"\U00013455"s); I(U"\\shading2413"s, U"\U00013455"s); I(U"\\shading2431"s, U"\U00013455"s); I(U"\\shading3124"s, U"\U00013455"s); I(U"\\shading3142"s, U"\U00013455"s); I(U"\\shading3214"s, U"\U00013455"s); I(U"\\shading3241"s, U"\U00013455"s); I(U"\\shading3412"s, U"\U00013455"s); I(U"\\shading3421"s, U"\U00013455"s); I(U"\\shading4123"s, U"\U00013455"s); I(U"\\shading4132"s, U"\U00013455"s); I(U"\\shading4213"s, U"\U00013455"s); I(U"\\shading4231"s, U"\U00013455"s); I(U"\\shading4312"s, U"\U00013455"s); I(U"\\shading4321"s, U"\U00013455"s);
     I(U"\\"s, U"\U00013440"s); // EGYPTIAN HIEROGLYPH MIRROR HORIZONTALLY
-    I(U"<"s, U"𓍹\u1343c"s); I(U"<1"s, U"𓍹\u1343c"s); I(U"<2"s, U"𓍹\u1343c"s); // EGYPTIAN HIEROGLYPH BEGIN ENCLOSURE
-    I(U">"s, U"\U0001343d}𓍺"s); I(U"1>"s, U"\U0001343d}𓍺"s); I(U"2>"s, U"\U0001343d}𓍺"s); // EGYPTIAN HIEROGLYPH END ENCLOSURE
-    I(U"<h1"s, U"𓉘\u1343c"s); I(U"<H1"s, U"𓉘\u1343c"s);
-    I(U"h1>"s, U"\U0001343d}𓉝"s); I(U"H1>"s, U"\U0001343d}𓉝"s);
-    I(U"<h2"s, U"𓉙\u1343c"s); I(U"<H2"s, U"𓉙\u1343c"s);
-    I(U"h2>"s, U"\U0001343d}𓉜"s); I(U"H2>"s, U"\U0001343d}𓉜"s);
-    I(U"<h3"s, U"𓉚\u1343c"s); I(U"<H3"s, U"𓉚\u1343c"s);
-    I(U"h3>"s, U"\U0001343d}𓉛"s); I(U"H3>"s, U"\U0001343d}𓉛"s);
-    I(U"<f"s, U"𓊈\u1343e"s); I(U"<F"s, U"𓊈\u1343e"s);
+    I(U"<"s, U"𓍹\U0001343c"s); I(U"<1"s, U"𓍹\U0001343c"s); I(U"<2"s, U"𓍹\U0001343c"s); // EGYPTIAN HIEROGLYPH BEGIN ENCLOSURE
+    I(U">"s, U"\U0001343d𓍺"s); I(U"1>"s, U"\U0001343d𓍺"s); I(U"2>"s, U"\U0001343d𓍺"s); // EGYPTIAN HIEROGLYPH END ENCLOSURE
+    I(U"<h1"s, U"𓉘\U0001343c"s); I(U"<H1"s, U"𓉘\U0001343c"s);
+    I(U"h1>"s, U"\U0001343d𓉝"s); I(U"H1>"s, U"\U0001343d𓉝"s);
+    I(U"<h2"s, U"𓉙\U0001343c"s); I(U"<H2"s, U"𓉙\U0001343c"s);
+    I(U"h2>"s, U"\U0001343d𓉜"s); I(U"H2>"s, U"\U0001343d𓉜"s);
+    I(U"<h3"s, U"𓉚\U0001343c"s); I(U"<H3"s, U"𓉚\U0001343c"s);
+    I(U"h3>"s, U"\U0001343d𓉛"s); I(U"H3>"s, U"\U0001343d𓉛"s);
+    I(U"<f"s, U"𓊈\U0001343e"s); I(U"<F"s, U"𓊈\U0001343e"s);
     I(U"("s, U"\U00013437"s); // EGYPTIAN HIEROGLYPH BEGIN SEGMENT
     I(U")"s, U"\U00013438"s); // EGYPTIAN HIEROGLYPH END SEGMENT
     I(U"##"s, U"\U00013436"s); // EGYPTIAN HIEROGLYPH OVERLAY MIDDLE
@@ -1535,7 +1535,7 @@ class SignList {
     return s;
   }
 
-  static bool compareSigns(Entry const &left, Entry const &right) {
+  static bool CompareSigns(Entry const &left, Entry const &right) {
     auto l = left.first;
     auto r = right.first;
     if (l.size() == r.size()) {
@@ -1545,42 +1545,48 @@ class SignList {
     }
   }
 
-  static std::vector<Entry> *createMapping() {
+  static std::vector<Entry> *CreateMapping() {
     using namespace std;
     auto s = new vector<Entry>();
-    for (auto const &it : signs()) {
+    for (auto const &it : Signs()) {
       s->push_back(it);
     }
-    for (auto const &it : special()) {
+    for (auto const &it : Special()) {
       s->push_back(it);
     }
-    std::sort(s->begin(), s->end(), compareSigns);
+    std::sort(s->begin(), s->end(), CompareSigns);
     return s;
   }
 
+  static std::vector<Entry> const &Mapping() {
+    using namespace std;
+    static unique_ptr<vector<Entry> const> const mapping(CreateMapping());
+    return *mapping;
+  }
+
 public:
-  static std::optional<Entry> map(std::u32string const &s, std::optional<int> offset) {
+  static std::optional<Entry> Map(std::u32string const &s, std::optional<int> offset) {
     using namespace std;
     int o = offset ? *offset : 0;
     u32string_view v(s.begin() + o, s.end());
-    static unique_ptr<vector<Entry> const> const mapping(createMapping());
-    auto found = find_if(mapping->begin(), mapping->end(), [&](Entry const &m) {
+    auto const &mapping = Mapping();
+    auto found = find_if(mapping.begin(), mapping.end(), [&](Entry const &m) {
       return v.starts_with(m.first);
     });
-    if (found == mapping->end()) {
+    if (found == mapping.end()) {
       return nullopt;
     } else {
       return *found;
     }
   }
 
-  static std::vector<std::u32string> const &categories() {
+  static std::vector<std::u32string> const &Categories() {
     using namespace std;
     using namespace std::literals::string_literals;
     static vector<u32string> categories;
     if (categories.empty()) {
       unordered_set<u32string> index;
-      for (auto [s, _] : signs()) {
+      for (auto [s, _] : Signs()) {
         auto found = find_if(s.begin(), s.end(), [](char32_t c) {
           return U'0' <= c && c <= U'9';
         });
@@ -1615,7 +1621,7 @@ public:
   }
 #endif
 
-  static bool isFormatControl(std::u32string const &ch) {
+  static bool IsFormatControl(std::u32string const &ch) {
     char32_t cp = ch[0];
     return 0x13430 <= cp && cp <= 0x13455;
   }
@@ -1637,72 +1643,66 @@ public:
   }
 #endif
 
-  static bool isSign(std::u32string const &ch) {
+  static bool IsSign(std::u32string const &ch) {
     using namespace std;
     static unordered_set<u32string> all;
     if (all.empty()) {
-      for (auto [write, sign] : signs()) {
+      for (auto [write, sign] : Signs()) {
         all.insert(sign);
       }
     }
     return all.find(ch) != all.end();
   }
 
-  static std::vector<std::u32string> enclosureBeginning;
-  static std::vector<std::u32string> enclosureTerminal;
-#if 0
+  static std::vector<std::u32string> const enclosureBeginning;
+  static std::vector<std::u32string> const enclosureTerminal;
 
-  static readonly topStartInsertion = "\u{13432}";
-  static readonly bottomStartInsertion = "\u{13433}";
-  static readonly topEndInsertion = "\u{13434}";
-  static readonly bottomEndInsertion = "\u{13435}";
-  private static _insertions: Map<string, Insertion>;
-  private static ensureInsertions(): ReadonlyMap<string, Insertion> {
-    if (this._insertions === undefined) {
-      const i = new Map<string, Insertion>();
-      for (const key of Object.keys(insertions)) {
-        const sign = this.map(key.toUpperCase());
-        if (sign === undefined) {
-          continue;
-        }
-        const s = sign[1];
-        if (s === "𓅱") {
-          const v = insertions[key];
-          delete v["be"];
-          i.set(s, { ...v, te: { "46": "22" } });
-        } else {
-          i.set(s, insertions[key]);
-        }
+  static std::u32string const topStartInsertion;
+  static std::u32string const bottomStartInsertion;
+  static std::u32string const topEndInsertion;
+  static std::u32string const bottomEndInsertion;
+
+private:
+  static std::unordered_map<std::u32string, uint8_t> const *CreateInsertions() {
+    using namespace std;
+    auto s = new unordered_map<u32string, uint8_t>();
+    for (auto const &[key, sign] : Signs()) {
+      auto type = Insertions::InsertionType(key);
+      if (type == 0) {
+        continue;
       }
-      this._insertions = i;
+      if (sign == U"𓅱") {
+        type = (type & (~Insertions::Type::BottomEnd)) | Insertions::Type::TopEnd;
+      }
+      (*s)[sign] = type;
     }
-    return this._insertions;
+    return s;
   }
-  static insertionType(
-    left: string,
-    right: string,
-  ): "bottomStart" | "topStart" | "bottomEnd" | "topEnd" | undefined {
-    const insertions = this.ensureInsertions();
-    const l = insertions.get(left);
-    if (l !== undefined) {
-      if (l.be !== undefined) {
-        return "bottomEnd";
+
+public:
+  static std::optional<Insertions::Type> InsertionType(std::u32string const &left, std::u32string const &right) {
+    using namespace std;
+    static unique_ptr<unordered_map<u32string, uint8_t> const> const table(CreateInsertions());
+    auto l = table->find(left);
+    if (l != table->end()) {
+      if ((l->second & Insertions::Type::BottomEnd) == Insertions::Type::BottomEnd) {
+        return Insertions::Type::BottomEnd;
       }
-      if (l.te !== undefined) {
-        return "topEnd";
-      }
-    }
-    const r = insertions.get(right);
-    if (r !== undefined) {
-      if (r.bs !== undefined) {
-        return "bottomStart";
-      }
-      if (r.ts !== undefined) {
-        return "topStart";
+      if ((l->second & Insertions::Type::TopEnd) == Insertions::Type::TopEnd) {
+        return Insertions::Type::TopEnd;
       }
     }
+    auto r = table->find(right);
+    if (r != table->end()) {
+      if ((r->second & Insertions::Type::BottomStart) == Insertions::Type::BottomStart) {
+        return Insertions::Type::BottomStart;
+      }
+      if ((r->second & Insertions::Type::TopStart) == Insertions::Type::TopStart) {
+        return Insertions::Type::TopStart;
+      }
+    }
+    return nullopt;
   }
-#endif
 };
 
 } // namespace ksesh

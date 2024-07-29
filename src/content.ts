@@ -509,12 +509,20 @@ export class Line {
       switch (type) {
         case "topStart":
           chars[i - 1] = { ...left, char: right.char, charPlain: left.char };
-          chars[i] = { ...center, char: SignList.topStartInsertion };
+          chars[i] = {
+            ...center,
+            char: SignList.topStartInsertion,
+            charPlain: "",
+          };
           chars[i + 1] = { ...right, char: left.char, charPlain: right.char };
           break;
         case "bottomStart":
           chars[i - 1] = { ...left, char: right.char, charPlain: left.char };
-          chars[i] = { ...center, char: SignList.bottomStartInsertion };
+          chars[i] = {
+            ...center,
+            char: SignList.bottomStartInsertion,
+            charPlain: "",
+          };
           chars[i + 1] = { ...right, char: left.char, charPlain: right.char };
           break;
         case "topEnd":

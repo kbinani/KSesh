@@ -66,6 +66,7 @@ list(APPEND ksesh_files
   src/desktop/SignList.hpp
   src/desktop/Harfbuzz.hpp
   src/desktop/String.hpp
+  src/desktop/Insertions.hpp
 )
 if (APPLE)
   list(APPEND ksesh_files src/desktop/Application.mm)
@@ -108,15 +109,9 @@ target_link_libraries(ksesh
   PRIVATE
     ksesh-binary-data
     juce::juce_gui_extra
-    juce::juce_opengl
   PUBLIC
     juce::juce_recommended_config_flags
     juce::juce_recommended_lto_flags
-)
-
-target_include_directories(ksesh
-  PRIVATE
-    deps/JUCE/modules/juce_graphics/image_formats
 )
 
 source_group(TREE ${CMAKE_CURRENT_LIST_DIR} FILES ${ksesh_files})

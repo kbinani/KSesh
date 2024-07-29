@@ -9,6 +9,7 @@
 #include "String.hpp"
 #include "Harfbuzz.hpp"
 #include "BinaryData.hpp"
+#include "Insertions.hpp"
 #include "SignList.hpp"
 #include "Content.hpp"
 #include "HieroglyphComponent.hpp"
@@ -66,7 +67,7 @@ private:
   HbFontUniquePtr fFont;
 };
 
-std::vector<std::u32string> SignList::enclosureBeginning = {
+std::vector<std::u32string> const SignList::enclosureBeginning = {
     U"𓉘"s,
     U"𓉙"s,
     U"𓉚"s,
@@ -74,7 +75,7 @@ std::vector<std::u32string> SignList::enclosureBeginning = {
     U"𓊈"s,
     U"𓍹"s,
 };
-std::vector<std::u32string> SignList::enclosureTerminal = {
+std::vector<std::u32string> const SignList::enclosureTerminal = {
     U"𓉛"s,
     U"𓉜"s,
     U"𓉝"s,
@@ -83,6 +84,11 @@ std::vector<std::u32string> SignList::enclosureTerminal = {
     U"𓍺"s,
     U"𓍻"s,
 };
+
+std::u32string const SignList::topStartInsertion = U"\U00013432";
+std::u32string const SignList::bottomStartInsertion = U"\U00013433";
+std::u32string const SignList::topEndInsertion = U"\U00013434";
+std::u32string const SignList::bottomEndInsertion = U"\U00013435";
 
 } // namespace ksesh
 
