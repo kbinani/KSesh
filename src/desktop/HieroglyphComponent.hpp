@@ -7,11 +7,11 @@ public:
   explicit HieroglyphComponent(HbFontUniquePtr const &font) : fFont(font) {}
 
   void paint(juce::Graphics &g) override {
-    g.fillAll(juce::Colour(204, 204, 204));
+    g.fillAll(getLookAndFeel().findColour(juce::TextEditor::ColourIds::backgroundColourId));
     if (!fContent) {
       return;
     }
-    g.setColour(juce::Colours::black);
+    g.setColour(getLookAndFeel().findColour(juce::TextEditor::ColourIds::textColourId));
     float fontSize = 48;
     float margin = 8;
 
@@ -34,6 +34,10 @@ public:
     if (fContent) {
       repaint();
     }
+  }
+
+  void lookAndFeelChanged() override {
+    repaint();
   }
 
 private:

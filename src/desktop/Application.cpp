@@ -25,7 +25,7 @@ using namespace std::literals::string_literals;
 
 namespace ksesh {
 
-class Application : public juce::JUCEApplication {
+class Application : public juce::JUCEApplication, public juce::DarkModeSettingListener {
 public:
   Application() {}
 
@@ -49,8 +49,13 @@ public:
                                         nullptr));
     HbFaceUniquePtr face(hb_face_create(blob.get(), 0));
     fFont.reset(hb_font_create(face.get()));
-    fLaf = std::make_unique<LookAndFeel>();
+    if (juce::Desktop::getInstance().isDarkModeActive()) {
+      fLaf = std::make_unique<DarkLookAndFeel>();
+    } else {
+      fLaf = std::make_unique<LightLookAndFeel>();
+    }
     juce::LookAndFeel::setDefaultLookAndFeel(fLaf.get());
+    juce::Desktop::getInstance().addDarkModeSettingListener(this);
     fMainWindow = std::make_unique<MainWindow>(getApplicationName(), fFont);
   }
 
@@ -65,9 +70,21 @@ public:
   void anotherInstanceStarted(juce::String const &) override {
   }
 
+  void darkModeSettingChanged() override {
+    if (juce::Desktop::getInstance().isDarkModeActive()) {
+      std::unique_ptr<juce::LookAndFeel> laf = std::make_unique<DarkLookAndFeel>();
+      juce::LookAndFeel::setDefaultLookAndFeel(laf.get());
+      fLaf.swap(laf);
+    } else {
+      std::unique_ptr<juce::LookAndFeel> laf = std::make_unique<LightLookAndFeel>();
+      juce::LookAndFeel::setDefaultLookAndFeel(laf.get());
+      fLaf.swap(laf);
+    }
+  }
+
 private:
   std::unique_ptr<MainWindow> fMainWindow;
-  std::unique_ptr<LookAndFeel> fLaf;
+  std::unique_ptr<juce::LookAndFeel> fLaf;
   HbFontUniquePtr fFont;
 };
 

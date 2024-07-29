@@ -26,6 +26,10 @@ public:
     juce::JUCEApplication::getInstance()->systemRequestedQuit();
   }
 
+  void lookAndFeelChanged() override {
+    setBackgroundColour(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
+  }
+
 private:
   std::unique_ptr<MainComponent> fMain;
 
