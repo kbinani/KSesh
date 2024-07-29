@@ -65,6 +65,7 @@ list(APPEND ksesh_files
   src/desktop/Content.hpp
   src/desktop/SignList.hpp
   src/desktop/SignList.cpp
+  src/desktop/Harfbuzz.hpp
 )
 if (APPLE)
   list(APPEND ksesh_files src/desktop/Application.mm)

@@ -57,13 +57,13 @@ public:
     float fontSize = 48;
     float margin = 8;
 
-    float scale = fontSize / (float)hb_face_get_upem(hb_font_get_face(fFont.hb));
+    float scale = fontSize / (float)hb_face_get_upem(hb_font_get_face(fFont.hb.get()));
     g.addTransform(juce::AffineTransform::translation(margin, margin));
     g.addTransform(juce::AffineTransform::scale(scale, -scale));
     for (auto const &line : fContent->lines) {
       for (auto const &glyph : line->glyphs) {
         juce::Path path;
-        hb_font_draw_glyph(fFont.hb, glyph.glyphId, fDrawFuncs, &path);
+        hb_font_draw_glyph(fFont.hb.get(), glyph.glyphId, fDrawFuncs, &path);
         if (path.getBounds().isEmpty()) {
           continue;
         }

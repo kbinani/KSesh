@@ -39,14 +39,10 @@ struct GlyphInformation {
 };
 
 struct FontData {
-  hb_font_t *const hb;
+  HbFontUniquePtr hb;
   juce::Font const juce;
 
   FontData(hb_font_t *hb, juce::Font font) : hb(hb), juce(font) {}
-
-  ~FontData() {
-    hb_font_destroy(hb);
-  }
 
 private:
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(FontData)
@@ -175,22 +171,22 @@ public:
     juce::String u(juce::CharPointer_UTF32((wchar_t *)result.c_str()), juce::CharPointer_UTF32((wchar_t *)(result.data() + result.size())));
     u8string utf8((char8_t const *)u.toRawUTF8());
 
-    hb_buffer_t *buffer = hb_buffer_create();
-    hb_buffer_add_utf8(buffer, (char const *)utf8.c_str(), -1, 0, -1);
-    hb_buffer_set_direction(buffer, HB_DIRECTION_LTR);
-    hb_buffer_set_script(buffer, HB_SCRIPT_EGYPTIAN_HIEROGLYPHS);
-    hb_buffer_set_cluster_level(buffer, HB_BUFFER_CLUSTER_LEVEL_CHARACTERS);
-    hb_shape(font.hb, buffer, nullptr, 0);
+    HbBufferUniquePtr buffer(hb_buffer_create());
+    hb_buffer_add_utf8(buffer.get(), (char const *)utf8.c_str(), -1, 0, -1);
+    hb_buffer_set_direction(buffer.get(), HB_DIRECTION_LTR);
+    hb_buffer_set_script(buffer.get(), HB_SCRIPT_EGYPTIAN_HIEROGLYPHS);
+    hb_buffer_set_cluster_level(buffer.get(), HB_BUFFER_CLUSTER_LEVEL_CHARACTERS);
+    hb_shape(font.hb.get(), buffer.get(), nullptr, 0);
 
     hb_font_extents_t extents{};
-    hb_font_get_h_extents(font.hb, &extents);
+    hb_font_get_h_extents(font.hb.get(), &extents);
     auto ascender = extents.ascender;
     auto descender = extents.descender;
-    unitsPerEm = hb_face_get_upem(hb_font_get_face(font.hb));
+    unitsPerEm = hb_face_get_upem(hb_font_get_face(font.hb.get()));
 
-    unsigned int numGlyphs = hb_buffer_get_length(buffer);
-    hb_glyph_info_t *glyphInfo = hb_buffer_get_glyph_infos(buffer, nullptr);
-    hb_glyph_position_t *glyphPos = hb_buffer_get_glyph_positions(buffer, nullptr);
+    unsigned int numGlyphs = hb_buffer_get_length(buffer.get());
+    hb_glyph_info_t *glyphInfo = hb_buffer_get_glyph_infos(buffer.get(), nullptr);
+    hb_glyph_position_t *glyphPos = hb_buffer_get_glyph_positions(buffer.get(), nullptr);
     hb_position_t cursorX = 0;
     hb_position_t cursorY = -(unitsPerEm + descender);
     for (unsigned int i = 0; i < numGlyphs; i++) {
@@ -232,7 +228,7 @@ public:
         }
       }
     }
-    this->buffer = buffer;
+    this->buffer.swap(buffer);
     if (lastCluster < utf8.size()) {
       clusters.push_back(Cluster(index, bb));
     }
@@ -252,16 +248,12 @@ public:
     boundingBox = juce::Rectangle<float>(0, 0, maxX, ascender - descender);
   }
 
-  ~Line() {
-    hb_buffer_destroy(buffer);
-  }
-
 public:
   std::u32string result;
   std::vector<Cluster> clusters;
   juce::Rectangle<float> boundingBox;
   std::vector<Char> chars;
-  hb_buffer_t *buffer;
+  HbBufferUniquePtr buffer;
   int unitsPerEm;
   std::vector<GlyphInformation> glyphs;
 

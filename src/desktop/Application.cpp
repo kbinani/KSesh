@@ -1,13 +1,12 @@
 #include <juce_gui_extra/juce_gui_extra.h>
 #include <juce_opengl/juce_opengl.h>
 
-#include <juce_graphics/fonts/harfbuzz/hb.hh>
-
 #include <iostream>
 
 #pragma GCC diagnostic ignored "-Wunused-variable"
 
 // clang-format off
+#include "Harfbuzz.hpp"
 #include "BinaryData.hpp"
 #include "SignList.hpp"
 #include "Content.hpp"
@@ -39,16 +38,14 @@ public:
 
   void initialise(juce::String const &) override {
     auto typeface = juce::Typeface::createSystemTypefaceFor(BinaryData::eot_ttf, BinaryData::eot_ttfSize);
-    auto blob = hb_blob_create(BinaryData::eot_ttf,
-                               BinaryData::eot_ttfSize,
-                               HB_MEMORY_MODE_READONLY,
-                               nullptr,
-                               nullptr);
-    hb_face_t *face = hb_face_create(blob, 0);
-    hb_font_t *font = hb_font_create(face);
-    fFont = std::make_unique<FontData>(font, juce::Font(juce::FontOptions(typeface)));
-    hb_face_destroy(face);
-    hb_blob_destroy(blob);
+    HbBlobUniquePtr blob(hb_blob_create(BinaryData::eot_ttf,
+                                        BinaryData::eot_ttfSize,
+                                        HB_MEMORY_MODE_READONLY,
+                                        nullptr,
+                                        nullptr));
+    HbFaceUniquePtr face(hb_face_create(blob.get(), 0));
+    HbFontUniquePtr font(hb_font_create(face.get()));
+    fFont = std::make_unique<FontData>(font.release(), juce::Font(juce::FontOptions(typeface)));
     fMainWindow = std::make_unique<MainWindow>(getApplicationName(), *fFont);
   }
 
