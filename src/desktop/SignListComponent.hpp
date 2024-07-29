@@ -4,7 +4,7 @@ namespace ksesh {
 
 class SignListComponent : public juce::Component {
 public:
-  explicit SignListComponent(FontData const &font) : fFont(font) {
+  explicit SignListComponent(HbFontUniquePtr const &font) : fFont(font) {
   }
 
   void paint(juce::Graphics &g) override {
@@ -12,7 +12,7 @@ public:
   }
 
 private:
-  FontData const &fFont;
+  HbFontUniquePtr const &fFont;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SignListComponent)
 };

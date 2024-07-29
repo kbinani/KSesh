@@ -38,19 +38,9 @@ struct GlyphInformation {
   uint32_t cluster;
 };
 
-struct FontData {
-  HbFontUniquePtr hb;
-  juce::Font const juce;
-
-  FontData(hb_font_t *hb, juce::Font font) : hb(hb), juce(font) {}
-
-private:
-  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(FontData)
-};
-
 class Line {
 public:
-  Line(int rawOffset, std::u32string const &raw, FontData const &font) {
+  Line(int rawOffset, std::u32string const &raw, HbFontUniquePtr const &font) {
     using namespace std;
     using namespace std::literals::string_literals;
     vector<CharBase> chars;
@@ -92,7 +82,7 @@ public:
             return ch.ch.ends_with(c);
           });
           if (found != SignList::enclosureTerminal.end()) {
-            ch.ch = U"\u1343d"s;
+            ch.ch = U"\U0001343d"s;
             break;
           }
         }
@@ -176,13 +166,13 @@ public:
     hb_buffer_set_direction(buffer.get(), HB_DIRECTION_LTR);
     hb_buffer_set_script(buffer.get(), HB_SCRIPT_EGYPTIAN_HIEROGLYPHS);
     hb_buffer_set_cluster_level(buffer.get(), HB_BUFFER_CLUSTER_LEVEL_CHARACTERS);
-    hb_shape(font.hb.get(), buffer.get(), nullptr, 0);
+    hb_shape(font.get(), buffer.get(), nullptr, 0);
 
     hb_font_extents_t extents{};
-    hb_font_get_h_extents(font.hb.get(), &extents);
+    hb_font_get_h_extents(font.get(), &extents);
     auto ascender = extents.ascender;
     auto descender = extents.descender;
-    unitsPerEm = hb_face_get_upem(hb_font_get_face(font.hb.get()));
+    unitsPerEm = hb_face_get_upem(hb_font_get_face(font.get()));
 
     unsigned int numGlyphs = hb_buffer_get_length(buffer.get());
     hb_glyph_info_t *glyphInfo = hb_buffer_get_glyph_infos(buffer.get(), nullptr);
@@ -198,7 +188,7 @@ public:
       auto xAdvance = glyphPos[i].x_advance;
       auto yAdvance = glyphPos[i].y_advance;
       info.x = cursorX + xOffset;
-      info.y = (cursorY + yOffset);
+      info.y = -(cursorY + yOffset);
       glyphs.push_back(info);
       cursorX += xAdvance;
       cursorY += yAdvance;
@@ -209,7 +199,8 @@ public:
     optional<juce::Rectangle<float>> bb;
     float maxX = 0;
     for (auto const &info : glyphs) {
-      juce::Rectangle<float> bounds = font.juce.getTypefacePtr()->getGlyphBounds(juce::TypefaceMetricsKind::portable, info.glyphId);
+      juce::Path path = Harfbuzz::CreatePath(info.glyphId, font);
+      juce::Rectangle<float> bounds = path.getBounds();
       if (info.cluster != lastCluster) {
         auto u8 = utf8.substr(lastCluster, info.cluster - lastCluster);
         auto u = juce::String::fromUTF8(u8.c_str());
@@ -263,7 +254,7 @@ private:
 
 class Content {
 public:
-  Content(std::u32string const &raw, FontData const &font) {
+  Content(std::u32string const &raw, HbFontUniquePtr const &font) {
     using namespace std;
     u32string::size_type offset = 0;
     while (true) {

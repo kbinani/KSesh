@@ -37,16 +37,14 @@ public:
   }
 
   void initialise(juce::String const &) override {
-    auto typeface = juce::Typeface::createSystemTypefaceFor(BinaryData::eot_ttf, BinaryData::eot_ttfSize);
     HbBlobUniquePtr blob(hb_blob_create(BinaryData::eot_ttf,
                                         BinaryData::eot_ttfSize,
                                         HB_MEMORY_MODE_READONLY,
                                         nullptr,
                                         nullptr));
     HbFaceUniquePtr face(hb_face_create(blob.get(), 0));
-    HbFontUniquePtr font(hb_font_create(face.get()));
-    fFont = std::make_unique<FontData>(font.release(), juce::Font(juce::FontOptions(typeface)));
-    fMainWindow = std::make_unique<MainWindow>(getApplicationName(), *fFont);
+    fFont.reset(hb_font_create(face.get()));
+    fMainWindow = std::make_unique<MainWindow>(getApplicationName(), fFont);
   }
 
   void shutdown() override {
@@ -62,7 +60,7 @@ public:
 
 private:
   std::unique_ptr<MainWindow> fMainWindow;
-  std::unique_ptr<FontData> fFont;
+  HbFontUniquePtr fFont;
 };
 
 } // namespace ksesh

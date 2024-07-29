@@ -4,9 +4,9 @@ namespace ksesh {
 
 class MainWindow : public juce::DocumentWindow {
 public:
-  MainWindow(juce::String name, FontData const &font) : juce::DocumentWindow(name,
-                                                                             juce::Desktop::getInstance().getDefaultLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId),
-                                                                             juce::DocumentWindow::allButtons) {
+  MainWindow(juce::String name, HbFontUniquePtr const &font) : juce::DocumentWindow(name,
+                                                                                    juce::Desktop::getInstance().getDefaultLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId),
+                                                                                    juce::DocumentWindow::allButtons) {
     setUsingNativeTitleBar(true);
     fMain = std::make_unique<MainComponent>(font);
     setContentNonOwned(fMain.get(), true);

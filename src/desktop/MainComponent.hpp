@@ -8,7 +8,7 @@ class MainComponent : public juce::Component, public TextEditorComponent::Delega
   };
 
 public:
-  explicit MainComponent(FontData const &font) : fFont(font) {
+  explicit MainComponent(HbFontUniquePtr const &font) : fFont(font) {
     int const width = 1280;
     int const height = 720;
 
@@ -50,7 +50,7 @@ private:
   std::unique_ptr<TextEditorComponent> fTextEditor;
   std::unique_ptr<HieroglyphComponent> fHieroglyph;
   std::unique_ptr<SignListComponent> fSignList;
-  FontData const &fFont;
+  HbFontUniquePtr const &fFont;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };
