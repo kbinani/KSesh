@@ -254,7 +254,7 @@ public:
   Content(std::u32string const &raw, HbFontUniquePtr const &font) {
     using namespace std;
     u32string::size_type offset = 0;
-    while (true) {
+    while (offset < raw.size()) {
       auto found = raw.find(U'\n', offset);
       if (found == u32string::npos) {
         auto l = make_shared<Line>(offset, raw.substr(offset), font);
