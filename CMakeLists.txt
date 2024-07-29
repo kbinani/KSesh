@@ -33,7 +33,7 @@ endif()
 add_subdirectory(deps/JUCE)
 
 juce_add_gui_app(ksesh
-  PRODUCT_NAME "ksesh"
+  PRODUCT_NAME "KSesh"
   APP_SANDBOX_ENABLED TRUE
   APP_SANDBOX_INHERIT FALSE
   APP_SANDBOX_OPTIONS "com.apple.security.files.user-selected.read-write;com.apple.security.files.bookmarks.app-scope"
