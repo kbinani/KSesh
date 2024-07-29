@@ -18,6 +18,7 @@
 #include "SplitterComponent.hpp"
 #include "MainComponent.hpp"
 #include "MainWindow.hpp"
+#include "LookAndFeel.hpp"
 // clang-format on
 
 using namespace std::literals::string_literals;
@@ -48,6 +49,8 @@ public:
                                         nullptr));
     HbFaceUniquePtr face(hb_face_create(blob.get(), 0));
     fFont.reset(hb_font_create(face.get()));
+    fLaf = std::make_unique<LookAndFeel>();
+    juce::LookAndFeel::setDefaultLookAndFeel(fLaf.get());
     fMainWindow = std::make_unique<MainWindow>(getApplicationName(), fFont);
   }
 
@@ -64,6 +67,7 @@ public:
 
 private:
   std::unique_ptr<MainWindow> fMainWindow;
+  std::unique_ptr<LookAndFeel> fLaf;
   HbFontUniquePtr fFont;
 };
 

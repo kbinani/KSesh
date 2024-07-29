@@ -67,6 +67,7 @@ list(APPEND ksesh_files
   src/desktop/Harfbuzz.hpp
   src/desktop/String.hpp
   src/desktop/Insertions.hpp
+  src/desktop/LookAndFeel.hpp
 )
 if (APPLE)
   list(APPEND ksesh_files src/desktop/Application.mm)
