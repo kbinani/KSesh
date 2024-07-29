@@ -19,6 +19,8 @@
 #include "MainWindow.hpp"
 // clang-format on
 
+using namespace std::literals::string_literals;
+
 namespace ksesh {
 
 class Application : public juce::JUCEApplication {
@@ -62,6 +64,24 @@ public:
 private:
   std::unique_ptr<MainWindow> fMainWindow;
   HbFontUniquePtr fFont;
+};
+
+std::vector<std::u32string> SignList::enclosureBeginning = {
+    U"𓉘"s,
+    U"𓉙"s,
+    U"𓉚"s,
+    U"𓊆"s,
+    U"𓊈"s,
+    U"𓍹"s,
+};
+std::vector<std::u32string> SignList::enclosureTerminal = {
+    U"𓉛"s,
+    U"𓉜"s,
+    U"𓉝"s,
+    U"𓊇"s,
+    U"𓊉"s,
+    U"𓍺"s,
+    U"𓍻"s,
 };
 
 } // namespace ksesh

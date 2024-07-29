@@ -64,7 +64,6 @@ list(APPEND ksesh_files
   src/desktop/SplitterComponent.hpp
   src/desktop/Content.hpp
   src/desktop/SignList.hpp
-  src/desktop/SignList.cpp
   src/desktop/Harfbuzz.hpp
   src/desktop/String.hpp
 )
