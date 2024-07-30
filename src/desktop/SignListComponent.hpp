@@ -195,6 +195,7 @@ public:
   void mouseExit(juce::MouseEvent const &e) override {
     if (fHitTabButton >= 0) {
       fHitTabButton = -1;
+      updateCursor();
       repaint();
     }
   }
@@ -207,6 +208,7 @@ public:
       auto const &tb = fTabButtons[i];
       if (juce::Rectangle<float>(tb.x, tb.y, tb.width, tb.height).contains(e.getPosition().toFloat())) {
         fMouseDownCategory = i;
+        updateCursor();
         repaint();
         return;
       }
@@ -215,10 +217,12 @@ public:
       auto const &sb = fSignButtons[i];
       if (juce::Rectangle<float>(sb.x, sb.y, sb.width, sb.height).contains(e.getPosition().toFloat())) {
         fMouseDownSign = i;
+        updateCursor();
         repaint();
         return;
       }
     }
+    updateCursor();
   }
 
   void mouseUp(juce::MouseEvent const &e) override {
@@ -230,6 +234,7 @@ public:
     }
     fMouseDownCategory = -1;
     fMouseDownSign = -1;
+    updateCursor();
     repaint();
   }
 
@@ -256,7 +261,11 @@ private:
       fHitSignButton = hitSignButton;
       repaint();
     }
-    if (fHitTabButton >= 0 || fHitSignButton >= 0) {
+    updateCursor();
+  }
+
+  void updateCursor() {
+    if (fHitTabButton >= 0 || fHitSignButton >= 0 || fMouseDownCategory >= 0 || fMouseDownSign >= 0) {
       setMouseCursor(juce::MouseCursor::PointingHandCursor);
     } else {
       setMouseCursor(juce::MouseCursor::NormalCursor);
