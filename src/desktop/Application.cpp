@@ -4,7 +4,6 @@
 #include <iostream>
 
 #pragma GCC diagnostic ignored "-Wunused-variable"
-#pragma clang diagnostic ignored "-Wunused-variable"
 
 // clang-format off
 #include "String.hpp"

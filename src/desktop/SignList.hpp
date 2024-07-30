@@ -1084,6 +1084,7 @@ class SignList {
     return s;
   }
 
+public:
   static std::vector<Entry> const &Signs() {
     using namespace std;
     static unique_ptr<vector<Entry> const> const s(CreateSigns());
@@ -1096,6 +1097,7 @@ class SignList {
     return *s;
   }
 
+private:
   static std::vector<Entry> const *CreateSpecial() {
     using namespace std;
     auto s = new vector<Entry>();
