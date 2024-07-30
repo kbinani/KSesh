@@ -14,6 +14,8 @@
 #include "Content.hpp"
 #include "HieroglyphComponent.hpp"
 #include "TextEditorComponent.hpp"
+#include "Sign.hpp"
+#include "SignListButtonContainer.hpp"
 #include "SignListComponent.hpp"
 #include "SplitterComponent.hpp"
 #include "MainComponent.hpp"

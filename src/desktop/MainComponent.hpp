@@ -24,6 +24,9 @@ public:
 
     fSignList = std::make_unique<SignListComponent>(font);
     fSignList->setBounds(0, height / 2 + resizerSize / 2, width, height / 2 - resizerSize / 2);
+    fSignList->onClickSign = [this](Sign const &sign) {
+      onClickSign(sign);
+    };
 
     fHorizontalSplitter = std::make_unique<SplitterComponent>(fVerticalSplitter.get(), fSignList.get(), false);
     fHorizontalSplitter->setBounds(0, height / 2 + resizerSize / 2, width, resizerSize);
@@ -42,6 +45,12 @@ public:
     auto str = U32StringFromJuceString(text);
     auto c = std::make_shared<Content>(str, fFont);
     fHieroglyph->setContent(c);
+  }
+
+private:
+  void onClickSign(Sign const &sign) {
+    fTextEditor->insert(sign.name);
+    fTextEditor->focus();
   }
 
 private:

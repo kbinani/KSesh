@@ -68,6 +68,8 @@ list(APPEND ksesh_files
   src/desktop/String.hpp
   src/desktop/Insertions.hpp
   src/desktop/LookAndFeel.hpp
+  src/desktop/Sign.hpp
+  src/desktop/SignListButtonContainer.hpp
 )
 if (APPLE)
   list(APPEND ksesh_files src/desktop/Application.mm)

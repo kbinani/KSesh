@@ -29,6 +29,22 @@ public:
     fEditor->applyColourToAllText(getLookAndFeel().findColour(juce::TextEditor::textColourId));
   }
 
+  void insert(juce::String const &s) {
+    auto text = fEditor->getText();
+    auto selected = fEditor->getHighlightedRegion();
+    auto str = s;
+    if (selected.getEnd() >= text.length()) {
+      str = s + " ";
+    } else if (selected.getEnd() < text.length() && text.substring(selected.getEnd(), selected.getEnd() + 1) != " ") {
+      str = s + " ";
+    }
+    fEditor->insertTextAtCaret(str);
+  }
+
+  void focus() {
+    fEditor->grabKeyboardFocus();
+  }
+
 private:
   void onTextChange() {
     if (!fDelegate) {
