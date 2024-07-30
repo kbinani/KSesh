@@ -79,14 +79,19 @@ public:
 
     auto textColor = getLookAndFeel().findColour(juce::TextEditor::textColourId);
     auto borderColor = getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId);
-    //    auto highlightColor = getLookAndFeel().findColour(juce::TextEditor::highlightColourId);
+    auto highlightColor = getLookAndFeel().findColour(juce::TextEditor::highlightColourId);
 
     float scale = 1.0f / Harfbuzz::UnitsPerEm(fFont);
     float space = 2;
 
-    for (auto const &tb : fTabButtons) {
+    for (int i = 0; i < (int)fTabButtons.size(); i++) {
+      auto const &tb = fTabButtons[i];
       float textSize = 16;
       float signSize = 20;
+      if (i == fHitTabButton) {
+        g.setColour(highlightColor);
+        g.fillRect(tb.x, tb.y, tb.width, tb.height);
+      }
       g.setFont(textSize);
       g.setColour(textColor);
       if (tb.path.isEmpty()) {
@@ -119,7 +124,43 @@ public:
     layout();
   }
 
+  void mouseEnter(juce::MouseEvent const &e) override {
+    updateButtonHit(e.getPosition());
+  }
+
+  void mouseMove(juce::MouseEvent const &e) override {
+    updateButtonHit(e.getPosition());
+  }
+
+  void mouseExit(juce::MouseEvent const &e) override {
+    if (fHitTabButton >= 0) {
+      fHitTabButton = -1;
+      repaint();
+    }
+  }
+
 private:
+  void updateButtonHit(juce::Point<int> const &p) {
+    int hitTabButton = -1;
+    for (int i = 0; i < (int)fTabButtons.size(); i++) {
+      auto const &tb = fTabButtons[i];
+      if (juce::Rectangle<float>(tb.x, tb.y, tb.width, tb.height).contains(p.toFloat())) {
+        hitTabButton = i;
+        break;
+      }
+    }
+
+    if (fHitTabButton != hitTabButton) {
+      fHitTabButton = hitTabButton;
+      repaint();
+    }
+    if (fHitTabButton >= 0 || fHitSignButton >= 0) {
+      setMouseCursor(juce::MouseCursor::PointingHandCursor);
+    } else {
+      setMouseCursor(juce::MouseCursor::NormalCursor);
+    }
+  }
+
   Category makeCategory(juce::String const &name, std::u32string const &sign) {
     return Category(name, Harfbuzz::CreatePath(sign, fFont));
   }
@@ -155,6 +196,8 @@ private:
   std::vector<TabButton> fTabButtons;
   std::vector<SignButton> fSignButtons;
   int fRows = 0;
+  int fHitTabButton = -1;
+  int fHitSignButton = -1;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SignListComponent)
 };
