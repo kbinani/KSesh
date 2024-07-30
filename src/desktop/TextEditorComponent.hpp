@@ -25,6 +25,10 @@ public:
     fEditor->setBounds(0, 0, getWidth(), getHeight());
   }
 
+  void lookAndFeelChanged() override {
+    fEditor->applyColourToAllText(getLookAndFeel().findColour(juce::TextEditor::textColourId));
+  }
+
 private:
   void onTextChange() {
     if (!fDelegate) {
