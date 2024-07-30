@@ -32,13 +32,6 @@ struct Cluster {
   Cluster(int resultOffset, std::optional<juce::Rectangle<float>> bounds) : resultOffset(resultOffset), bounds(bounds) {}
 };
 
-struct GlyphInformation {
-  hb_codepoint_t glyphId;
-  hb_position_t x;
-  hb_position_t y;
-  uint32_t cluster;
-};
-
 class Line {
 public:
   Line(int rawOffset, std::u32string const &raw, HbFontUniquePtr const &font) {
@@ -128,12 +121,7 @@ public:
     }
     u8string utf8 = U8StringFromU32String(result);
 
-    HbBufferUniquePtr buffer(hb_buffer_create());
-    hb_buffer_add_utf8(buffer.get(), (char const *)utf8.c_str(), -1, 0, -1);
-    hb_buffer_set_direction(buffer.get(), HB_DIRECTION_LTR);
-    hb_buffer_set_script(buffer.get(), HB_SCRIPT_EGYPTIAN_HIEROGLYPHS);
-    hb_buffer_set_cluster_level(buffer.get(), HB_BUFFER_CLUSTER_LEVEL_CHARACTERS);
-    hb_shape(font.get(), buffer.get(), nullptr, 0);
+    HbBufferUniquePtr buffer(Harfbuzz::CreateBuffer(result, font));
 
     hb_font_extents_t extents{};
     hb_font_get_h_extents(font.get(), &extents);
@@ -141,25 +129,7 @@ public:
     auto descender = extents.descender;
     unitsPerEm = hb_face_get_upem(hb_font_get_face(font.get()));
 
-    unsigned int numGlyphs = hb_buffer_get_length(buffer.get());
-    hb_glyph_info_t *glyphInfo = hb_buffer_get_glyph_infos(buffer.get(), nullptr);
-    hb_glyph_position_t *glyphPos = hb_buffer_get_glyph_positions(buffer.get(), nullptr);
-    hb_position_t cursorX = 0;
-    hb_position_t cursorY = -(unitsPerEm + descender);
-    for (unsigned int i = 0; i < numGlyphs; i++) {
-      GlyphInformation info;
-      info.glyphId = glyphInfo[i].codepoint;
-      info.cluster = glyphInfo[i].cluster;
-      auto xOffset = glyphPos[i].x_offset;
-      auto yOffset = glyphPos[i].y_offset;
-      auto xAdvance = glyphPos[i].x_advance;
-      auto yAdvance = glyphPos[i].y_advance;
-      info.x = cursorX + xOffset;
-      info.y = -(cursorY + yOffset);
-      glyphs.push_back(info);
-      cursorX += xAdvance;
-      cursorY += yAdvance;
-    }
+    Harfbuzz::CreateGlyphInformations(buffer, font, glyphs);
 
     uint32_t lastCluster = 0;
     int index = 0;

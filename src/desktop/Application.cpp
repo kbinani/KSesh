@@ -4,6 +4,7 @@
 #include <iostream>
 
 #pragma GCC diagnostic ignored "-Wunused-variable"
+#pragma clang diagnostic ignored "-Wunused-variable"
 
 // clang-format off
 #include "String.hpp"
@@ -49,10 +50,11 @@ public:
                                         nullptr));
     HbFaceUniquePtr face(hb_face_create(blob.get(), 0));
     fFont.reset(hb_font_create(face.get()));
+    fLaf = std::make_unique<LookAndFeel>();
     if (juce::Desktop::getInstance().isDarkModeActive()) {
-      fLaf = std::make_unique<DarkLookAndFeel>();
+      fLaf->setColourScheme(juce::LookAndFeel_V4::getDarkColourScheme());
     } else {
-      fLaf = std::make_unique<LightLookAndFeel>();
+      fLaf->setColourScheme(juce::LookAndFeel_V4::getLightColourScheme());
     }
     juce::LookAndFeel::setDefaultLookAndFeel(fLaf.get());
     juce::Desktop::getInstance().addDarkModeSettingListener(this);
@@ -71,20 +73,19 @@ public:
   }
 
   void darkModeSettingChanged() override {
+    auto laf = std::make_unique<LookAndFeel>();
     if (juce::Desktop::getInstance().isDarkModeActive()) {
-      std::unique_ptr<juce::LookAndFeel> laf = std::make_unique<DarkLookAndFeel>();
-      juce::LookAndFeel::setDefaultLookAndFeel(laf.get());
-      fLaf.swap(laf);
+      laf->setColourScheme(juce::LookAndFeel_V4::getDarkColourScheme());
     } else {
-      std::unique_ptr<juce::LookAndFeel> laf = std::make_unique<LightLookAndFeel>();
-      juce::LookAndFeel::setDefaultLookAndFeel(laf.get());
-      fLaf.swap(laf);
+      laf->setColourScheme(juce::LookAndFeel_V4::getLightColourScheme());
     }
+    juce::LookAndFeel::setDefaultLookAndFeel(laf.get());
+    fLaf.swap(laf);
   }
 
 private:
   std::unique_ptr<MainWindow> fMainWindow;
-  std::unique_ptr<juce::LookAndFeel> fLaf;
+  std::unique_ptr<LookAndFeel> fLaf;
   HbFontUniquePtr fFont;
 };
 
