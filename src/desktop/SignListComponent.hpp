@@ -4,6 +4,172 @@
 
 namespace ksesh {
 
+struct Sign {
+  juce::String name;
+  std::shared_ptr<juce::Path> path;
+};
+
+class SignListButtonContainer : public juce::Component {
+  struct SignButton {
+    int x;
+    int y;
+    int width;
+    int height;
+    juce::String name;
+    std::shared_ptr<juce::Path> path;
+  };
+
+  enum {
+    signButtonTextSize = 14,
+    signButtonHeaderHeight = 16,
+    signButtonSignSize = 40,
+    signButtonWidth = 44,
+    signButtonHeight = 60,
+    signButtonMinMargin = 4,
+  };
+
+public:
+  explicit SignListButtonContainer(HbFontUniquePtr const &font) : fFont(font) {}
+
+  void setSigns(std::vector<Sign> const &signs) {
+    fSigns = signs;
+    layout(getWidth());
+  }
+
+  void paint(juce::Graphics &g) override {
+    auto textColor = getLookAndFeel().findColour(juce::TextEditor::textColourId);
+    auto borderColor = getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId);
+    auto highlightColor = getLookAndFeel().findColour(juce::TextEditor::highlightColourId);
+    auto highlightTextColor = getLookAndFeel().findColour(juce::TextButton::textColourOnId);
+    auto activeColor = getLookAndFeel().findColour(juce::TextButton::buttonOnColourId);
+
+    float scale = 1.0f / Harfbuzz::UnitsPerEm(fFont);
+
+    for (int i = 0; i < (int)fSignButtons.size(); i++) {
+      auto const &sb = fSignButtons[i];
+      if (i == fMouseDownSign) {
+        g.setColour(activeColor);
+        g.fillRect(sb.x, sb.y, sb.width, sb.height);
+      } else if (i == fHitSignButton) {
+        g.setColour(highlightColor);
+        g.fillRect(sb.x, sb.y, sb.width, sb.height);
+      }
+      g.setFont(signButtonTextSize);
+      if (i == fMouseDownSign) {
+        g.setColour(highlightTextColor);
+      } else {
+        g.setColour(textColor);
+      }
+      g.drawText(sb.name, juce::Rectangle<float>(sb.x, sb.y, sb.width, signButtonHeaderHeight).reduced(1), juce::Justification::centred);
+      auto bounds = sb.path->getBoundsTransformed(juce::AffineTransform::scale(scale * signButtonSignSize, scale * signButtonSignSize));
+      g.saveState();
+      float x = sb.x + sb.width * 0.5f - bounds.getWidth() * 0.5f - bounds.getX();
+      float y = sb.y + signButtonHeaderHeight + (signButtonHeight - signButtonHeaderHeight) * 0.5f - bounds.getHeight() * 0.5f - bounds.getY();
+      g.addTransform(juce::AffineTransform(scale * signButtonSignSize, 0, x, 0, scale * signButtonSignSize, y));
+      g.fillPath(*sb.path);
+      g.restoreState();
+    }
+  }
+
+  void mouseEnter(juce::MouseEvent const &e) override {
+    updateButtonHit(e.getPosition());
+  }
+
+  void mouseMove(juce::MouseEvent const &e) override {
+    updateButtonHit(e.getPosition());
+  }
+
+  void mouseExit(juce::MouseEvent const &e) override {
+    if (fHitSignButton >= 0) {
+      fHitSignButton = -1;
+      updateCursor();
+      repaint();
+    }
+  }
+
+  void mouseDown(juce::MouseEvent const &e) override {
+    for (int i = 0; i < (int)fSignButtons.size(); i++) {
+      auto const &sb = fSignButtons[i];
+      if (juce::Rectangle<float>(sb.x, sb.y, sb.width, sb.height).contains(e.getPosition().toFloat())) {
+        fMouseDownSign = i;
+        updateCursor();
+        repaint();
+        return;
+      }
+    }
+  }
+
+  void mouseUp(juce::MouseEvent const &e) override {
+    fMouseDownSign = -1;
+    updateCursor();
+    repaint();
+  }
+
+  int layout(int width) {
+    int y = 0;
+    int x = 0;
+    int maxY = 0;
+    float scale = signButtonSignSize / (float)Harfbuzz::UnitsPerEm(fFont);
+    fSignButtons.clear();
+    for (auto const &it : fSigns) {
+      auto bounds = it.path->getBoundsTransformed(juce::AffineTransform::scale(scale, scale));
+      int buttonWidth = signButtonWidth;
+      if (bounds.getWidth() + signButtonMinMargin * 2 > signButtonWidth) {
+        buttonWidth = (int)ceil(bounds.getWidth() + signButtonMinMargin * 2);
+      }
+      if (x + buttonWidth > width) {
+        x = 0;
+        y += signButtonHeight + 1;
+      }
+      SignButton sb;
+      sb.x = x;
+      sb.y = y;
+      sb.width = buttonWidth;
+      sb.height = signButtonHeight;
+      sb.name = it.name;
+      sb.path = it.path;
+      fSignButtons.push_back(sb);
+      x += buttonWidth + 1;
+      maxY = y + signButtonHeight;
+    }
+    setBounds(0, 0, width, maxY);
+    return maxY;
+  }
+
+private:
+  void updateButtonHit(juce::Point<int> const &p) {
+    int hitTabButton = -1;
+    int hitSignButton = -1;
+    for (int i = 0; i < (int)fSignButtons.size(); i++) {
+      auto const &sb = fSignButtons[i];
+      if (juce::Rectangle<float>(sb.x, sb.y, sb.width, sb.height).contains(p.toFloat())) {
+        hitSignButton = i;
+        break;
+      }
+    }
+    if (fHitSignButton != hitSignButton) {
+      fHitSignButton = hitSignButton;
+      repaint();
+    }
+    updateCursor();
+  }
+
+  void updateCursor() {
+    if (fHitSignButton >= 0 || fMouseDownSign >= 0) {
+      setMouseCursor(juce::MouseCursor::PointingHandCursor);
+    } else {
+      setMouseCursor(juce::MouseCursor::NormalCursor);
+    }
+  }
+
+private:
+  HbFontUniquePtr const &fFont;
+  std::vector<Sign> fSigns;
+  std::vector<SignButton> fSignButtons;
+  int fHitSignButton = -1;
+  int fMouseDownSign = -1;
+};
+
 class SignListComponent : public juce::Component {
   struct Category {
     explicit Category(juce::String const &name, std::shared_ptr<juce::Path> path = nullptr) : name(name), path(path) {
@@ -22,20 +188,6 @@ class SignListComponent : public juce::Component {
     std::shared_ptr<juce::Path> path;
   };
 
-  struct Sign {
-    juce::String name;
-    std::shared_ptr<juce::Path> path;
-  };
-
-  struct SignButton {
-    int x;
-    int y;
-    int width;
-    int height;
-    juce::String name;
-    std::shared_ptr<juce::Path> path;
-  };
-
   enum {
     tabButtonHeight = 28,
     tabButtonWidth = 60,
@@ -43,12 +195,7 @@ class SignListComponent : public juce::Component {
     tabButtonTextSize = 16,
     tabButtonSignSize = 22,
 
-    signButtonTextSize = 14,
-    signButtonHeaderHeight = 16,
-    signButtonSignSize = 40,
-    signButtonWidth = 44,
-    signButtonHeight = 60,
-    signButtonMinMargin = 4,
+    scrollBarWidth = 8,
   };
 
 public:
@@ -91,6 +238,13 @@ public:
       auto s = makeSign(it.first, it.second);
       fAllSigns[s.name] = s;
     }
+
+    fViewport = std::make_unique<juce::Viewport>();
+    addAndMakeVisible(*fViewport);
+    fContainer = std::make_unique<SignListButtonContainer>(font);
+    addAndMakeVisible(*fContainer);
+    fViewport->setViewedComponent(fContainer.get(), false);
+    fViewport->setScrollBarsShown(true, false, true, false);
 
     setActiveCategory(1);
     layout();
@@ -154,34 +308,15 @@ public:
       int y = (i + 1) * (tabButtonHeight + 1);
       g.drawLine(0, y, width, y, 1);
     }
-    for (int i = 0; i < (int)fSignButtons.size(); i++) {
-      auto const &sb = fSignButtons[i];
-      if (i == fMouseDownSign) {
-        g.setColour(activeColor);
-        g.fillRect(sb.x, sb.y, sb.width, sb.height);
-      } else if (i == fHitSignButton) {
-        g.setColour(highlightColor);
-        g.fillRect(sb.x, sb.y, sb.width, sb.height);
-      }
-      g.setFont(signButtonTextSize);
-      if (i == fMouseDownSign) {
-        g.setColour(highlightTextColor);
-      } else {
-        g.setColour(textColor);
-      }
-      g.drawText(sb.name, juce::Rectangle<float>(sb.x, sb.y, sb.width, signButtonHeaderHeight), juce::Justification::centred);
-      auto bounds = sb.path->getBoundsTransformed(juce::AffineTransform::scale(scale * signButtonSignSize, scale * signButtonSignSize));
-      g.saveState();
-      float x = sb.x + sb.width * 0.5f - bounds.getWidth() * 0.5f - bounds.getX();
-      float y = sb.y + signButtonHeaderHeight + (signButtonHeight - signButtonHeaderHeight) * 0.5f - bounds.getHeight() * 0.5f - bounds.getY();
-      g.addTransform(juce::AffineTransform(scale * signButtonSignSize, 0, x, 0, scale * signButtonSignSize, y));
-      g.fillPath(*sb.path);
-      g.restoreState();
-    }
   }
 
   void resized() override {
+    int const width = getWidth();
+    int const height = getHeight();
     layout();
+    int const h = fRows * (tabButtonHeight + 1);
+    int const preferredHeight = fContainer->layout(width);
+    fViewport->setBounds(0, h, width, height - h);
   }
 
   void mouseEnter(juce::MouseEvent const &e) override {
@@ -202,21 +337,11 @@ public:
 
   void mouseDown(juce::MouseEvent const &e) override {
     fMouseDownCategory = -1;
-    fMouseDownSign = -1;
     bool hit = false;
     for (int i = 0; i < (int)fTabButtons.size(); i++) {
       auto const &tb = fTabButtons[i];
       if (juce::Rectangle<float>(tb.x, tb.y, tb.width, tb.height).contains(e.getPosition().toFloat())) {
         fMouseDownCategory = i;
-        updateCursor();
-        repaint();
-        return;
-      }
-    }
-    for (int i = 0; i < (int)fSignButtons.size(); i++) {
-      auto const &sb = fSignButtons[i];
-      if (juce::Rectangle<float>(sb.x, sb.y, sb.width, sb.height).contains(e.getPosition().toFloat())) {
-        fMouseDownSign = i;
         updateCursor();
         repaint();
         return;
@@ -233,7 +358,6 @@ public:
       }
     }
     fMouseDownCategory = -1;
-    fMouseDownSign = -1;
     updateCursor();
     repaint();
   }
@@ -248,24 +372,15 @@ private:
         break;
       }
     }
-    int hitSignButton = -1;
-    for (int i = 0; i < (int)fSignButtons.size(); i++) {
-      auto const &sb = fSignButtons[i];
-      if (juce::Rectangle<float>(sb.x, sb.y, sb.width, sb.height).contains(p.toFloat())) {
-        hitSignButton = i;
-        break;
-      }
-    }
-    if (fHitTabButton != hitTabButton || fHitSignButton != hitSignButton) {
+    if (fHitTabButton != hitTabButton) {
       fHitTabButton = hitTabButton;
-      fHitSignButton = hitSignButton;
       repaint();
     }
     updateCursor();
   }
 
   void updateCursor() {
-    if (fHitTabButton >= 0 || fHitSignButton >= 0 || fMouseDownCategory >= 0 || fMouseDownSign >= 0) {
+    if (fHitTabButton >= 0 || fMouseDownCategory >= 0) {
       setMouseCursor(juce::MouseCursor::PointingHandCursor);
     } else {
       setMouseCursor(juce::MouseCursor::NormalCursor);
@@ -313,37 +428,11 @@ private:
       fTabButtons.push_back(tb);
       x += tabButtonWidth + 1;
     }
-    y += tabButtonHeight + 1;
-    x = 0;
-    float scale = signButtonSignSize / (float)Harfbuzz::UnitsPerEm(fFont);
-    fSignButtons.clear();
-    for (auto const &it : fUseSigns) {
-      auto bounds = it.path->getBoundsTransformed(juce::AffineTransform::scale(scale, scale));
-      int buttonWidth = signButtonWidth;
-      if (bounds.getWidth() + signButtonMinMargin * 2 > signButtonWidth) {
-        buttonWidth = (int)ceil(bounds.getWidth() + signButtonMinMargin * 2);
-      }
-      if (x + buttonWidth > width) {
-        x = 0;
-        y += signButtonHeight + 1;
-        if (y > height) {
-          break;
-        }
-      }
-      SignButton sb;
-      sb.x = x;
-      sb.y = y;
-      sb.width = buttonWidth;
-      sb.height = signButtonHeight;
-      sb.name = it.name;
-      sb.path = it.path;
-      fSignButtons.push_back(sb);
-      x += buttonWidth + 1;
-    }
+    fContainer->layout(width);
   }
 
   void filterSigns() {
-    fUseSigns.clear();
+    std::vector<Sign> signs;
     auto activeCategory = fCategories[fActiveCategory];
     if (activeCategory.name == "typing") {
     } else if (activeCategory.name == "tall" || activeCategory.name == "wide" || activeCategory.name == "small") {
@@ -386,7 +475,7 @@ private:
         if (sign == fAllSigns.end()) {
           continue;
         }
-        fUseSigns.push_back(sign->second);
+        signs.push_back(sign->second);
       }
     } else {
       for (auto const &it : SignList::Signs()) {
@@ -402,9 +491,10 @@ private:
         if (sign == fAllSigns.end()) {
           continue;
         }
-        fUseSigns.push_back(sign->second);
+        signs.push_back(sign->second);
       }
     }
+    fContainer->setSigns(signs);
   }
 
   void setActiveCategory(int index) {
@@ -416,18 +506,16 @@ private:
   }
 
 private:
+  std::unique_ptr<juce::Viewport> fViewport;
+  std::unique_ptr<SignListButtonContainer> fContainer;
   HbFontUniquePtr const &fFont;
   std::vector<Category> fCategories;
   std::vector<TabButton> fTabButtons;
-  std::vector<SignButton> fSignButtons;
   std::unordered_map<juce::String, Sign> fAllSigns;
-  std::vector<Sign> fUseSigns;
   int fRows = 0;
   int fActiveCategory = 0;
   int fHitTabButton = -1;
-  int fHitSignButton = -1;
   int fMouseDownCategory = -1;
-  int fMouseDownSign = -1;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SignListComponent)
 };
