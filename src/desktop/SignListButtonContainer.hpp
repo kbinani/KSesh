@@ -1,5 +1,7 @@
 #pragma once
 
+#pragma GCC diagnostic ignored "-Wunused-variable"
+
 namespace ksesh {
 
 class SignListButtonContainer : public juce::Component {
@@ -93,7 +95,7 @@ public:
   }
 
   void mouseUp(juce::MouseEvent const &e) override {
-    if (e.mods.isLeftButtonDown() && 0 <= fMouseDownSign && fMouseDownSign < fSigns.size()) {
+    if (e.mods.isLeftButtonDown() && 0 <= fMouseDownSign && fMouseDownSign < (int)fSigns.size()) {
       if (onClickSign) {
         auto const &sign = fSigns[fMouseDownSign];
         onClickSign(sign);
