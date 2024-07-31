@@ -95,9 +95,10 @@ public:
   }
 
   void mouseUp(juce::MouseEvent const &e) override {
-    if (e.mods.isLeftButtonDown() && 0 <= fMouseDownSign && fMouseDownSign < (int)fSigns.size()) {
-      if (onClickSign) {
-        auto const &sign = fSigns[fMouseDownSign];
+    if (e.mods.isLeftButtonDown() && 0 <= fMouseDownSign && fMouseDownSign < (int)fSignButtons.size() && fMouseDownSign < (int)fSigns.size()) {
+      auto const &sb = fSignButtons[fMouseDownSign];
+      auto const &sign = fSigns[fMouseDownSign];
+      if (juce::Rectangle<float>(sb.x, sb.y, sb.width, sb.height).contains(e.getPosition().toFloat()) && onClickSign) {
         onClickSign(sign);
       }
     }
