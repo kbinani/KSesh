@@ -12,6 +12,7 @@
 #include "Insertions.hpp"
 #include "SignList.hpp"
 #include "Content.hpp"
+#include "AppSetting.hpp"
 #include "HieroglyphComponent.hpp"
 #include "TextEditorComponent.hpp"
 #include "Sign.hpp"
@@ -52,11 +53,7 @@ public:
     HbFaceUniquePtr face(hb_face_create(blob.get(), 0));
     fFont.reset(hb_font_create(face.get()));
     fLaf = std::make_unique<LookAndFeel>();
-    if (juce::Desktop::getInstance().isDarkModeActive()) {
-      fLaf->setColourScheme(juce::LookAndFeel_V4::getDarkColourScheme());
-    } else {
-      fLaf->setColourScheme(juce::LookAndFeel_V4::getLightColourScheme());
-    }
+    fLaf->setColourScheme(fSetting.getColorScheme(juce::Desktop::getInstance().isDarkModeActive()));
     juce::LookAndFeel::setDefaultLookAndFeel(fLaf.get());
     juce::Desktop::getInstance().addDarkModeSettingListener(this);
     fMainWindow = std::make_unique<MainWindow>(getApplicationName(), fFont);
@@ -74,12 +71,11 @@ public:
   }
 
   void darkModeSettingChanged() override {
-    auto laf = std::make_unique<LookAndFeel>();
-    if (juce::Desktop::getInstance().isDarkModeActive()) {
-      laf->setColourScheme(juce::LookAndFeel_V4::getDarkColourScheme());
-    } else {
-      laf->setColourScheme(juce::LookAndFeel_V4::getLightColourScheme());
+    if (fSetting.colorScheme != AppSetting::ColorScheme::Auto) {
+      return;
     }
+    auto laf = std::make_unique<LookAndFeel>();
+    laf->setColourScheme(fSetting.getColorScheme(juce::Desktop::getInstance().isDarkModeActive()));
     juce::LookAndFeel::setDefaultLookAndFeel(laf.get());
     fLaf.swap(laf);
   }
@@ -88,6 +84,7 @@ private:
   std::unique_ptr<MainWindow> fMainWindow;
   std::unique_ptr<LookAndFeel> fLaf;
   HbFontUniquePtr fFont;
+  AppSetting fSetting;
 };
 
 std::vector<std::u32string> const SignList::enclosureBeginning = {
