@@ -48,49 +48,31 @@ public:
 
 private:
   void textEditorDidChangeCaretPosition(juce::String const &text, int caret) {
-    auto typing = getTypingAtCaret(text, caret);
-    fSignList->setTyping(typing);
+    if (!fIgnoreCaretChange) {
+      auto typing = TextEditorComponent::GetTypingAtCaret(text, caret);
+      fSignList->setTyping(typing);
+    }
   }
 
   void textEditorDidChangeText(juce::String const &text, int caret) {
     auto str = U32StringFromJuceString(text);
     auto c = std::make_shared<Content>(str, fFont);
     fHieroglyph->setContent(c);
-    auto typing = getTypingAtCaret(text, caret);
-    fSignList->setTyping(typing);
-  }
-
-  juce::String getTypingAtCaret(juce::String const &text, int caret) {
-    if (caret < 1) {
-      return "";
+    if (!fIgnoreCaretChange) {
+      auto typing = TextEditorComponent::GetTypingAtCaret(text, caret);
+      fSignList->setTyping(typing);
     }
-    auto leading = U32StringFromJuceString(text.substring(0, caret));
-    auto first = leading.back();
-    int offset = (int)leading.size();
-    if (U'0' <= first && first <= U'9') {
-      for (int i = offset - 1; i >= 0; i--) {
-        auto ch = leading[i];
-        offset = i;
-        if (ch < U'0' || U'9' < ch) {
-          break;
-        }
-      }
-    }
-    for (int i = offset - 1; i >= 0; i--) {
-      auto ch = leading[i];
-      if ((U'A' <= ch && ch <= U'Z') || (U'a' <= ch && ch <= U'z')) {
-        offset = i;
-      } else {
-        break;
-      }
-    }
-    auto typing = leading.substr(offset);
-    return JuceStringFromU32String(typing);
   }
 
   void onClickSign(Sign const &sign) {
-    fTextEditor->insert(sign.name);
+    fIgnoreCaretChange = true;
+    auto result = fTextEditor->insert(sign.name);
     fTextEditor->focus();
+    auto str = U32StringFromJuceString(result);
+    auto c = std::make_shared<Content>(str, fFont);
+    fHieroglyph->setContent(c);
+
+    fIgnoreCaretChange = false;
   }
 
 private:
@@ -100,6 +82,7 @@ private:
   std::unique_ptr<HieroglyphComponent> fHieroglyph;
   std::unique_ptr<SignListComponent> fSignList;
   HbFontUniquePtr const &fFont;
+  bool fIgnoreCaretChange = false;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };
