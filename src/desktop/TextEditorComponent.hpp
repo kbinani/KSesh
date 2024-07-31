@@ -4,19 +4,16 @@ namespace ksesh {
 
 class TextEditorComponent : public juce::Component {
 public:
-  class Delegate {
-  public:
-    virtual ~Delegate() = default;
-    virtual void textEditorComponentDidChangeText(juce::String const &text) = 0;
-  };
-
   TextEditorComponent() {
     fEditor = std::make_unique<juce::TextEditor>();
     fEditor->setMultiLine(true);
     fEditor->setFont(juce::Font(juce::FontOptions(24)));
     fEditor->setReturnKeyStartsNewLine(true);
     fEditor->onTextChange = [this]() {
-      this->onTextChange();
+      this->_onTextChange();
+    };
+    fEditor->onCaretPositionChange = [this]() {
+      this->_onCaretPositionChange();
     };
     addAndMakeVisible(fEditor.get());
   }
@@ -46,16 +43,24 @@ public:
   }
 
 private:
-  void onTextChange() {
-    if (!fDelegate) {
+  void _onCaretPositionChange() {
+    if (onCaretPositionChange) {
+      onCaretPositionChange(fEditor->getText(), fEditor->getCaretPosition());
+    }
+  }
+
+  void _onTextChange() {
+    if (!onTextChange) {
       return;
     }
     auto text = fEditor->getText();
-    fDelegate->textEditorComponentDidChangeText(text);
+    auto caret = fEditor->getCaretPosition();
+    onTextChange(text, caret);
   }
 
 public:
-  Delegate *fDelegate;
+  std::function<void(juce::String const &, int)> onTextChange;
+  std::function<void(juce::String const &, int)> onCaretPositionChange;
 
 private:
   std::unique_ptr<juce::TextEditor> fEditor;

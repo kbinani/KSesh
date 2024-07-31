@@ -201,6 +201,11 @@ public:
     repaint();
   }
 
+  void setTyping(juce::String const &typing) {
+    fTyping = typing;
+    setActiveCategory(0);
+  }
+
 private:
   void updateButtonHit(juce::Point<int> const &p) {
     int hitTabButton = -1;
@@ -274,6 +279,29 @@ private:
     std::vector<Sign> signs;
     auto activeCategory = fCategories[fActiveCategory];
     if (activeCategory.name == "typing") {
+      if (fTyping.isNotEmpty()) {
+        auto search = U32StringFromJuceString(fTyping);
+        for (auto const &it : SignList::Signs()) {
+          if (!it.first.starts_with(search)) {
+            continue;
+          }
+          if (auto found = fAllSigns.find(JuceStringFromU32String(it.first)); found != fAllSigns.end()) {
+            signs.push_back(found->second);
+          }
+        }
+        for (auto const &it : SignList::Special()) {
+          if (!it.first.starts_with(search)) {
+            continue;
+          }
+          auto code = SignList::CodeFromSign(it.second);
+          if (!code) {
+            continue;
+          }
+          if (auto found = fAllSigns.find(JuceStringFromU32String(*code)); found != fAllSigns.end()) {
+            signs.push_back(found->second);
+          }
+        }
+      }
     } else if (activeCategory.name == "tall" || activeCategory.name == "wide" || activeCategory.name == "small") {
       std::vector<juce::String> list;
       // clang-format off
@@ -337,10 +365,14 @@ private:
   }
 
   void setActiveCategory(int index) {
-    if (fActiveCategory != index) {
+    if (fActiveCategory != index || index == 0) {
       fActiveCategory = index;
+      if (index != 0) {
+        fTyping.clear();
+      }
       filterSigns();
       layout();
+      repaint();
     }
   }
 
@@ -354,10 +386,12 @@ private:
   std::vector<Category> fCategories;
   std::vector<TabButton> fTabButtons;
   std::unordered_map<juce::String, Sign> fAllSigns;
+
   int fRows = 0;
   int fActiveCategory = 0;
   int fHitTabButton = -1;
   int fMouseDownCategory = -1;
+  juce::String fTyping;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SignListComponent)
 };

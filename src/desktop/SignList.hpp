@@ -1604,24 +1604,52 @@ public:
     }
     return categories;
   }
-#if 0
-  private static _reverseMapping = new Map<string, string[]>();
-  private static ensureReverseMapping(): ReadonlyMap<string, string[]> {
-    if (this._reverseMapping.size === 0) {
-      for (const [write, sign] of this.special) {
-        if (sign === "") {
-          continue;
-        }
-        const current: string[] = this._reverseMapping.get(sign) ?? [];
-        this._reverseMapping.set(sign, [...current, write]);
+
+private:
+  static std::unordered_map<std::u32string, std::vector<std::u32string>> *CreateReverseMapping() {
+    using namespace std;
+    auto ret = new unordered_map<u32string, vector<u32string>>();
+    for (auto const &[write, sign] : Special()) {
+      if (sign.empty()) {
+        continue;
       }
+      (*ret)[sign].push_back(write);
     }
-    return this._reverseMapping;
+    return ret;
   }
-  static mapReverse(sign: string): string[] | undefined {
-    return this.ensureReverseMapping().get(sign);
+
+public:
+  static std::vector<std::u32string> const &MapReverse(std::u32string const &sign) {
+    using namespace std;
+    static unique_ptr<unordered_map<u32string, vector<u32string>> const> const sTable(CreateReverseMapping());
+    if (auto found = sTable->find(sign); found == sTable->end()) {
+      static std::vector<std::u32string> st;
+      return st;
+    } else {
+      return found->second;
+    }
   }
-#endif
+
+private:
+  static std::unordered_map<std::u32string, std::u32string> *CreateCodeFromSignTable() {
+    using namespace std;
+    auto ret = new unordered_map<u32string, u32string>();
+    for (auto const &[write, sign] : Signs()) {
+      (*ret)[sign] = write;
+    }
+    return ret;
+  }
+
+public:
+  static std::optional<std::u32string> CodeFromSign(std::u32string const &sign) {
+    using namespace std;
+    static unique_ptr<unordered_map<u32string, u32string> const> const sTable(CreateCodeFromSignTable());
+    if (auto found = sTable->find(sign); found != sTable->end()) {
+      return found->second;
+    } else {
+      return nullopt;
+    }
+  }
 
   static bool IsFormatControl(std::u32string const &ch) {
     char32_t cp = ch[0];

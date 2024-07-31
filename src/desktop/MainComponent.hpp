@@ -2,7 +2,7 @@
 
 namespace ksesh {
 
-class MainComponent : public juce::Component, public TextEditorComponent::Delegate {
+class MainComponent : public juce::Component {
   enum {
     resizerSize = 8,
   };
@@ -14,7 +14,12 @@ public:
 
     fTextEditor = std::make_unique<TextEditorComponent>();
     fTextEditor->setBounds(0, 0, width / 2 - resizerSize / 2, height / 2 - resizerSize / 2);
-    fTextEditor->fDelegate = this;
+    fTextEditor->onTextChange = [this](juce::String const &text, int caret) {
+      this->textEditorDidChangeText(text, caret);
+    };
+    fTextEditor->onCaretPositionChange = [this](juce::String const &text, int caret) {
+      this->textEditorDidChangeCaretPosition(text, caret);
+    };
 
     fHieroglyph = std::make_unique<HieroglyphComponent>(font);
     fHieroglyph->setBounds(width / 2 + resizerSize / 2, 0, width / 2 - resizerSize / 2, height / 2 - resizerSize / 2);
@@ -41,13 +46,48 @@ public:
     fHorizontalSplitter->setBounds(0, 0, width, height);
   }
 
-  void textEditorComponentDidChangeText(juce::String const &text) override {
+private:
+  void textEditorDidChangeCaretPosition(juce::String const &text, int caret) {
+    auto typing = getTypingAtCaret(text, caret);
+    fSignList->setTyping(typing);
+  }
+
+  void textEditorDidChangeText(juce::String const &text, int caret) {
     auto str = U32StringFromJuceString(text);
     auto c = std::make_shared<Content>(str, fFont);
     fHieroglyph->setContent(c);
+    auto typing = getTypingAtCaret(text, caret);
+    fSignList->setTyping(typing);
   }
 
-private:
+  juce::String getTypingAtCaret(juce::String const &text, int caret) {
+    if (caret < 1) {
+      return "";
+    }
+    auto leading = U32StringFromJuceString(text.substring(0, caret));
+    auto first = leading.back();
+    int offset = (int)leading.size();
+    if (U'0' <= first && first <= U'9') {
+      for (int i = offset - 1; i >= 0; i--) {
+        auto ch = leading[i];
+        offset = i;
+        if (ch < U'0' || U'9' < ch) {
+          break;
+        }
+      }
+    }
+    for (int i = offset - 1; i >= 0; i--) {
+      auto ch = leading[i];
+      if ((U'A' <= ch && ch <= U'Z') || (U'a' <= ch && ch <= U'z')) {
+        offset = i;
+      } else {
+        break;
+      }
+    }
+    auto typing = leading.substr(offset);
+    return JuceStringFromU32String(typing);
+  }
+
   void onClickSign(Sign const &sign) {
     fTextEditor->insert(sign.name);
     fTextEditor->focus();
