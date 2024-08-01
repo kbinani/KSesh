@@ -13,6 +13,7 @@
 #include "SignList.hpp"
 #include "Content.hpp"
 #include "AppSetting.hpp"
+#include "PresentationSetting.hpp"
 #include "HieroglyphComponent.hpp"
 #include "TextEditorComponent.hpp"
 #include "Sign.hpp"

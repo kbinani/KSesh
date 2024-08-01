@@ -201,7 +201,7 @@ public:
       }
       auto l = make_shared<Line>(offset, raw.substr(offset, found - offset), font);
       lines.push_back(l);
-      offset += found + 1;
+      offset = found + 1;
     }
   }
 

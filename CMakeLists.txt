@@ -71,6 +71,7 @@ list(APPEND ksesh_files
   src/desktop/Sign.hpp
   src/desktop/SignListButtonContainer.hpp
   src/desktop/AppSetting.hpp
+  src/desktop/PresentationSetting.hpp
 )
 if (APPLE)
   list(APPEND ksesh_files src/desktop/Application.mm)

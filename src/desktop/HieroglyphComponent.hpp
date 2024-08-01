@@ -12,20 +12,23 @@ public:
       return;
     }
     g.setColour(getLookAndFeel().findColour(juce::TextEditor::ColourIds::textColourId));
-    float fontSize = 48;
-    float margin = 8;
 
-    float scale = fontSize / (float)Harfbuzz::UnitsPerEm(fFont);
-    g.addTransform(juce::AffineTransform::translation(margin, margin));
+    float const upem = (float)Harfbuzz::UnitsPerEm(fFont);
+    float const scale = fSetting.fontSize / upem;
+    float const padding = fSetting.padding / scale;
+    float const lineSpacing = fSetting.lineSpacing / scale;
+    float dx = padding;
+    float dy = padding;
     g.addTransform(juce::AffineTransform::scale(scale, scale));
     for (auto const &line : fContent->lines) {
       for (auto const &glyph : line->glyphs) {
-        auto path = Harfbuzz::CreatePath(glyph.glyphId, fFont, glyph.x, glyph.y);
+        auto path = Harfbuzz::CreatePath(glyph.glyphId, fFont, glyph.x + dx, glyph.y + dy);
         if (path.getBounds().isEmpty()) {
           continue;
         }
         g.fillPath(path);
       }
+      dy += lineSpacing + upem;
     }
   }
 
@@ -41,6 +44,7 @@ public:
   }
 
 private:
+  PresentationSetting fSetting;
   HbFontUniquePtr const &fFont;
   std::shared_ptr<Content> fContent;
 
