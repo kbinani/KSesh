@@ -12,12 +12,13 @@ public:
       return;
     }
     auto textColor = getLookAndFeel().findColour(juce::TextEditor::ColourIds::textColourId);
-    auto caretColor = getLookAndFeel().findColour(juce::TextEditor::highlightColourId);
+    auto caretColor = getLookAndFeel().findColour(juce::CaretComponent::caretColourId);
+    auto highlightColor = getLookAndFeel().findColour(juce::TextEditor::highlightColourId);
 
     g.saveState();
-    g.setColour(caretColor.withAlpha(0.2f));
+    g.setColour(highlightColor);
     for (auto const &rect : fCursor.selectionRects) {
-      g.fillRect(rect.expanded(cursorPadding * 0.5f, cursorPadding));
+      g.fillRect(rect);
     }
     g.restoreState();
 
@@ -43,8 +44,8 @@ public:
     g.restoreState();
 
     if (fCursor.rect) {
-      g.setColour(caretColor.withAlpha(0.5f));
-      g.fillRect(fCursor.rect->expanded(cursorPadding * 0.5f, cursorPadding));
+      g.setColour(caretColor);
+      g.fillRect(fCursor.rect->expanded(caretWidth * 0.5f, 0));
     }
   }
 
@@ -61,7 +62,7 @@ public:
 
   void setSelectedRange(int start, int end, Direction direction) {
     if (fContent) {
-      fCursor = fContent->cursor(start, end, fFont, fSetting.fontSize, fSetting.lineSpacing, fSetting.padding, direction);
+      fCursor = fContent->cursor(start, end, direction, fFont, fSetting);
     }
     repaint();
   }
@@ -71,7 +72,7 @@ private:
   HbFontUniquePtr const &fFont;
   std::shared_ptr<Content> fContent;
   Cursor fCursor;
-  static float constexpr cursorPadding = 4;
+  static float constexpr caretWidth = 2;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(HieroglyphComponent)
 };

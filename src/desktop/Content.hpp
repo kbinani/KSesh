@@ -255,9 +255,11 @@ public:
   CaretLocation closestPosition(
       juce::Point<float> point,
       HbFontUniquePtr const &font,
-      float fontSize,
-      float lineSpacing,
-      float padding) {
+      PresentationSetting const &setting) {
+    float const padding = setting.padding;
+    float const fontSize = setting.fontSize;
+    float const lineSpacing = setting.lineSpacing;
+
     if (lines.empty()) {
       return CaretLocation(0, Direction::Forward);
     }
@@ -287,11 +289,9 @@ public:
         auto cursor = this->cursor(
             it.location,
             it.location,
+            it.direction,
             font,
-            fontSize,
-            lineSpacing,
-            padding,
-            it.direction);
+            setting);
         if (!cursor.rect) {
           continue;
         }
@@ -424,11 +424,13 @@ public:
   Cursor cursor(
       int selectionStart,
       int selectionEnd,
+      Direction direction,
       HbFontUniquePtr const &font,
-      float fontSize,
-      float lineSpacing,
-      float padding,
-      Direction direction) {
+      PresentationSetting const &setting) {
+    float fontSize = setting.fontSize;
+    float lineSpacing = setting.lineSpacing;
+    float padding = setting.padding;
+
     float upem = Harfbuzz::UnitsPerEm(font);
     auto scale = fontSize / upem;
     if (selectionStart == selectionEnd) {
@@ -443,7 +445,7 @@ public:
         float dx = padding;
         float dy = padding + (fontSize + lineSpacing) * lineIndex;
         auto line = this->lines[lineIndex];
-        auto bounds = line->boundingBox * scale;
+        auto bounds = (line->boundingBox * scale).expanded(setting.caretExpand);
         Cursor ret;
         ret.rect = juce::Rectangle<float>(
             dx + bounds.getX() + bounds.getWidth(),
@@ -479,7 +481,7 @@ public:
           Cursor ret;
           return ret;
         }
-        auto bounds = (*cluster.bounds) * scale;
+        auto bounds = ((*cluster.bounds) * scale).expanded(setting.caretExpand);
         if (std::holds_alternative<CursorLocationLeft>(*location)) {
           Cursor ret;
           ret.rect = juce::Rectangle<float>(dx + bounds.getX(), dy + bounds.getY(), 0, bounds.getHeight());
@@ -548,7 +550,7 @@ public:
             }
             auto cluster = line->clusters[j];
             if (cluster.bounds) {
-              auto bounds = (*cluster.bounds) * scale;
+              auto bounds = ((*cluster.bounds) * scale).expanded(setting.caretExpand);
               juce::Rectangle<float> add(dx + bounds.getX(),
                                          dy + bounds.getY(),
                                          bounds.getWidth(),
