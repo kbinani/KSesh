@@ -4,7 +4,9 @@ namespace ksesh {
 
 class HieroglyphComponent : public juce::Component {
 public:
-  explicit HieroglyphComponent(HbFontUniquePtr const &font) : fFont(font) {}
+  explicit HieroglyphComponent(HbFontUniquePtr const &font) : fFont(font) {
+    setMouseCursor(juce::MouseCursor::IBeamCursor);
+  }
 
   void paint(juce::Graphics &g) override {
     g.fillAll(getLookAndFeel().findColour(juce::TextEditor::ColourIds::backgroundColourId));
@@ -49,6 +51,23 @@ public:
     }
   }
 
+  void lookAndFeelChanged() override {
+    repaint();
+  }
+
+  void mouseUp(juce::MouseEvent const &e) override {
+    if (!fContent) {
+      return;
+    }
+    if (e.mods.isLeftButtonDown()) {
+      auto position = fContent->closestPosition(fEnd, e.getPosition().toFloat(), fFont, fSetting);
+      setSelectedRange(position.location, position.location, position.direction);
+      if (onSelectedRangeChange) {
+        onSelectedRangeChange(position.location, position.location, position.direction);
+      }
+    }
+  }
+
   void setContent(std::shared_ptr<Content> const &c) {
     fContent = c;
     if (fContent) {
@@ -56,22 +75,27 @@ public:
     }
   }
 
-  void lookAndFeelChanged() override {
-    repaint();
-  }
-
   void setSelectedRange(int start, int end, Direction direction) {
+    fStart = start;
+    fEnd = end;
+    fDirection = direction;
     if (fContent) {
       fCursor = fContent->cursor(start, end, direction, fFont, fSetting);
     }
     repaint();
   }
 
+public:
+  std::function<void(int start, int end, Direction direction)> onSelectedRangeChange;
+
 private:
   PresentationSetting fSetting;
   HbFontUniquePtr const &fFont;
   std::shared_ptr<Content> fContent;
   Cursor fCursor;
+  int fStart = 0;
+  int fEnd = 0;
+  Direction fDirection = Direction::Forward;
   static float constexpr caretWidth = 2;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(HieroglyphComponent)

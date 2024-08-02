@@ -99,6 +99,10 @@ public:
     fEditor->grabKeyboardFocus();
   }
 
+  void setSelectedRange(int start, int end, Direction direction) {
+    fEditor->setHighlightedRegion(juce::Range<int>(start, end));
+  }
+
 private:
   juce::Range<int> getSelectedRange() const {
     auto range = fEditor->getHighlightedRegion();

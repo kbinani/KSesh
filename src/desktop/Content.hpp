@@ -253,6 +253,7 @@ public:
   }
 
   CaretLocation closestPosition(
+      int current,
       juce::Point<float> point,
       HbFontUniquePtr const &font,
       PresentationSetting const &setting) {
@@ -275,6 +276,7 @@ public:
     auto line = lines[lineIndex];
     float minDistance = std::numeric_limits<float>::max();
     CaretLocation nearest(line->rawOffset, Direction::Forward);
+    std::vector<CaretLocation> test;
     for (int i = 0; i < (int)line->chars.size(); i++) {
       auto ch = line->chars[i];
       if (!ch.sign) {
@@ -282,9 +284,15 @@ public:
       }
       auto start = line->rawOffset + ch.rawOffset;
       auto end = line->rawOffset + ch.rawOffset + (int)ch.raw.size();
-      CaretLocation test[2] = {
-          CaretLocation(start, Direction::Forward),
-          CaretLocation(end, Direction::Backward)};
+      test.clear();
+      if (i == current) {
+        test.push_back(CaretLocation(start, Direction::Forward));
+        test.push_back(CaretLocation(end, Direction::Backward));
+      } else if (i < current) {
+        test.push_back(CaretLocation(start, Direction::Forward));
+      } else {
+        test.push_back(CaretLocation(end, Direction::Backward));
+      }
       for (auto it : test) {
         auto cursor = this->cursor(
             it.location,

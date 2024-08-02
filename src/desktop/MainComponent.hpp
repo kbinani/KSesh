@@ -23,6 +23,9 @@ public:
 
     fHieroglyph = std::make_unique<HieroglyphComponent>(font);
     fHieroglyph->setBounds(width / 2 + resizerSize / 2, 0, width / 2 - resizerSize / 2, height / 2 - resizerSize / 2);
+    fHieroglyph->onSelectedRangeChange = [this](int start, int end, Direction direction) {
+      this->hieroglyphDidChangeSelectedRange(start, end, direction);
+    };
 
     fVerticalSplitter = std::make_unique<SplitterComponent>(fTextEditor.get(), fHieroglyph.get(), true);
     fVerticalSplitter->setBounds(width / 2 - resizerSize / 2, 0, resizerSize, height / 2 - resizerSize / 2);
@@ -47,6 +50,10 @@ public:
   }
 
 private:
+  void hieroglyphDidChangeSelectedRange(int start, int end, Direction direction) {
+    fTextEditor->setSelectedRange(start, end, direction);
+  }
+
   void textEditorDidChangeCaretPosition(juce::String const &text, int start, int end, Direction direction) {
     if (!fIgnoreCaretChange) {
       auto typing = TextEditorComponent::GetTypingAtCaret(text, start, end);
