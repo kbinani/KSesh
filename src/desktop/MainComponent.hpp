@@ -14,11 +14,11 @@ public:
 
     fTextEditor = std::make_unique<TextEditorComponent>();
     fTextEditor->setBounds(0, 0, width / 2 - resizerSize / 2, height / 2 - resizerSize / 2);
-    fTextEditor->onTextChange = [this](juce::String const &text, int caret) {
-      this->textEditorDidChangeText(text, caret);
+    fTextEditor->onTextChange = [this](juce::String const &text, int start, int end, Direction direction) {
+      this->textEditorDidChangeText(text, start, end, direction);
     };
-    fTextEditor->onCaretPositionChange = [this](juce::String const &text, int caret) {
-      this->textEditorDidChangeCaretPosition(text, caret);
+    fTextEditor->onCaretPositionChange = [this](juce::String const &text, int start, int end, Direction direction) {
+      this->textEditorDidChangeCaretPosition(text, start, end, direction);
     };
 
     fHieroglyph = std::make_unique<HieroglyphComponent>(font);
@@ -47,20 +47,22 @@ public:
   }
 
 private:
-  void textEditorDidChangeCaretPosition(juce::String const &text, int caret) {
+  void textEditorDidChangeCaretPosition(juce::String const &text, int start, int end, Direction direction) {
     if (!fIgnoreCaretChange) {
-      auto typing = TextEditorComponent::GetTypingAtCaret(text, caret);
+      auto typing = TextEditorComponent::GetTypingAtCaret(text, start, end);
       fSignList->setTyping(typing);
+      fHieroglyph->setSelectedRange(start, end, direction);
     }
   }
 
-  void textEditorDidChangeText(juce::String const &text, int caret) {
+  void textEditorDidChangeText(juce::String const &text, int start, int end, Direction direction) {
     auto str = U32StringFromJuceString(text);
     auto c = std::make_shared<Content>(str, fFont);
     fHieroglyph->setContent(c);
     if (!fIgnoreCaretChange) {
-      auto typing = TextEditorComponent::GetTypingAtCaret(text, caret);
+      auto typing = TextEditorComponent::GetTypingAtCaret(text, start, end);
       fSignList->setTyping(typing);
+      fHieroglyph->setSelectedRange(start, end, direction);
     }
   }
 

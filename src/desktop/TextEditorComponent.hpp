@@ -26,11 +26,11 @@ public:
     fEditor->applyColourToAllText(getLookAndFeel().findColour(juce::TextEditor::textColourId));
   }
 
-  static juce::String GetTypingAtCaret(juce::String const &text, int caret) {
-    if (caret < 1) {
+  static juce::String GetTypingAtCaret(juce::String const &text, int start, int end) {
+    if (start < 1) {
       return "";
     }
-    auto leading = U32StringFromJuceString(text.substring(0, caret));
+    auto leading = U32StringFromJuceString(text.substring(0, start));
     auto first = leading.back();
     int offset = (int)leading.size();
     if (U'0' <= first && first <= U'9') {
@@ -56,9 +56,9 @@ public:
 
   juce::String insert(juce::String const &s) {
     auto text = fEditor->getText();
+    auto selected = getSelectedRange();
     int caret = fEditor->getCaretPosition();
-    auto typing = GetTypingAtCaret(text, caret);
-    auto selected = fEditor->getHighlightedRegion();
+    auto typing = GetTypingAtCaret(text, selected.getStart(), selected.getEnd());
     if (typing.isNotEmpty() && selected.isEmpty() && s.startsWith(typing)) {
       juce::String next;
       int nextCaret = caret - typing.length() + s.length() + 1;
@@ -100,9 +100,27 @@ public:
   }
 
 private:
+  juce::Range<int> getSelectedRange() const {
+    auto range = fEditor->getHighlightedRegion();
+    auto caret = fEditor->getCaretPosition();
+    if (range.getLength() == 0) {
+      return juce::Range<int>(caret, caret);
+    } else {
+      return range;
+    }
+  }
+
   void _onCaretPositionChange() {
+    auto pos = fEditor->getCaretPosition();
+    if (pos < fPrev) {
+      fDirection = Direction::Backward;
+    } else if (fPrev < pos) {
+      fDirection = Direction::Forward;
+    }
+    fPrev = pos;
     if (onCaretPositionChange) {
-      onCaretPositionChange(fEditor->getText(), fEditor->getCaretPosition());
+      auto range = getSelectedRange();
+      onCaretPositionChange(fEditor->getText(), range.getStart(), range.getEnd(), fDirection);
     }
   }
 
@@ -111,16 +129,18 @@ private:
       return;
     }
     auto text = fEditor->getText();
-    auto caret = fEditor->getCaretPosition();
-    onTextChange(text, caret);
+    auto range = getSelectedRange();
+    onTextChange(text, range.getStart(), range.getEnd(), fDirection);
   }
 
 public:
-  std::function<void(juce::String const &, int)> onTextChange;
-  std::function<void(juce::String const &, int)> onCaretPositionChange;
+  std::function<void(juce::String const &, int start, int end, Direction)> onTextChange;
+  std::function<void(juce::String const &, int start, int end, Direction)> onCaretPositionChange;
 
 private:
   std::unique_ptr<juce::TextEditor> fEditor;
+  int fPrev = 0;
+  Direction fDirection = Direction::Forward;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TextEditorComponent)
 };
