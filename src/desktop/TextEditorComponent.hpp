@@ -106,6 +106,24 @@ public:
     fEditor->setHighlightedRegion(juce::Range<int>(start, end));
   }
 
+  void resetText(juce::String const &s) {
+    fEditor->onTextChange = nullptr;
+    fEditor->onCaretPositionChange = nullptr;
+    fEditor->onSelectionChange = nullptr;
+    fEditor->setText(s);
+    fEditor->setHighlightedRegion(juce::Range<int>(s.length(), s.length()));
+    fEditor->setCaretPosition(s.length());
+    fEditor->onTextChange = [this]() {
+      this->_onTextChange();
+    };
+    fEditor->onCaretPositionChange = [this]() {
+      this->_onCaretPositionChange();
+    };
+    fEditor->onSelectionChange = [this]() {
+      this->_onCaretPositionChange();
+    };
+  }
+
 private:
   juce::Range<int> getSelectedRange() const {
     auto range = fEditor->getHighlightedRegion();

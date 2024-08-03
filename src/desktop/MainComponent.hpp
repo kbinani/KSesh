@@ -91,6 +91,10 @@ public:
 
   void getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo &info) override {
     switch (commandID) {
+    case commandFileOpen:
+      info.setInfo(TRANS("Open"), {}, {}, 0);
+      info.addDefaultKeypress('o', juce::ModifierKeys::commandModifier);
+      break;
     case commandFileSave:
       info.setInfo(TRANS("Save"), {}, {}, 0);
       info.setActive((bool)fContent);
@@ -129,6 +133,9 @@ public:
 
   bool perform(juce::ApplicationCommandTarget::InvocationInfo const &info) override {
     switch (info.commandID) {
+    case commandFileOpen:
+      open();
+      return true;
     case commandFileSave:
       save();
       return true;
@@ -158,6 +165,33 @@ public:
   }
 
 private:
+  void open() {
+    if (!fOpenFileChooser) {
+      fOpenFileChooser = std::make_unique<juce::FileChooser>(TRANS("Open"), juce::File(), "*.txt");
+    }
+    fOpenFileChooser->launchAsync(juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles, [this](juce::FileChooser const &chooser) {
+      auto file = chooser.getResult();
+      if (file == juce::File()) {
+        return;
+      }
+      auto stream = file.createInputStream();
+      if (!stream || stream->failedToOpen()) {
+        juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, TRANS("Error"), TRANS("Failed to open"));
+        return;
+      }
+      auto str = stream->readString();
+      auto c = std::make_shared<Content>(U32StringFromJuceString(str), fFont);
+      setContent(c);
+      fSave = file;
+      fDirty = false;
+      fHieroglyph->setSelectedRange(str.length(), str.length(), Direction::Forward);
+      fTextEditor->resetText(str);
+      if (onSaveFilePathChanged) {
+        onSaveFilePathChanged(file, false);
+      }
+    });
+  }
+
   void saveWithNewName() {
     if (!fContent) {
       return;
@@ -365,6 +399,7 @@ private:
   std::unique_ptr<juce::FileChooser> fSaveFileChooser;
   juce::File fSave;
   bool fDirty = false;
+  std::unique_ptr<juce::FileChooser> fOpenFileChooser;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };

@@ -5,6 +5,7 @@ namespace ksesh {
 enum CommandID : juce::CommandID {
   kCommandIDFirst = 1,
 
+  commandFileOpen,
   commandFileSave,
   commandFileSaveAs,
   commandFileExportAsPdf,
