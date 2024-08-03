@@ -57,6 +57,12 @@ public:
     startTimerHz(1);
   }
 
+  ~MainComponent() {
+#if JUCE_MAC
+    juce::MenuBarModel::setMacMainMenu(nullptr);
+#endif
+  }
+
   void resized() override {
     juce::Rectangle<int> bounds(0, 0, getWidth(), getHeight());
 #if !JUCE_MAC
@@ -85,8 +91,20 @@ public:
 
   void getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo &info) override {
     switch (commandID) {
-    case CommandID::commandFileExportAsPng:
-      info.setInfo(TRANS("Export as PNG"), {}, {}, 0);
+    case CommandID::commandFileExportAsPng1x:
+      info.setInfo(TRANS("1x scale"), {}, {}, 0);
+      info.setActive((bool)fContent);
+      break;
+    case CommandID::commandFileExportAsPng2x:
+      info.setInfo(TRANS("2x scale"), {}, {}, 0);
+      info.setActive((bool)fContent);
+      break;
+    case CommandID::commandFileExportAsPng4x:
+      info.setInfo(TRANS("4x scale"), {}, {}, 0);
+      info.setActive((bool)fContent);
+      break;
+    case CommandID::commandFileExportAsPng8x:
+      info.setInfo(TRANS("8x scale"), {}, {}, 0);
       info.setActive((bool)fContent);
       break;
     case CommandID::commandFileExportAsPdf:
@@ -101,8 +119,17 @@ public:
 
   bool perform(juce::ApplicationCommandTarget::InvocationInfo const &info) override {
     switch (info.commandID) {
-    case CommandID::commandFileExportAsPng:
+    case CommandID::commandFileExportAsPng1x:
       exportAsPng(1);
+      return true;
+    case CommandID::commandFileExportAsPng2x:
+      exportAsPng(2);
+      return true;
+    case CommandID::commandFileExportAsPng4x:
+      exportAsPng(4);
+      return true;
+    case CommandID::commandFileExportAsPng8x:
+      exportAsPng(8);
       return true;
     case CommandID::commandFileExportAsPdf:
       exportAsPdf();
@@ -119,18 +146,19 @@ private:
     if (!fExportPngFileChooser) {
       fExportPngFileChooser = std::make_unique<juce::FileChooser>(TRANS("Export as PNG"), juce::File(), "*.png");
     }
-    fExportPngFileChooser->launchAsync(juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::warnAboutOverwriting, [this](juce::FileChooser const &chooser) {
+    fExportPngFileChooser->launchAsync(juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::warnAboutOverwriting, [this, scale](juce::FileChooser const &chooser) {
       auto file = chooser.getResult();
       if (file == juce::File() || !fContent) {
         return;
       }
       PresentationSetting setting = fSetting;
       auto [widthf, heightf] = fContent->getSize(setting);
-      int width = (int)ceil(widthf);
-      int height = (int)ceil(heightf);
+      int width = (int)ceil(widthf * scale);
+      int height = (int)ceil(heightf * scale);
       juce::Image img(juce::Image::PixelFormat::ARGB, width, height, true);
       {
         juce::Graphics g(img);
+        g.addTransform(juce::AffineTransform::scale(scale, scale));
         fContent->draw(g, fFont, setting);
       }
       auto stream = file.createOutputStream();
@@ -213,6 +241,7 @@ private:
   void setContent(std::shared_ptr<Content> content) {
     fContent = content;
     fHieroglyph->setContent(content);
+    fMenuModel->menuItemsChanged();
   }
 
   void onClickSign(Sign const &sign) {

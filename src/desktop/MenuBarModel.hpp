@@ -17,7 +17,12 @@ public:
   juce::PopupMenu getMenuForIndex(int topLevelMenuIndex, juce::String const &menuName) override {
     juce::PopupMenu menu;
     if (topLevelMenuIndex == 0) {
-      menu.addCommandItem(fManager, commandFileExportAsPng);
+      juce::PopupMenu png;
+      png.addCommandItem(fManager, commandFileExportAsPng1x);
+      png.addCommandItem(fManager, commandFileExportAsPng2x);
+      png.addCommandItem(fManager, commandFileExportAsPng4x);
+      png.addCommandItem(fManager, commandFileExportAsPng8x);
+      menu.addSubMenu(TRANS("Export as PNG"), png, true);
       menu.addCommandItem(fManager, commandFileExportAsPdf);
       menu.addSeparator();
       menu.addCommandItem(fManager, commandFileExit);
