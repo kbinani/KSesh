@@ -120,6 +120,14 @@ public:
     repaint();
   }
 
+  void setPresentationSetting(PresentationSetting s) {
+    fSetting = s;
+    if (fContent) {
+      fCursor = fContent->cursor(fStart, fEnd, fDirection, fFont, fSetting);
+      repaint();
+    }
+  }
+
 public:
   std::function<void(int start, int end, Direction direction)> onSelectedRangeChange;
 
