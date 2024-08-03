@@ -239,7 +239,7 @@ struct CaretLocation {
 
 class Content {
 public:
-  Content(std::u32string const &raw, HbFontUniquePtr const &font) {
+  Content(std::u32string const &raw, HbFontUniquePtr const &font) : unitsPerEm(Harfbuzz::UnitsPerEm(font)) {
     using namespace std;
     u32string::size_type offset = 0;
     while (offset < raw.size()) {
@@ -442,7 +442,7 @@ public:
     float lineSpacing = setting.lineSpacing;
     float padding = setting.padding;
 
-    float upem = Harfbuzz::UnitsPerEm(font);
+    float upem = unitsPerEm;
     auto scale = fontSize / upem;
     if (selectionStart == selectionEnd) {
       auto location = cursorLocation(selectionStart, direction);
@@ -549,8 +549,7 @@ public:
 
   std::string toPDF(HbFontUniquePtr const &font, PresentationSetting const &setting) const {
     using namespace std;
-    float upem = Harfbuzz::UnitsPerEm(font);
-    float scale = setting.fontSize / upem;
+    float scale = setting.fontSize / (float)unitsPerEm;
     optional<juce::Rectangle<float>> bb;
     float dx = setting.padding;
     float dy = setting.padding;
@@ -703,7 +702,46 @@ public:
     return out;
   }
 
+  std::pair<float, float> getSize(PresentationSetting const &setting) const {
+    if (lines.empty()) {
+      return std::make_pair<float>(2 * setting.padding, 2 * setting.padding);
+    }
+    float upem = (float)unitsPerEm;
+    float const scale = setting.fontSize / upem;
+    float height = setting.padding * 2 + setting.fontSize * lines.size() + setting.padding * (lines.size() - 1);
+    float width = setting.padding * 2;
+    for (auto const &line : lines) {
+      auto bb = (line->boundingBox * scale).translated(setting.padding, setting.padding);
+      width = std::max(width, bb.getRight() + setting.padding);
+    }
+    return std::make_pair(width, height);
+  }
+
+  void draw(juce::Graphics &g, HbFontUniquePtr const &font, PresentationSetting const &setting) const {
+    float upem = (float)unitsPerEm;
+    float const scale = setting.fontSize / upem;
+    float const padding = setting.padding / scale;
+    float const lineSpacing = setting.lineSpacing / scale;
+    float dx = padding;
+    float dy = padding;
+    g.saveState();
+    g.addTransform(juce::AffineTransform::scale(scale, scale));
+    g.setColour(juce::Colours::black);
+    for (auto const &line : lines) {
+      for (auto const &glyph : line->glyphs) {
+        auto path = Harfbuzz::CreatePath(glyph.glyphId, font, glyph.x + dx, glyph.y + dy);
+        if (path.getBounds().isEmpty()) {
+          continue;
+        }
+        g.fillPath(path);
+      }
+      dy += lineSpacing + upem;
+    }
+    g.restoreState();
+  }
+
   std::vector<std::shared_ptr<Line>> lines;
+  unsigned int const unitsPerEm;
 };
 
 } // namespace ksesh

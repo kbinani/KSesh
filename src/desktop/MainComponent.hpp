@@ -85,8 +85,13 @@ public:
 
   void getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo &info) override {
     switch (commandID) {
+    case CommandID::commandFileExportAsPng:
+      info.setInfo(TRANS("Export as PNG"), {}, {}, 0);
+      info.setActive((bool)fContent);
+      break;
     case CommandID::commandFileExportAsPdf:
       info.setInfo(TRANS("Export as PDF"), {}, {}, 0);
+      info.setActive((bool)fContent);
       break;
     case CommandID::commandFileExit:
       info.setInfo(TRANS("Exit"), {}, {}, 0);
@@ -96,6 +101,9 @@ public:
 
   bool perform(juce::ApplicationCommandTarget::InvocationInfo const &info) override {
     switch (info.commandID) {
+    case CommandID::commandFileExportAsPng:
+      exportAsPng(1);
+      return true;
     case CommandID::commandFileExportAsPdf:
       exportAsPdf();
       return true;
@@ -107,13 +115,54 @@ public:
   }
 
 private:
+  void exportAsPng(float scale) {
+    if (!fExportPngFileChooser) {
+      fExportPngFileChooser = std::make_unique<juce::FileChooser>(TRANS("Export as PNG"), juce::File(), "*.png");
+    }
+    fExportPngFileChooser->launchAsync(juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::warnAboutOverwriting, [this](juce::FileChooser const &chooser) {
+      auto file = chooser.getResult();
+      if (file == juce::File() || !fContent) {
+        return;
+      }
+      PresentationSetting setting = fSetting;
+      auto [widthf, heightf] = fContent->getSize(setting);
+      int width = (int)ceil(widthf);
+      int height = (int)ceil(heightf);
+      juce::Image img(juce::Image::PixelFormat::ARGB, width, height, true);
+      {
+        juce::Graphics g(img);
+        fContent->draw(g, fFont, setting);
+      }
+      auto stream = file.createOutputStream();
+      auto title = TRANS("Error");
+      auto message = TRANS("Failed to export as PNG");
+      if (!stream || stream->failedToOpen()) {
+        juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
+        return;
+      }
+      if (stream->truncate().failed()) {
+        juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
+        return;
+      }
+      if (!stream->setPosition(0)) {
+        juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
+        return;
+      }
+      juce::PNGImageFormat format;
+      if (!format.writeImageToStream(img, *stream)) {
+        juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
+        return;
+      }
+    });
+  }
+
   void exportAsPdf() {
     if (!fExportPdfFileChooser) {
       fExportPdfFileChooser = std::make_unique<juce::FileChooser>(TRANS("Export as PDF"), juce::File(), "*.pdf");
     }
-    fExportPdfFileChooser->launchAsync(juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles, [this](juce::FileChooser const &chooser) {
+    fExportPdfFileChooser->launchAsync(juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::warnAboutOverwriting, [this](juce::FileChooser const &chooser) {
       auto file = chooser.getResult();
-      if (file == juce::File()) {
+      if (file == juce::File() || !fContent) {
         return;
       }
       auto str = fContent->toPDF(fFont, fSetting);
@@ -171,8 +220,7 @@ private:
     auto result = fTextEditor->insert(sign.name);
     fTextEditor->focus();
     auto str = U32StringFromJuceString(result);
-    auto c = std::make_shared<Content>(str, fFont);
-    fHieroglyph->setContent(c);
+    setContent(std::make_shared<Content>(str, fFont));
 
     fIgnoreCaretChange = false;
   }
@@ -193,6 +241,7 @@ private:
   std::unique_ptr<juce::FileChooser> fExportPdfFileChooser;
   std::shared_ptr<Content> fContent;
   PresentationSetting fSetting;
+  std::unique_ptr<juce::FileChooser> fExportPngFileChooser;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };
