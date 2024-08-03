@@ -22,6 +22,7 @@
 #include "SignListButtonContainer.hpp"
 #include "SignListComponent.hpp"
 #include "SplitterComponent.hpp"
+#include "MenuBarModel.hpp"
 #include "MainComponent.hpp"
 #include "MainWindow.hpp"
 #include "LookAndFeel.hpp"

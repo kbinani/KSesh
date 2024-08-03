@@ -76,6 +76,7 @@ list(APPEND ksesh_files
   src/desktop/PresentationSetting.hpp
   src/desktop/PDFGen.cpp
   src/desktop/PDFGen.hpp
+  src/desktop/MenuBarModel.hpp
 )
 if (APPLE)
   list(APPEND ksesh_files src/desktop/Application.mm)

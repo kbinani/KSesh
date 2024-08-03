@@ -2,7 +2,7 @@
 
 namespace ksesh {
 
-class MainComponent : public juce::Component, public juce::Timer {
+class MainComponent : public juce::Component, public juce::Timer, public juce::ApplicationCommandTarget {
   enum : int {
     resizerSize = 8,
   };
@@ -40,14 +40,29 @@ public:
     fHorizontalSplitter->setBounds(0, height / 2 + resizerSize / 2, width, resizerSize);
     addAndMakeVisible(*fHorizontalSplitter);
 
+    fCommandManager = std::make_unique<juce::ApplicationCommandManager>();
+    fCommandManager->registerAllCommandsForTarget(this);
+    addKeyListener(fCommandManager->getKeyMappings());
+
+    fMenuModel = std::make_unique<MenuBarModel>(fCommandManager.get());
+#if JUCE_MAC
+    juce::MenuBarModel::setMacMainMenu(fMenuModel.get());
+#else
+    fMenuComponent = std::make_unique<juce::MenuBarComponent>(fMenuModel.get());
+    addAndMakeVisible(*fMenuComponent);
+#endif
+
     setSize(width, height);
-    startTimerHz(10);
+    startTimerHz(1);
   }
 
   void resized() override {
-    int const width = getWidth();
-    int const height = getHeight();
-    fHorizontalSplitter->setBounds(0, 0, width, height);
+    juce::Rectangle<int> bounds(0, 0, getWidth(), getHeight());
+#if !JUCE_MAC
+    auto menuBarHeight = getLookAndFeel().getDefaultMenuBarHeight();
+    fMenuComponent->setBounds(bounds.removeFromTop(menuBarHeight));
+#endif
+    fHorizontalSplitter->setBounds(bounds);
   }
 
   void timerCallback() override {
@@ -55,6 +70,20 @@ public:
       fTextEditor->focus();
       stopTimer();
     }
+  }
+
+  juce::ApplicationCommandTarget *getNextCommandTarget() override {
+    return nullptr;
+  }
+
+  void getAllCommands(juce::Array<juce::CommandID> &commands) override {
+  }
+
+  void getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo &result) override {
+  }
+
+  bool perform(juce::ApplicationCommandTarget::InvocationInfo const &info) override {
+    return false;
   }
 
 private:
@@ -100,6 +129,11 @@ private:
   std::unique_ptr<SignListComponent> fSignList;
   HbFontUniquePtr const &fFont;
   bool fIgnoreCaretChange = false;
+  std::unique_ptr<juce::ApplicationCommandManager> fCommandManager;
+  std::unique_ptr<juce::MenuBarModel> fMenuModel;
+#if !JUCE_MAC
+  std::unique_ptr<juce::MenuBarComponent> fMenuComponent;
+#endif
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };
