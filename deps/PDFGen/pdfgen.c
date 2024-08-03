@@ -135,7 +135,6 @@ typedef SSIZE_T ssize_t;
 #define PDF_IS_TRANSPARENT(c) (((c) >> 24) == 0xff)
 
 #if defined(_MSC_VER)
-#define inline __inline
 #define snprintf _snprintf
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
@@ -437,8 +436,7 @@ static inline void *flexarray_get(const struct flexarray *flex, int index)
  */
 
 #define INIT_DSTR                                                            \
-    (struct dstr)                                                            \
-    {                                                                        \
+    dstr {                                                                   \
         .static_data = {0}, .data = NULL, .alloc_len = 0, .used_len = 0      \
     }
 
