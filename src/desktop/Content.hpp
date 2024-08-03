@@ -238,6 +238,22 @@ struct CaretLocation {
 };
 
 class Content {
+  template <class Handle, auto *deleter>
+  struct ScopedHandle {
+    explicit ScopedHandle(Handle handle) : handle(handle) {
+    }
+    ~ScopedHandle() {
+      deleter(handle);
+    }
+    operator Handle() const {
+      return handle;
+    }
+    operator bool() const {
+      return handle != INVALID_HANDLE_VALUE;
+    }
+    Handle handle;
+  };
+
 public:
   Content(std::u32string const &raw, HbFontUniquePtr const &font) : unitsPerEm(Harfbuzz::UnitsPerEm(font)) {
     using namespace std;
@@ -738,6 +754,214 @@ public:
       dy += lineSpacing + upem;
     }
     g.restoreState();
+  }
+
+  std::string toEMF(HbFontUniquePtr const &font, PresentationSetting const &setting) const {
+    using namespace std;
+    string out;
+#if JUCE_WINDOWS
+
+    auto [widthf, heightf] = getSize(setting);
+    LONG width = (LONG)ceil(widthf);
+    LONG height = (LONG)ceil(heightf);
+    RECT rc;
+    rc.left = 0;
+    rc.top = 0;
+    rc.right = 3000;//width;
+    rc.bottom = 2000;//height;
+    HDC hdc = ::CreateEnhMetaFile(nullptr, nullptr, &rc, nullptr);
+    if (INVALID_HANDLE_VALUE == hdc) {
+      return out;
+    }
+
+    struct Data {
+      HDC hdc;
+      int dx = 0;
+      int dy = 0;
+      float ty = 0;
+      float tx = 0;
+      float currentX = 0;
+      float currentY = 0;
+      int x(float v) const {
+        return (int)round(v + tx) + dx;
+      }
+      int y(float v) const {
+        return (int)round(-v + ty) + dy;
+      }
+      void current(float x, float y) {
+        currentX = x;
+        currentY = y;
+      }
+    };
+    HbDrawFuncsUniquePtr funcs(hb_draw_funcs_create());
+    hb_draw_funcs_set_move_to_func(
+        funcs.get(),
+        [](auto *, void *data, auto *, float x, float y, auto *) {
+          auto &d = *static_cast<Data *>(data);
+          ::MoveToEx(d.hdc, d.x(x), d.y(y), nullptr);
+          DBG("MoveToEx(" << d.x(x) << ", " << d.y(y) << ")");
+          d.current(x, y);
+        },
+        nullptr, nullptr);
+    hb_draw_funcs_set_line_to_func(
+        funcs.get(),
+        [](auto *, void *data, auto *, float x, float y, auto *) {
+          auto &d = *static_cast<Data *>(data);
+          ::LineTo(d.hdc, d.x(x), d.y(y));
+          DBG("LineTo(" << d.x(x) << ", " << d.y(y) << ")");
+          d.current(x, y);
+        },
+        nullptr, nullptr);
+    hb_draw_funcs_set_quadratic_to_func(
+        funcs.get(),
+        [](auto *, void *data, auto *, float ctlX, float ctlY, float toX, float toY, auto *) {
+          auto &d = *static_cast<Data *>(data);
+          float xc1 = d.currentX + (ctlX - d.currentX) * (2.0f / 3.0f);
+          float yc1 = d.currentY + (ctlY - d.currentY) * (2.0f / 3.0f);
+          float xc2 = toX + (ctlX - toX) * (2.0f / 3.0f);
+          float yc2 = toY + (ctlY - toY) * (2.0f / 3.0f);
+          POINT pt[3] = {
+              {d.x(xc1), d.y(yc1)},
+              {d.x(xc2), d.y(yc2)},
+              {d.x(toX), d.y(toY)},
+          };
+          ::PolyBezierTo(d.hdc, pt, 3);
+          //::LineTo(d.hdc, d.x(toX), d.y(toY));
+          DBG("PolyBezierTo([" << pt[0].x << ", " << pt[0].y << "], [" << pt[1].x << ", " << pt[1].y << "], [" << pt[2].x << ", " << pt[2].y << "])");
+          d.current(toX, toY);
+        },
+        nullptr, nullptr);
+    hb_draw_funcs_set_cubic_to_func(
+        funcs.get(),
+        [](auto *, void *data, auto *, float ctlX1, float ctlY1, float ctlX2, float ctlY2, float toX, float toY, auto *) {
+          auto &d = *static_cast<Data *>(data);
+          POINT pt[3] = {
+              {d.x(ctlX1), d.y(ctlY1)},
+              {d.x(ctlX2), d.y(ctlY2)},
+              {d.x(toX), d.y(toY)},
+          };
+          ::PolyBezierTo(d.hdc, pt, 3);
+          //::LineTo(d.hdc, d.x(toX), d.y(toY));
+          DBG("PolyBezierTo([" << pt[0].x << ", " << pt[0].y << "], [" << pt[1].x << ", " << pt[1].y << "], [" << pt[2].x << ", " << pt[2].y << "])");
+          d.current(toX, toY);
+        },
+        nullptr, nullptr);
+    hb_draw_funcs_set_close_path_func(
+        funcs.get(),
+        [](auto *, void *data, auto *, auto *) {
+          auto &d = *static_cast<Data *>(data);
+          //::EndPath(d.hdc);
+          //DBG("EndPath");
+          ::CloseFigure(d.hdc);
+          DBG("CloseFigure");
+        },
+        nullptr, nullptr);
+
+    ::Rectangle(hdc, 0, 0, width, height);
+
+    //::SelectObject(hdc, ::CreateSolidBrush(RGB(255, 255, 255)));
+    //::Rectangle(hdc, setting.padding, setting.padding, width - setting.padding, height - setting.padding);
+
+    ScopedHandle<HBRUSH, ::DeleteObject> brush(::CreateSolidBrush(RGB(0, 0, 0)));
+    ::SelectObject(hdc, brush);
+
+//    ::BeginPath(hdc);
+    /*
+    ::MoveToEx(hdc, 4, 4, nullptr);
+    ::LineTo(hdc, 20, 4);
+    ::LineTo(hdc, 20, 40);
+    ::LineTo(hdc, 4, 40);
+    ::CloseFigure(hdc);
+    ::FillPath(hdc);
+
+    ::MoveToEx(hdc, 30, 4, nullptr);
+    ::LineTo(hdc, 40, 4);
+    ::LineTo(hdc, 40, 50);
+    ::FillPath(hdc);
+    */
+
+    float const scale = setting.fontSize / (float)unitsPerEm;
+    float dy = 0;
+    XFORM mtx;
+    mtx.eM11 = scale;
+    mtx.eM12 = 0;
+    mtx.eM21 = 0;
+    mtx.eM22 = scale;
+    mtx.eDx = setting.padding;
+    mtx.eDy = setting.padding;
+    ::SetWorldTransform(hdc, &mtx);
+#if 1
+    hb_font_extents_t extents{};
+    hb_font_get_h_extents(font.get(), &extents);
+    auto descender = extents.descender;
+    int lineIndex = 0;
+    for (auto const &line : lines) {
+      unsigned int numGlyphs = hb_buffer_get_length(line->buffer.get());
+      hb_glyph_info_t *glyphInfo = hb_buffer_get_glyph_infos(line->buffer.get(), nullptr);
+      hb_glyph_position_t *glyphPos = hb_buffer_get_glyph_positions(line->buffer.get(), nullptr);
+      hb_position_t cursorX = 0;
+      hb_position_t cursorY = -(unitsPerEm + descender);
+      for (unsigned int i = 0; i < numGlyphs; i++) {
+        auto glyphId = glyphInfo[i].codepoint;
+        auto xOffset = glyphPos[i].x_offset;
+        auto yOffset = glyphPos[i].y_offset;
+        auto xAdvance = glyphPos[i].x_advance;
+        auto yAdvance = glyphPos[i].y_advance;
+        float x = cursorX + xOffset;
+        float y = -(cursorY + yOffset);
+
+        Data data;
+        data.hdc = hdc;
+        data.tx = x;
+        data.ty = y;
+        data.dx = 0;
+        data.dy = dy;
+        hb_font_draw_glyph(font.get(), glyphId, funcs.get(), &data);
+        ::FillPath(hdc);
+        DBG("FillPath");
+        cursorX += xAdvance;
+        cursorY += yAdvance;
+      }
+      lineIndex++;
+      dy += setting.lineSpacing / scale + setting.fontSize / scale;
+    }
+    DBG("maxX=" << (width / scale) << "; maxY=" << (height / scale));
+#else
+    //::Rectangle(hdc, 0, 0, width / scale, height / scale);
+    for (auto const &line : lines) {
+      for (auto const &glyph : line->glyphs) {
+        Data data;
+        data.hdc = hdc;
+        data.dx = glyph.x;
+        data.dy = glyph.y + dy;
+        ::BeginPath(hdc);
+        DBG("-----");
+        DBG("BeginPath");
+        hb_font_draw_glyph(font.get(), glyph.glyphId, funcs.get(), &data);
+        ::FillPath(hdc);
+        DBG("FillPath");
+      }
+      dy += (setting.fontSize + setting.lineSpacing) / (float)unitsPerEm;
+    }
+#endif
+
+    ScopedHandle<HENHMETAFILE, ::DeleteEnhMetaFile> file(::CloseEnhMetaFile(hdc));
+    if (!file) {
+      return out;
+    }
+    auto size = ::GetEnhMetaFileBits(file, 0, nullptr);
+    if (size == 0) {
+      return out;
+    }
+    string s;
+    s.resize(size);
+    if (::GetEnhMetaFileBits(file, s.size(), (LPBYTE)s.data()) != size) {
+      return out;
+    }
+    s.swap(out);
+    return out;
+#endif
+    return out;
   }
 
   std::vector<std::shared_ptr<Line>> lines;
