@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(ksesh_macos_deployment_target "11.0")
+set(ksesh_macos_deployment_target "13.3")
 set(ksesh_apple_development_team_id "XM695N4A7T")
 
 if (MSVC)
@@ -56,7 +56,6 @@ juce_add_gui_app(ksesh
 )
 
 list(APPEND ksesh_files
-  deps/PDFGen/pdfgen.c
   deps/PDFGen/pdfgen.h
 
   src/desktop/MainWindow.hpp
@@ -75,6 +74,8 @@ list(APPEND ksesh_files
   src/desktop/SignListButtonContainer.hpp
   src/desktop/AppSetting.hpp
   src/desktop/PresentationSetting.hpp
+  src/desktop/PDFGen.cpp
+  src/desktop/PDFGen.hpp
 )
 if (APPLE)
   list(APPEND ksesh_files src/desktop/Application.mm)

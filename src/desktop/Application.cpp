@@ -1,7 +1,7 @@
 #include <juce_gui_extra/juce_gui_extra.h>
 #include <juce_opengl/juce_opengl.h>
 
-#include "pdfgen.h"
+#include "PDFGen.hpp"
 
 #include <iostream>
 

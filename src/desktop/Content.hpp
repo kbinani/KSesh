@@ -662,7 +662,6 @@ public:
     hb_font_extents_t extents{};
     hb_font_get_h_extents(font.get(), &extents);
     auto descender = extents.descender;
-    auto ascender = extents.ascender;
 
     unique_ptr<pdf_doc, juce::FunctionPointerDestructor<pdf_destroy>> doc(pdf_create(width, height, nullptr));
     pdf_append_page(doc.get());
@@ -699,8 +698,9 @@ public:
       }
       lineIndex++;
     }
-    pdf_save(doc.get(), "result.pdf");
-    return "";
+    string out;
+    pdf_save_stream(doc.get(), out);
+    return out;
   }
 
   std::vector<std::shared_ptr<Line>> lines;
