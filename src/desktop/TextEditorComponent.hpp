@@ -15,6 +15,9 @@ public:
     fEditor->onCaretPositionChange = [this]() {
       this->_onCaretPositionChange();
     };
+    fEditor->onSelectionChange = [this]() {
+      this->_onCaretPositionChange();
+    };
     addAndMakeVisible(fEditor.get());
   }
 

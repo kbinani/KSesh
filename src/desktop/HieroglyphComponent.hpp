@@ -14,6 +14,7 @@ public:
       return;
     }
     auto textColor = getLookAndFeel().findColour(juce::TextEditor::ColourIds::textColourId);
+    auto highlightTextColor = getLookAndFeel().findColour(juce::TextEditor::ColourIds::highlightedTextColourId);
     auto caretColor = getLookAndFeel().findColour(juce::CaretComponent::caretColourId);
     auto highlightColor = getLookAndFeel().findColour(juce::TextEditor::highlightColourId);
 
@@ -32,12 +33,28 @@ public:
     float dy = padding;
     g.saveState();
     g.addTransform(juce::AffineTransform::scale(scale, scale));
+    juce::Range<int> selection(fStart, fEnd);
     for (auto const &line : fContent->lines) {
-      g.setColour(textColor);
+      if (fStart == fEnd) {
+        g.setColour(textColor);
+      }
       for (auto const &glyph : line->glyphs) {
         auto path = Harfbuzz::CreatePath(glyph.glyphId, fFont, glyph.x + dx, glyph.y + dy);
         if (path.getBounds().isEmpty()) {
           continue;
+        }
+        if (fStart != fEnd) {
+          bool selected = false;
+          for (auto const &ch : line->chars) {
+            if (!ch.sign || ch.cluster != glyph.cluster) {
+              continue;
+            }
+            if (selection.getIntersectionWith({line->rawOffset + ch.rawOffset, line->rawOffset + ch.rawOffset + (int)ch.raw.size()}).getLength() == (int)ch.raw.size()) {
+              selected = true;
+              break;
+            }
+          }
+          g.setColour(selected ? highlightTextColor : textColor);
         }
         g.fillPath(path);
       }
@@ -55,15 +72,33 @@ public:
     repaint();
   }
 
-  void mouseUp(juce::MouseEvent const &e) override {
+  void mouseDown(juce::MouseEvent const &e) override {
     if (!fContent) {
       return;
     }
     if (e.mods.isLeftButtonDown()) {
-      auto position = fContent->closestPosition(fEnd, e.getPosition().toFloat(), fFont, fSetting);
+      auto position = fContent->closestPosition(std::nullopt, e.getPosition().toFloat(), fFont, fSetting);
+      fDown = position.location;
       setSelectedRange(position.location, position.location, position.direction);
       if (onSelectedRangeChange) {
         onSelectedRangeChange(position.location, position.location, position.direction);
+      }
+    }
+  }
+
+  void mouseDrag(juce::MouseEvent const &e) override {
+    if (!fContent) {
+      return;
+    }
+    if (e.mods.isLeftButtonDown()) {
+      if (fDown) {
+        auto position = fContent->closestPosition(*fDown, e.getPosition().toFloat(), fFont, fSetting);
+        int start = std::min<int>(position.location, *fDown);
+        int end = std::max<int>(position.location, *fDown);
+        setSelectedRange(start, end, position.direction);
+        if (onSelectedRangeChange) {
+          onSelectedRangeChange(start, end, position.direction);
+        }
       }
     }
   }
@@ -93,6 +128,7 @@ private:
   HbFontUniquePtr const &fFont;
   std::shared_ptr<Content> fContent;
   Cursor fCursor;
+  std::optional<int> fDown;
   int fStart = 0;
   int fEnd = 0;
   Direction fDirection = Direction::Forward;

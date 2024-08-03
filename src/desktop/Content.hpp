@@ -22,14 +22,16 @@ struct CharBase {
 };
 
 struct Char : public CharBase {
+  int clusterIndex;
   int cluster;
-  Char(CharBase const &base, int cluster) : CharBase(base.ch, base.raw, base.rawOffset, base.resultOffset, base.ctrl, base.sign), cluster(cluster) {}
+  Char(CharBase const &base, int clusterIndex, int cluster) : CharBase(base.ch, base.raw, base.rawOffset, base.resultOffset, base.ctrl, base.sign), clusterIndex(clusterIndex), cluster(cluster) {}
 };
 
 struct Cluster {
   int resultOffset;
+  int cluster;
   std::optional<juce::Rectangle<float>> bounds;
-  Cluster(int resultOffset, std::optional<juce::Rectangle<float>> bounds) : resultOffset(resultOffset), bounds(bounds) {}
+  Cluster(int resultOffset, std::optional<juce::Rectangle<float>> bounds, int cluster) : resultOffset(resultOffset), bounds(bounds), cluster(cluster) {}
 };
 
 class Line {
@@ -140,7 +142,7 @@ public:
       juce::Rectangle<float> bounds = path.getBounds();
       if (info.cluster != lastCluster) {
         auto u32 = U32StringFromU8string(utf8.substr(lastCluster, info.cluster - lastCluster));
-        clusters.push_back(Cluster(index, bb));
+        clusters.push_back(Cluster(index, bb, lastCluster));
         index += u32.size();
         lastCluster = info.cluster;
         bb = nullopt;
@@ -156,7 +158,7 @@ public:
     }
     this->buffer.swap(buffer);
     if (lastCluster < utf8.size()) {
-      clusters.push_back(Cluster(index, bb));
+      clusters.push_back(Cluster(index, bb, lastCluster));
     }
     for (size_t i = 0; i < clusters.size(); i++) {
       int from = clusters[i].resultOffset;
@@ -164,9 +166,10 @@ public:
           i + 1 < clusters.size()
               ? clusters[i + 1].resultOffset
               : this->result.size();
+      int cluster = clusters[i].cluster;
       for (CharBase const &ch : chars) {
         if (from <= ch.resultOffset && ch.resultOffset < to) {
-          this->chars.push_back(Char(ch, i));
+          this->chars.push_back(Char(ch, i, cluster));
         }
       }
     }
@@ -253,7 +256,7 @@ public:
   }
 
   CaretLocation closestPosition(
-      int current,
+      std::optional<int> current,
       juce::Point<float> point,
       HbFontUniquePtr const &font,
       PresentationSetting const &setting) {
@@ -285,7 +288,7 @@ public:
       auto start = line->rawOffset + ch.rawOffset;
       auto end = line->rawOffset + ch.rawOffset + (int)ch.raw.size();
       test.clear();
-      if (i == current) {
+      if (!current || i == *current) {
         test.push_back(CaretLocation(start, Direction::Forward));
         test.push_back(CaretLocation(end, Direction::Backward));
       } else if (i < current) {
@@ -350,18 +353,18 @@ public:
     int firstCharIndex = charIndex;
     for (int i = charIndex; i >= 0; i--) {
       auto ch = line->chars[i];
-      if (ch.cluster == char_.cluster) {
+      if (ch.clusterIndex == char_.clusterIndex) {
         firstCharIndex = i;
-      } else if (ch.cluster < char_.cluster) {
+      } else if (ch.clusterIndex < char_.clusterIndex) {
         break;
       }
     }
     int lastCharIndex = charIndex;
     for (int i = charIndex; i < (int)line->chars.size(); i++) {
       auto ch = line->chars[i];
-      if (ch.cluster == char_.cluster) {
+      if (ch.clusterIndex == char_.clusterIndex) {
         lastCharIndex = i;
-      } else if (ch.cluster > char_.cluster) {
+      } else if (ch.clusterIndex > char_.clusterIndex) {
         break;
       }
     }
@@ -376,12 +379,12 @@ public:
     if (startCharIndex < 0) {
       return nullopt;
     }
-    if (char_.cluster > 0) {
+    if (char_.clusterIndex > 0) {
       for (int i = firstCharIndex - 1; i >= 0; i--) {
         auto ch = line->chars[i];
         if (ch.sign && !ch.ctrl) {
           if (location == line->rawOffset + ch.rawOffset + (int)ch.raw.size()) {
-            return CursorLocationRight(lineIndex, ch.cluster, true);
+            return CursorLocationRight(lineIndex, ch.clusterIndex, true);
           }
         }
       }
@@ -390,39 +393,39 @@ public:
     if (
         line->rawOffset + start.rawOffset < location &&
         location <= line->rawOffset + start.rawOffset + (int)start.raw.size()) {
-      return CursorLocationRight(lineIndex, start.cluster, true);
+      return CursorLocationRight(lineIndex, start.clusterIndex, true);
     }
     if (line->rawOffset + start.rawOffset + (int)start.raw.size() < location) {
       if (direction == Direction::Backward) {
-        return CursorLocationRight(lineIndex, char_.cluster, false);
-      } else if ((int)line->clusters.size() - 1 == char_.cluster) {
+        return CursorLocationRight(lineIndex, char_.clusterIndex, false);
+      } else if ((int)line->clusters.size() - 1 == char_.clusterIndex) {
         return CursorLocationEnd(lineIndex);
       } else {
         for (int i = lastCharIndex + 1; i < (int)line->chars.size(); i++) {
           auto ch = line->chars[i];
           if (ch.sign) {
-            return CursorLocationLeft(lineIndex, ch.cluster);
+            return CursorLocationLeft(lineIndex, ch.clusterIndex);
           }
         }
       }
     }
     if (charIndex <= startCharIndex) {
-      if (direction == Direction::Forward || char_.cluster == 0) {
-        return CursorLocationLeft(lineIndex, char_.cluster);
+      if (direction == Direction::Forward || char_.clusterIndex == 0) {
+        return CursorLocationLeft(lineIndex, char_.clusterIndex);
       }
     }
     if (direction == Direction::Forward) {
       for (int i = charIndex + 1; i < (int)line->chars.size(); i++) {
         auto ch = line->chars[i];
         if (ch.sign) {
-          return CursorLocationLeft(lineIndex, ch.cluster);
+          return CursorLocationLeft(lineIndex, ch.clusterIndex);
         }
       }
     } else {
       for (int i = charIndex - 1; i >= 0; i--) {
         auto ch = line->chars[i];
         if (ch.sign) {
-          return CursorLocationRight(lineIndex, ch.cluster, false);
+          return CursorLocationRight(lineIndex, ch.clusterIndex, false);
         }
       }
     }
@@ -508,74 +511,38 @@ public:
         }
       }
     } else {
-      auto startLocation = cursorLocation(selectionStart, Direction::Forward);
-      auto endLocation = cursorLocation(selectionEnd, Direction::Backward);
-      std::vector<juce::Rectangle<float>> selectionRects;
-      if (startLocation && endLocation) {
-        LineAndCluster start;
-        if (std::holds_alternative<CursorLocationLeft>(*startLocation)) {
-          auto loc = std::get<CursorLocationLeft>(*startLocation);
-          start = LineAndCluster(loc.lineIndex, loc.clusterIndex);
-        } else if (std::holds_alternative<CursorLocationRight>(*startLocation)) {
-          auto loc = std::get<CursorLocationRight>(*startLocation);
-          start = LineAndCluster(loc.lineIndex, loc.clusterIndex);
-        } else if (std::holds_alternative<CursorLocationEnd>(*startLocation)) {
-          auto loc = std::get<CursorLocationEnd>(*startLocation);
-          start.lineIndex = loc.lineIndex;
-          start.clusterIndex = std::numeric_limits<int>::max();
-        }
-        LineAndCluster end;
-        if (std::holds_alternative<CursorLocationLeft>(*endLocation)) {
-          auto loc = std::get<CursorLocationLeft>(*endLocation);
-          end = LineAndCluster(loc.lineIndex, loc.clusterIndex);
-        } else if (std::holds_alternative<CursorLocationRight>(*endLocation)) {
-          auto loc = std::get<CursorLocationRight>(*endLocation);
-          end = LineAndCluster(loc.lineIndex, loc.clusterIndex);
-        } else if (std::holds_alternative<CursorLocationEnd>(*endLocation)) {
-          auto loc = std::get<CursorLocationEnd>(*endLocation);
-          end.lineIndex = loc.lineIndex;
-          end.clusterIndex = std::numeric_limits<int>::max();
-        }
-        auto dx = padding;
-        for (int i = 0; i < (int)lines.size(); i++) {
-          auto dy = padding + (fontSize + lineSpacing) * i;
-          auto line = lines[i];
-          std::optional<juce::Rectangle<float>> bb;
-          for (int j = 0; j < (int)line->clusters.size(); j++) {
-            LineAndCluster c(i, j);
-            if (compareLineAndCluster(start, c) == 0) {
-              if (!std::holds_alternative<CursorLocationLeft>(*startLocation)) {
-                continue;
-              }
-            } else if (compareLineAndCluster(end, c) == 0) {
-              if (!std::holds_alternative<CursorLocationRight>(*endLocation)) {
-                continue;
-              }
-            } else if (
-                0 <= compareLineAndCluster(start, c) ||
-                compareLineAndCluster(c, end) >= 0) {
+      Cursor ret;
+      juce::Range<int> selection(selectionStart, selectionEnd);
+      float dx = padding;
+      float dy = padding;
+      for (auto const &line : lines) {
+        std::optional<juce::Rectangle<float>> bb;
+
+        for (auto const &ch : line->chars) {
+          if (!ch.sign) {
+            continue;
+          }
+          auto intersection = selection.getIntersectionWith({line->rawOffset + ch.rawOffset, line->rawOffset + ch.rawOffset + (int)ch.raw.size()});
+          if (intersection.getLength() != (int)ch.raw.size()) {
+            continue;
+          }
+          for (auto const &cluster : line->clusters) {
+            if (!cluster.bounds || cluster.cluster != ch.cluster) {
               continue;
             }
-            auto cluster = line->clusters[j];
-            if (cluster.bounds) {
-              auto bounds = ((*cluster.bounds) * scale).expanded(setting.caretExpand);
-              juce::Rectangle<float> add(dx + bounds.getX(),
-                                         dy + bounds.getY(),
-                                         bounds.getWidth(),
-                                         bounds.getHeight());
-              if (bb) {
-                bb = bb->getUnion(add);
-              } else {
-                bb = add;
-              }
+            auto bounds = ((*cluster.bounds) * scale).expanded(setting.caretExpand).translated(dx, dy);
+            if (bb) {
+              bb = bb->getUnion(bounds);
+            } else {
+              bb = bounds;
             }
           }
-          if (bb) {
-            selectionRects.push_back(*bb);
-          }
         }
+        if (bb) {
+          ret.selectionRects.push_back(*bb);
+        }
+        dy += setting.lineSpacing + setting.fontSize;
       }
-      Cursor ret;
       return ret;
     }
   }
