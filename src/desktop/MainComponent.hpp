@@ -134,7 +134,9 @@ public:
   bool perform(juce::ApplicationCommandTarget::InvocationInfo const &info) override {
     switch (info.commandID) {
     case commandFileOpen:
-      open();
+      warnDirtyThen([this]() {
+        open();
+      });
       return true;
     case commandFileSave:
       save();
@@ -158,13 +160,47 @@ public:
       exportAsPdf();
       return true;
     case commandFileExit:
-      juce::JUCEApplication::getInstance()->quit();
+      warnDirtyThen([]() {
+        juce::JUCEApplication::getInstance()->quit();
+      });
       return true;
     }
     return false;
   }
 
 private:
+  void warnDirtyThen(std::function<void()> then) {
+    if (!then) {
+      return;
+    }
+    if (!fDirty) {
+      then();
+      return;
+    }
+    auto options = juce::MessageBoxOptions()
+                       .withIconType(juce::MessageBoxIconType::WarningIcon)
+                       .withTitle(TRANS("Warning"))
+                       .withMessage(TRANS("Do you want to save the changes you made to new document?"))
+                       .withButton(TRANS("Save"))       // yes
+                       .withButton(TRANS("Don't Save")) // no
+                       .withButton(TRANS("Cancel"));    // cancel
+    juce::NativeMessageBox::showAsync(options, [this, then](int result) {
+      switch (result) {
+      case 0:
+        // save
+        save(then);
+        break;
+      case 1:
+        then();
+        // don't save
+        break;
+      case 2:
+        // cancel
+        break;
+      }
+    });
+  }
+
   void open() {
     if (!fOpenFileChooser) {
       fOpenFileChooser = std::make_unique<juce::FileChooser>(TRANS("Open"), juce::File(), "*.txt");
@@ -192,14 +228,14 @@ private:
     });
   }
 
-  void saveWithNewName() {
+  void saveWithNewName(std::function<void()> then = nullptr) {
     if (!fContent) {
       return;
     }
     if (!fSaveFileChooser) {
       fSaveFileChooser = std::make_unique<juce::FileChooser>(TRANS("Save"), juce::File(), "*.txt");
     }
-    fSaveFileChooser->launchAsync(juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::warnAboutOverwriting, [this](juce::FileChooser const &chooser) {
+    fSaveFileChooser->launchAsync(juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::warnAboutOverwriting, [this, then](juce::FileChooser const &chooser) {
       auto file = chooser.getResult();
       if (file == juce::File() || !fContent) {
         return;
@@ -210,24 +246,42 @@ private:
         if (onSaveFilePathChanged) {
           onSaveFilePathChanged(file, false);
         }
+        if (then) {
+          waitModalThen(then);
+        }
       } else {
         juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, TRANS("Error"), TRANS("Failed to save"));
       }
     });
   }
 
-  void save() {
+  void waitModalThen(std::function<void()> then) {
+    std::function<void()> func;
+    func = [then, func]() {
+      if (juce::Component::getNumCurrentlyModalComponents() != 0) {
+        func();
+      } else {
+        then();
+      }
+    };
+    juce::Timer::callAfterDelay(100, func);
+  }
+
+  void save(std::function<void()> then = nullptr) {
     if (fSave != juce::File()) {
       if (saveTo(fSave)) {
         fDirty = false;
         if (onSaveFilePathChanged) {
           onSaveFilePathChanged(fSave, false);
         }
+        if (then) {
+          waitModalThen(then);
+        }
       } else {
         juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, TRANS("Error"), TRANS("Failed to save"));
       }
     } else {
-      saveWithNewName();
+      saveWithNewName(then);
     }
   }
 
