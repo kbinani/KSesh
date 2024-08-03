@@ -760,15 +760,14 @@ public:
     using namespace std;
     string out;
 #if JUCE_WINDOWS
-
     auto [widthf, heightf] = getSize(setting);
     LONG width = (LONG)ceil(widthf);
     LONG height = (LONG)ceil(heightf);
     RECT rc;
     rc.left = 0;
     rc.top = 0;
-    rc.right = 3000;//width;
-    rc.bottom = 2000;//height;
+    rc.right = width;
+    rc.bottom = height;
     HDC hdc = ::CreateEnhMetaFile(nullptr, nullptr, &rc, nullptr);
     if (INVALID_HANDLE_VALUE == hdc) {
       return out;
@@ -782,6 +781,14 @@ public:
       float tx = 0;
       float currentX = 0;
       float currentY = 0;
+      bool drawn = false;
+      bool filled = false;
+      void fill() {
+        ::EndPath(hdc);
+        ::FillPath(hdc);
+        drawn = false;
+        filled = false;
+      }
       int x(float v) const {
         return (int)round(v + tx) + dx;
       }
@@ -798,8 +805,11 @@ public:
         funcs.get(),
         [](auto *, void *data, auto *, float x, float y, auto *) {
           auto &d = *static_cast<Data *>(data);
+          if (d.drawn && !d.filled) {
+            //d.fill();
+          }
+          //::BeginPath(d.hdc);
           ::MoveToEx(d.hdc, d.x(x), d.y(y), nullptr);
-          DBG("MoveToEx(" << d.x(x) << ", " << d.y(y) << ")");
           d.current(x, y);
         },
         nullptr, nullptr);
@@ -808,7 +818,7 @@ public:
         [](auto *, void *data, auto *, float x, float y, auto *) {
           auto &d = *static_cast<Data *>(data);
           ::LineTo(d.hdc, d.x(x), d.y(y));
-          DBG("LineTo(" << d.x(x) << ", " << d.y(y) << ")");
+          d.drawn = true;
           d.current(x, y);
         },
         nullptr, nullptr);
@@ -826,8 +836,7 @@ public:
               {d.x(toX), d.y(toY)},
           };
           ::PolyBezierTo(d.hdc, pt, 3);
-          //::LineTo(d.hdc, d.x(toX), d.y(toY));
-          DBG("PolyBezierTo([" << pt[0].x << ", " << pt[0].y << "], [" << pt[1].x << ", " << pt[1].y << "], [" << pt[2].x << ", " << pt[2].y << "])");
+          d.drawn = true;
           d.current(toX, toY);
         },
         nullptr, nullptr);
@@ -841,8 +850,7 @@ public:
               {d.x(toX), d.y(toY)},
           };
           ::PolyBezierTo(d.hdc, pt, 3);
-          //::LineTo(d.hdc, d.x(toX), d.y(toY));
-          DBG("PolyBezierTo([" << pt[0].x << ", " << pt[0].y << "], [" << pt[1].x << ", " << pt[1].y << "], [" << pt[2].x << ", " << pt[2].y << "])");
+          d.drawn = true;
           d.current(toX, toY);
         },
         nullptr, nullptr);
@@ -851,37 +859,23 @@ public:
         [](auto *, void *data, auto *, auto *) {
           auto &d = *static_cast<Data *>(data);
           //::EndPath(d.hdc);
-          //DBG("EndPath");
           ::CloseFigure(d.hdc);
-          DBG("CloseFigure");
+          //::FillPath(d.hdc);
+          //d.filled = false;
+          //d.drawn = false;
         },
         nullptr, nullptr);
 
-    ::Rectangle(hdc, 0, 0, width, height);
-
-    //::SelectObject(hdc, ::CreateSolidBrush(RGB(255, 255, 255)));
-    //::Rectangle(hdc, setting.padding, setting.padding, width - setting.padding, height - setting.padding);
+    ScopedHandle<HPEN, ::DeleteObject> pen(::CreatePen(PS_SOLID, 0, RGB(255, 255, 255)));
+    ::SelectObject(hdc, pen);
+    //::Rectangle(hdc, 0, 0, width, height);
 
     ScopedHandle<HBRUSH, ::DeleteObject> brush(::CreateSolidBrush(RGB(0, 0, 0)));
     ::SelectObject(hdc, brush);
 
-//    ::BeginPath(hdc);
-    /*
-    ::MoveToEx(hdc, 4, 4, nullptr);
-    ::LineTo(hdc, 20, 4);
-    ::LineTo(hdc, 20, 40);
-    ::LineTo(hdc, 4, 40);
-    ::CloseFigure(hdc);
-    ::FillPath(hdc);
-
-    ::MoveToEx(hdc, 30, 4, nullptr);
-    ::LineTo(hdc, 40, 4);
-    ::LineTo(hdc, 40, 50);
-    ::FillPath(hdc);
-    */
-
     float const scale = setting.fontSize / (float)unitsPerEm;
     float dy = 0;
+
     XFORM mtx;
     mtx.eM11 = scale;
     mtx.eM12 = 0;
@@ -890,11 +884,11 @@ public:
     mtx.eDx = setting.padding;
     mtx.eDy = setting.padding;
     ::SetWorldTransform(hdc, &mtx);
-#if 1
+
     hb_font_extents_t extents{};
     hb_font_get_h_extents(font.get(), &extents);
     auto descender = extents.descender;
-    int lineIndex = 0;
+
     for (auto const &line : lines) {
       unsigned int numGlyphs = hb_buffer_get_length(line->buffer.get());
       hb_glyph_info_t *glyphInfo = hb_buffer_get_glyph_infos(line->buffer.get(), nullptr);
@@ -916,34 +910,15 @@ public:
         data.ty = y;
         data.dx = 0;
         data.dy = dy;
+        ::BeginPath(hdc);
         hb_font_draw_glyph(font.get(), glyphId, funcs.get(), &data);
+        ::EndPath(hdc);
         ::FillPath(hdc);
-        DBG("FillPath");
         cursorX += xAdvance;
         cursorY += yAdvance;
       }
-      lineIndex++;
       dy += setting.lineSpacing / scale + setting.fontSize / scale;
     }
-    DBG("maxX=" << (width / scale) << "; maxY=" << (height / scale));
-#else
-    //::Rectangle(hdc, 0, 0, width / scale, height / scale);
-    for (auto const &line : lines) {
-      for (auto const &glyph : line->glyphs) {
-        Data data;
-        data.hdc = hdc;
-        data.dx = glyph.x;
-        data.dy = glyph.y + dy;
-        ::BeginPath(hdc);
-        DBG("-----");
-        DBG("BeginPath");
-        hb_font_draw_glyph(font.get(), glyph.glyphId, funcs.get(), &data);
-        ::FillPath(hdc);
-        DBG("FillPath");
-      }
-      dy += (setting.fontSize + setting.lineSpacing) / (float)unitsPerEm;
-    }
-#endif
 
     ScopedHandle<HENHMETAFILE, ::DeleteEnhMetaFile> file(::CloseEnhMetaFile(hdc));
     if (!file) {
