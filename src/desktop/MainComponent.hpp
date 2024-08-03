@@ -2,8 +2,8 @@
 
 namespace ksesh {
 
-class MainComponent : public juce::Component {
-  enum {
+class MainComponent : public juce::Component, public juce::Timer {
+  enum : int {
     resizerSize = 8,
   };
 
@@ -41,12 +41,20 @@ public:
     addAndMakeVisible(*fHorizontalSplitter);
 
     setSize(width, height);
+    startTimerHz(10);
   }
 
   void resized() override {
     int const width = getWidth();
     int const height = getHeight();
     fHorizontalSplitter->setBounds(0, 0, width, height);
+  }
+
+  void timerCallback() override {
+    if (auto root = getTopLevelComponent(); root && root->isOnDesktop()) {
+      fTextEditor->focus();
+      stopTimer();
+    }
   }
 
 private:
