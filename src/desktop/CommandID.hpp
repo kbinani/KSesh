@@ -6,6 +6,7 @@ enum CommandID : juce::CommandID {
   kCommandIDFirst = 1,
 
   commandFileSave,
+  commandFileSaveAs,
   commandFileExportAsPdf,
   commandFileExportAsPng1x,
   commandFileExportAsPng2x,

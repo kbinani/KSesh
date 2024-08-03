@@ -96,6 +96,11 @@ public:
       info.setActive((bool)fContent);
       info.addDefaultKeypress('s', juce::ModifierKeys::commandModifier);
       break;
+    case commandFileSaveAs:
+      info.setInfo(TRANS("Save As..."), {}, {}, 0);
+      info.setActive((bool)fContent);
+      info.addDefaultKeypress('s', juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier);
+      break;
     case commandFileExportAsPng1x:
       info.setInfo(TRANS("1x scale"), {}, {}, 0);
       info.setActive((bool)fContent);
@@ -127,6 +132,9 @@ public:
     case commandFileSave:
       save();
       return true;
+    case commandFileSaveAs:
+      saveWithNewName();
+      return true;
     case commandFileExportAsPng1x:
       exportAsPng(1);
       return true;
@@ -150,6 +158,30 @@ public:
   }
 
 private:
+  void saveWithNewName() {
+    if (!fContent) {
+      return;
+    }
+    if (!fSaveFileChooser) {
+      fSaveFileChooser = std::make_unique<juce::FileChooser>(TRANS("Save"), juce::File(), "*.txt");
+    }
+    fSaveFileChooser->launchAsync(juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::warnAboutOverwriting, [this](juce::FileChooser const &chooser) {
+      auto file = chooser.getResult();
+      if (file == juce::File() || !fContent) {
+        return;
+      }
+      if (saveTo(file)) {
+        fDirty = false;
+        fSave = file;
+        if (onSaveFilePathChanged) {
+          onSaveFilePathChanged(file, false);
+        }
+      } else {
+        juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, TRANS("Error"), TRANS("Failed to save"));
+      }
+    });
+  }
+
   void save() {
     if (fSave != juce::File()) {
       if (saveTo(fSave)) {
@@ -161,24 +193,7 @@ private:
         juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, TRANS("Error"), TRANS("Failed to save"));
       }
     } else {
-      if (!fSaveFileChooser) {
-        fSaveFileChooser = std::make_unique<juce::FileChooser>(TRANS("Save"), juce::File(), "*.txt");
-      }
-      fSaveFileChooser->launchAsync(juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::warnAboutOverwriting, [this](juce::FileChooser const &chooser) {
-        auto file = chooser.getResult();
-        if (file == juce::File() || !fContent) {
-          return;
-        }
-        if (saveTo(file)) {
-          fDirty = false;
-          fSave = file;
-          if (onSaveFilePathChanged) {
-            onSaveFilePathChanged(file, false);
-          }
-        } else {
-          juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, TRANS("Error"), TRANS("Failed to save"));
-        }
-      });
+      saveWithNewName();
     }
   }
 

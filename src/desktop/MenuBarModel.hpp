@@ -18,6 +18,7 @@ public:
     juce::PopupMenu menu;
     if (topLevelMenuIndex == 0) {
       menu.addCommandItem(fManager, commandFileSave);
+      menu.addCommandItem(fManager, commandFileSaveAs);
       menu.addSeparator();
       juce::PopupMenu png;
       png.addCommandItem(fManager, commandFileExportAsPng1x);
