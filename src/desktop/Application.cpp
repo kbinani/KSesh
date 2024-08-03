@@ -69,7 +69,10 @@ public:
   }
 
   void systemRequestedQuit() override {
-    quit();
+    if (auto target = juce::ApplicationCommandManager::findDefaultComponentTarget(); target) {
+      juce::ApplicationCommandTarget::InvocationInfo info(commandFileExit);
+      target->invoke(info, false);
+    }
   }
 
   void anotherInstanceStarted(juce::String const &) override {
