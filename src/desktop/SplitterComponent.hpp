@@ -3,22 +3,23 @@
 namespace ksesh {
 
 class SplitterComponent : public juce::Component {
-  enum {
+  enum : int {
     resizerSize = 8,
   };
 
   class Resizer : public juce::Component {
   public:
     explicit Resizer(bool vertical) : fVertical(vertical) {
-      setRepaintsOnMouseActivity(true);
-      setMouseCursor(vertical ? juce::MouseCursor::LeftRightResizeCursor
-                              : juce::MouseCursor::UpDownResizeCursor);
+      setInterceptsMouseClicks(false, false);
     }
 
     void paint(juce::Graphics &g) override {
-      getLookAndFeel().drawStretchableLayoutResizerBar(g, getWidth(), getHeight(), fVertical,
-                                                       isMouseOver(), isMouseButtonDown());
+      getLookAndFeel().drawStretchableLayoutResizerBar(g, getWidth(), getHeight(), fVertical, fMouseOver, (bool)fMouseDown);
     }
+
+  public:
+    bool fMouseOver = false;
+    std::optional<juce::Point<int>> fMouseDown;
 
   private:
     bool const fVertical;
@@ -32,6 +33,8 @@ public:
     addAndMakeVisible(fResizer.get());
     addAndMakeVisible(leading);
     addAndMakeVisible(trailing);
+    setMouseCursor(vertical ? juce::MouseCursor::LeftRightResizeCursor
+                            : juce::MouseCursor::UpDownResizeCursor);
   }
 
   void resized() override {
@@ -48,6 +51,45 @@ public:
       fResizer->setBounds(0, h, width, resizerSize);
       fTrailing->setBounds(0, h + resizerSize, width, height - h - resizerSize);
     }
+  }
+
+  void mouseEnter(juce::MouseEvent const &e) override {
+    if (fResizer->getBoundsInParent().contains(e.getPosition())) {
+      fResizer->fMouseOver = true;
+      fResizer->repaint();
+    }
+  }
+
+  void mouseDown(juce::MouseEvent const &e) override {
+    if (e.mods.isLeftButtonDown() && fResizer->getBoundsInParent().contains(e.getPosition())) {
+      fResizer->fMouseDown = e.getPosition() - fResizer->getBoundsInParent().getTopLeft();
+      fResizer->repaint();
+    }
+  }
+
+  void mouseDrag(juce::MouseEvent const &e) override {
+    if (fResizer->fMouseDown) {
+      if (fVertical) {
+        float width = getWidth();
+        int x = (e.getPosition() - *fResizer->fMouseDown).getX() + resizerSize / 2;
+        fRatio = std::min<float>(std::max<float>(x / width, 0), 1);
+      } else {
+        float height = getHeight();
+        int y = (e.getPosition() - *fResizer->fMouseDown).getY() + resizerSize / 2;
+        fRatio = std::min<float>(std::max<float>(y / height, 0), 1);
+      }
+      resized();
+    }
+  }
+
+  void mouseUp(juce::MouseEvent const &e) override {
+    fResizer->fMouseDown = std::nullopt;
+    fResizer->repaint();
+  }
+
+  void mouseExit(juce::MouseEvent const &e) override {
+    fResizer->fMouseOver = false;
+    fResizer->repaint();
   }
 
 private:
