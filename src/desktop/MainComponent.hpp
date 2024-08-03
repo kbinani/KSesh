@@ -91,27 +91,32 @@ public:
 
   void getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo &info) override {
     switch (commandID) {
-    case CommandID::commandFileExportAsPng1x:
+    case commandFileSave:
+      info.setInfo(TRANS("Save"), {}, {}, 0);
+      info.setActive((bool)fContent);
+      info.addDefaultKeypress('s', juce::ModifierKeys::commandModifier);
+      break;
+    case commandFileExportAsPng1x:
       info.setInfo(TRANS("1x scale"), {}, {}, 0);
       info.setActive((bool)fContent);
       break;
-    case CommandID::commandFileExportAsPng2x:
+    case commandFileExportAsPng2x:
       info.setInfo(TRANS("2x scale"), {}, {}, 0);
       info.setActive((bool)fContent);
       break;
-    case CommandID::commandFileExportAsPng4x:
+    case commandFileExportAsPng4x:
       info.setInfo(TRANS("4x scale"), {}, {}, 0);
       info.setActive((bool)fContent);
       break;
-    case CommandID::commandFileExportAsPng8x:
+    case commandFileExportAsPng8x:
       info.setInfo(TRANS("8x scale"), {}, {}, 0);
       info.setActive((bool)fContent);
       break;
-    case CommandID::commandFileExportAsPdf:
+    case commandFileExportAsPdf:
       info.setInfo(TRANS("Export as PDF"), {}, {}, 0);
       info.setActive((bool)fContent);
       break;
-    case CommandID::commandFileExit:
+    case commandFileExit:
       info.setInfo(TRANS("Exit"), {}, {}, 0);
       break;
     }
@@ -119,22 +124,25 @@ public:
 
   bool perform(juce::ApplicationCommandTarget::InvocationInfo const &info) override {
     switch (info.commandID) {
-    case CommandID::commandFileExportAsPng1x:
+    case commandFileSave:
+      save();
+      return true;
+    case commandFileExportAsPng1x:
       exportAsPng(1);
       return true;
-    case CommandID::commandFileExportAsPng2x:
+    case commandFileExportAsPng2x:
       exportAsPng(2);
       return true;
-    case CommandID::commandFileExportAsPng4x:
+    case commandFileExportAsPng4x:
       exportAsPng(4);
       return true;
-    case CommandID::commandFileExportAsPng8x:
+    case commandFileExportAsPng8x:
       exportAsPng(8);
       return true;
-    case CommandID::commandFileExportAsPdf:
+    case commandFileExportAsPdf:
       exportAsPdf();
       return true;
-    case CommandID::commandFileExit:
+    case commandFileExit:
       juce::JUCEApplication::getInstance()->quit();
       return true;
     }
@@ -142,6 +150,66 @@ public:
   }
 
 private:
+  void save() {
+    if (fSave != juce::File()) {
+      if (saveTo(fSave)) {
+        fDirty = false;
+        if (onSaveFilePathChanged) {
+          onSaveFilePathChanged(fSave, false);
+        }
+      } else {
+        juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, TRANS("Error"), TRANS("Failed to save"));
+      }
+    } else {
+      if (!fSaveFileChooser) {
+        fSaveFileChooser = std::make_unique<juce::FileChooser>(TRANS("Save"), juce::File(), "*.txt");
+      }
+      fSaveFileChooser->launchAsync(juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::warnAboutOverwriting, [this](juce::FileChooser const &chooser) {
+        auto file = chooser.getResult();
+        if (file == juce::File() || !fContent) {
+          return;
+        }
+        if (saveTo(file)) {
+          fDirty = false;
+          fSave = file;
+          if (onSaveFilePathChanged) {
+            onSaveFilePathChanged(file, false);
+          }
+        } else {
+          juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, TRANS("Error"), TRANS("Failed to save"));
+        }
+      });
+    }
+  }
+
+  bool saveTo(juce::File const &file) const {
+    if (!fContent) {
+      return false;
+    }
+    if (file == juce::File()) {
+      return false;
+    }
+    std::u32string ret;
+    for (auto const &line : fContent->lines) {
+      if (!ret.empty()) {
+        ret += U"\n";
+      }
+      ret += line->raw;
+    }
+    auto stream = file.createOutputStream();
+    if (!stream || stream->failedToOpen()) {
+      return false;
+    }
+    if (!stream->setPosition(0)) {
+      return false;
+    }
+    if (stream->truncate().failed()) {
+      return false;
+    }
+    auto u8 = U8StringFromU32String(ret);
+    return stream->write(u8.c_str(), u8.size());
+  }
+
   void exportAsPng(float scale) {
     if (!fExportPngFileChooser) {
       fExportPngFileChooser = std::make_unique<juce::FileChooser>(TRANS("Export as PNG"), juce::File(), "*.png");
@@ -168,11 +236,11 @@ private:
         juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
         return;
       }
-      if (stream->truncate().failed()) {
+      if (!stream->setPosition(0)) {
         juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
         return;
       }
-      if (!stream->setPosition(0)) {
+      if (stream->truncate().failed()) {
         juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
         return;
       }
@@ -201,11 +269,11 @@ private:
         juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
         return;
       }
-      if (stream->truncate().failed()) {
+      if (!stream->setPosition(0)) {
         juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
         return;
       }
-      if (!stream->setPosition(0)) {
+      if (stream->truncate().failed()) {
         juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
         return;
       }
@@ -242,6 +310,11 @@ private:
     fContent = content;
     fHieroglyph->setContent(content);
     fMenuModel->menuItemsChanged();
+    bool wasDirty = fDirty;
+    fDirty = true;
+    if (!wasDirty && fSave != juce::File() && onSaveFilePathChanged) {
+      onSaveFilePathChanged(fSave, fDirty);
+    }
   }
 
   void onClickSign(Sign const &sign) {
@@ -253,6 +326,9 @@ private:
 
     fIgnoreCaretChange = false;
   }
+
+public:
+  std::function<void(juce::File, bool modified)> onSaveFilePathChanged;
 
 private:
   std::unique_ptr<SplitterComponent> fVerticalSplitter;
@@ -271,6 +347,9 @@ private:
   std::shared_ptr<Content> fContent;
   PresentationSetting fSetting;
   std::unique_ptr<juce::FileChooser> fExportPngFileChooser;
+  std::unique_ptr<juce::FileChooser> fSaveFileChooser;
+  juce::File fSave;
+  bool fDirty = false;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };

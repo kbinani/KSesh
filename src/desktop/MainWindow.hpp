@@ -9,6 +9,9 @@ public:
                                                                                     juce::DocumentWindow::allButtons) {
     setUsingNativeTitleBar(true);
     fMain = std::make_unique<MainComponent>(font);
+    fMain->onSaveFilePathChanged = [this](juce::File const &file, bool modified) {
+      setName(JUCE_APPLICATION_NAME_STRING + juce::String(" - ") + file.getFullPathName() + (modified ? " *" : ""));
+    };
     setContentNonOwned(fMain.get(), true);
 
 #if JUCE_IOS || JUCE_ANDROID
