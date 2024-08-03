@@ -56,6 +56,9 @@ juce_add_gui_app(ksesh
 )
 
 list(APPEND ksesh_files
+  deps/PDFGen/pdfgen.c
+  deps/PDFGen/pdfgen.h
+
   src/desktop/MainWindow.hpp
   src/desktop/MainComponent.hpp
   src/desktop/SignListComponent.hpp
@@ -110,6 +113,7 @@ elseif(APPLE)
   endforeach()
 endif()
 
+target_include_directories(ksesh PRIVATE deps/PDFGen)
 target_link_libraries(ksesh
   PRIVATE
     ksesh-binary-data

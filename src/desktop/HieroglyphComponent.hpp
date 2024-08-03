@@ -46,7 +46,7 @@ public:
         if (fStart != fEnd) {
           bool selected = false;
           for (auto const &ch : line->chars) {
-            if (!ch.sign || ch.cluster != glyph.cluster) {
+            if (!ch.sign || ch.cluster != (int)glyph.cluster) {
               continue;
             }
             if (selection.getIntersectionWith({line->rawOffset + ch.rawOffset, line->rawOffset + ch.rawOffset + (int)ch.raw.size()}).getLength() == (int)ch.raw.size()) {
