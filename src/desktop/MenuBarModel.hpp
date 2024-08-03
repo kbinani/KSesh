@@ -24,8 +24,10 @@ public:
       png.addCommandItem(fManager, commandFileExportAsPng8x);
       menu.addSubMenu(TRANS("Export as PNG"), png, true);
       menu.addCommandItem(fManager, commandFileExportAsPdf);
+#if !JUCE_MAC
       menu.addSeparator();
       menu.addCommandItem(fManager, commandFileExit);
+#endif
     }
     return menu;
   }
