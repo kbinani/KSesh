@@ -26,7 +26,7 @@ bool Clipboard::Store(std::string_view data, Type type) {
   switch (type) {
   case Type::Emf: {
     HGLOBAL mem = ::GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE | GMEM_ZEROINIT, data.size());
-    if (INVALID_HANDLE_VALUE == mem) {
+    if (!mem) {
       return false;
     }
     void *ptr = GlobalLock(mem);
@@ -57,10 +57,14 @@ bool Clipboard::Store(std::string_view data, Type type) {
     int bitCount = 32;
     int stride = (((width * bitCount) + 31) & ~31) >> 3;
     HGLOBAL mem = ::GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE | GMEM_ZEROINIT, sizeof(BITMAPINFO) + stride * height);
-    if (INVALID_HANDLE_VALUE == mem) {
+    if (!mem) {
       return false;
     }
     BITMAPINFO *info = (BITMAPINFO *)::GlobalLock(mem);
+    if (!info) {
+      ::GlobalFree(mem);
+      return false;
+    }
     info->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     info->bmiHeader.biWidth = width;
     info->bmiHeader.biHeight = height;
