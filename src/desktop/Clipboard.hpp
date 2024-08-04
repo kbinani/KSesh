@@ -11,28 +11,6 @@ public:
     Png,
   };
 
-  #if 0
-  static bool Available(Type t) {
-#if JUCE_WINDOWS
-    if (!::OpenClipboard(nullptr)) {
-      return false;
-    }
-    struct Closer {
-      ~Closer() {
-        ::CloseClipboard();
-      }
-    } closer;
-    switch (t) {
-    case Type::Emf:
-      return (bool)::IsClipboardFormatAvailable(CF_ENHMETAFILE);
-    case Type::Png:
-      return (bool)::IsClipboardFormatAvailable(CF_DIB);
-    }
-#endif
-    return false;
-  }
-  #endif
-
   static bool Store(std::string_view data, Type type) {
 #if JUCE_WINDOWS
     if (!::OpenClipboard(nullptr)) {
@@ -70,40 +48,23 @@ public:
       juce::PNGImageFormat format;
       juce::MemoryInputStream stream(data.data(), data.size(), false);
       stream.setPosition(0);
-      auto src = format.decodeImage(stream);
-      if (src.isNull()) {
+      auto img = format.decodeImage(stream);
+      if (img.isNull()) {
         return false;
       }
-      int const width = src.getWidth();
-      int const height = src.getHeight();
-      juce::Image img(juce::Image::PixelFormat::ARGB, width, height, true);
-      {
-        juce::Graphics g(img);
-        g.fillAll(juce::Colours::white);
-        g.drawImageAt(src, 0, 0);
-      }
-      auto pixelData = img.getPixelData();
-      int bpp;
-      switch (img.getFormat()) {
-      case juce::Image::PixelFormat::ARGB:
-        bpp = 4;
-        break;
-      case juce::Image::PixelFormat::RGB:
-        bpp = 3;
-        break;
-      default:
-        return false;
-      }
-      int bitCount = bpp * 8;
+      int const width = img.getWidth();
+      int const height = img.getHeight();
+      juce::Image::BitmapData bitmapData(img, juce::Image::BitmapData::ReadWriteMode::readOnly);
+      int bitCount = 32;
       int stride = (((width * bitCount) + 31) & ~31) >> 3;
       HGLOBAL mem = ::GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE | GMEM_ZEROINIT, sizeof(BITMAPINFO) + stride * height);
       if (INVALID_HANDLE_VALUE == mem) {
         return false;
       }
       BITMAPINFO *info = (BITMAPINFO *)::GlobalLock(mem);
-      info->bmiHeader.biSize = sizeof(BITMAPINFO);
-      info->bmiHeader.biWidth = img.getWidth();
-      info->bmiHeader.biHeight = img.getHeight();
+      info->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+      info->bmiHeader.biWidth = width;
+      info->bmiHeader.biHeight = height;
       info->bmiHeader.biPlanes = 1;
       info->bmiHeader.biBitCount = bitCount;
       info->bmiHeader.biCompression = BI_RGB;
@@ -112,17 +73,10 @@ public:
       info->bmiHeader.biYPelsPerMeter = 0;
       info->bmiHeader.biClrUsed = 0;
       info->bmiHeader.biClrImportant = 0;
-      uint8_t *dst = (uint8_t*)info + sizeof(BITMAPINFO);
+      uint8_t *dst = (uint8_t *)info + sizeof(BITMAPINFOHEADER);
       for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-          auto color = img.getPixelAt(x, height - y - 1);
-          RGBQUAD c;
-          c.rgbRed = color.getRed();
-          c.rgbGreen = color.getGreen();
-          c.rgbBlue = color.getBlue();
-          c.rgbReserved = color.getAlpha();
-          *(RGBQUAD *)(dst + (y * stride + bpp * x)) = c;
-        }
+        uint8_t *linePtr = bitmapData.getLinePointer(height - y - 1);
+        memcpy(dst + y * stride, linePtr, std::min(stride, bitmapData.lineStride));
       }
       ::GlobalUnlock(mem);
       return (bool)::SetClipboardData(CF_DIB, mem);

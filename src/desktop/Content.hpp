@@ -941,19 +941,6 @@ public:
     return out;
   }
 
-  juce::Image toImage(HbFontUniquePtr const &font, PresentationSetting const &setting, float scale) {
-    auto [widthf, heightf] = getSize(setting);
-    int width = (int)ceil(widthf * scale);
-    int height = (int)ceil(heightf * scale);
-    juce::Image img(juce::Image::PixelFormat::ARGB, width, height, true);
-    {
-      juce::Graphics g(img);
-      g.addTransform(juce::AffineTransform::scale(scale, scale));
-      draw(g, font, setting);
-    }
-    return img;
-  }
-
   std::vector<std::shared_ptr<Line>> lines;
   unsigned int const unitsPerEm;
 };

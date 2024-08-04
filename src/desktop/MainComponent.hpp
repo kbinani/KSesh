@@ -211,7 +211,7 @@ public:
     case commandEditCopyAsImage2x:
     case commandEditCopyAsImage4x:
     case commandEditCopyAsImage8x:
-      float scale = powf(2,  info.commandID - commandEditCopyAsImage1x);
+      float scale = powf(2, info.commandID - commandEditCopyAsImage1x);
       copyAsPng(scale);
       return true;
     }
@@ -384,7 +384,15 @@ private:
       if (file == juce::File() || !fContent) {
         return;
       }
-      auto img = fContent->toImage(fFont, fSetting, scale);
+      auto [widthf, heightf] = fContent->getSize(fSetting);
+      int width = (int)ceil(widthf * scale);
+      int height = (int)ceil(heightf * scale);
+      juce::Image img(juce::Image::PixelFormat::ARGB, width, height, true);
+      {
+        juce::Graphics g(img);
+        g.addTransform(juce::AffineTransform::scale(scale, scale));
+        fContent->draw(g, fFont, fSetting);
+      }
       auto stream = file.createOutputStream();
       auto title = TRANS("Error");
       auto message = TRANS("Failed to export as PNG");
@@ -481,7 +489,16 @@ private:
   }
 
   void copyAsPng(float scale) {
-    auto img = fContent->toImage(fFont, fSetting, scale);
+    auto [widthf, heightf] = fContent->getSize(fSetting);
+    int width = (int)ceil(widthf * scale);
+    int height = (int)ceil(heightf * scale);
+    juce::Image img(juce::Image::PixelFormat::ARGB, width, height, true);
+    {
+      juce::Graphics g(img);
+      g.fillAll(juce::Colours::white);
+      g.addTransform(juce::AffineTransform::scale(scale, scale));
+      fContent->draw(g, fFont, fSetting);
+    }
     juce::PNGImageFormat format;
     juce::MemoryOutputStream stream;
     format.writeImageToStream(img, stream);
