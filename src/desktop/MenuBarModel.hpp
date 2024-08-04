@@ -17,6 +17,7 @@ public:
   juce::PopupMenu getMenuForIndex(int topLevelMenuIndex, juce::String const &menuName) override {
     juce::PopupMenu menu;
     if (topLevelMenuIndex == 0) {
+      menu.addCommandItem(fManager, commandFileNew);
       menu.addCommandItem(fManager, commandFileOpen);
       menu.addSeparator();
       menu.addCommandItem(fManager, commandFileSave);

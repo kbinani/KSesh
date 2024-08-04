@@ -5,6 +5,7 @@ namespace ksesh {
 enum CommandID : juce::CommandID {
   kCommandIDFirst = 1,
 
+  commandFileNew,
   commandFileOpen,
   commandFileSave,
   commandFileSaveAs,

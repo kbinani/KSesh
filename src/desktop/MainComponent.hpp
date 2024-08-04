@@ -91,8 +91,12 @@ public:
 
   void getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo &info) override {
     switch (commandID) {
+    case commandFileNew:
+      info.setInfo(TRANS("New"), {}, {}, 0);
+      info.addDefaultKeypress('n', juce::ModifierKeys::commandModifier);
+      break;
     case commandFileOpen:
-      info.setInfo(TRANS("Open"), {}, {}, 0);
+      info.setInfo(TRANS("Open..."), {}, {}, 0);
       info.addDefaultKeypress('o', juce::ModifierKeys::commandModifier);
       break;
     case commandFileSave:
@@ -139,16 +143,21 @@ public:
 
   bool perform(juce::ApplicationCommandTarget::InvocationInfo const &info) override {
     switch (info.commandID) {
+    case commandFileNew:
+      warnDirtyThen([this]() {
+        newDocument();
+      });
+      return true;
     case commandFileOpen:
       warnDirtyThen([this]() {
-        open();
+        openDocument();
       });
       return true;
     case commandFileSave:
-      save();
+      saveDocument();
       return true;
     case commandFileSaveAs:
-      saveWithNewName();
+      saveDocumentWithNewName();
       return true;
     case commandFileExportAsPng1x:
       exportAsPng(1);
@@ -199,7 +208,7 @@ private:
       switch (result) {
       case 0:
         // save
-        save(then);
+        saveDocument(then);
         break;
       case 1:
         then();
@@ -212,7 +221,19 @@ private:
     });
   }
 
-  void open() {
+  void newDocument() {
+    fSave = juce::File();
+    fDirty = false;
+    auto c = std::make_shared<Content>(U"", fFont);
+    setContent(c);
+    fHieroglyph->setSelectedRange(0, 0, Direction::Forward);
+    fTextEditor->resetText("");
+    if (onSaveFilePathChanged) {
+      onSaveFilePathChanged(fSave, false);
+    }
+  }
+
+  void openDocument() {
     if (!fOpenFileChooser) {
       fOpenFileChooser = std::make_unique<juce::FileChooser>(TRANS("Open"), juce::File(), "*.txt");
     }
@@ -239,7 +260,7 @@ private:
     });
   }
 
-  void saveWithNewName(std::function<void()> then = nullptr) {
+  void saveDocumentWithNewName(std::function<void()> then = nullptr) {
     if (!fContent) {
       return;
     }
@@ -251,7 +272,7 @@ private:
       if (file == juce::File() || !fContent) {
         return;
       }
-      if (saveTo(file)) {
+      if (saveDocumentTo(file)) {
         fDirty = false;
         fSave = file;
         if (onSaveFilePathChanged) {
@@ -278,9 +299,9 @@ private:
     juce::Timer::callAfterDelay(100, func);
   }
 
-  void save(std::function<void()> then = nullptr) {
+  void saveDocument(std::function<void()> then = nullptr) {
     if (fSave != juce::File()) {
-      if (saveTo(fSave)) {
+      if (saveDocumentTo(fSave)) {
         fDirty = false;
         if (onSaveFilePathChanged) {
           onSaveFilePathChanged(fSave, false);
@@ -292,11 +313,11 @@ private:
         juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, TRANS("Error"), TRANS("Failed to save"));
       }
     } else {
-      saveWithNewName(then);
+      saveDocumentWithNewName(then);
     }
   }
 
-  bool saveTo(juce::File const &file) const {
+  bool saveDocumentTo(juce::File const &file) const {
     if (!fContent) {
       return false;
     }

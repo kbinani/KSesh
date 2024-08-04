@@ -10,7 +10,8 @@ public:
     setUsingNativeTitleBar(true);
     fMain = std::make_unique<MainComponent>(font);
     fMain->onSaveFilePathChanged = [this](juce::File const &file, bool modified) {
-      setName(JUCE_APPLICATION_NAME_STRING + juce::String(" - ") + file.getFullPathName() + (modified ? " *" : ""));
+      auto name = file == juce::File() ? TRANS("Unnamed") : file.getFullPathName();
+      setName(JUCE_APPLICATION_NAME_STRING + juce::String(" - ") + name + (modified ? " *" : ""));
     };
     setContentNonOwned(fMain.get(), true);
 
