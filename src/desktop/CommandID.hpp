@@ -13,9 +13,12 @@ enum CommandID : juce::CommandID {
   commandFileExportAsPng2x,
   commandFileExportAsPng4x,
   commandFileExportAsPng8x,
+#if JUCE_WINDOWS
+  commandFileExportAsEmf,
+#endif
   commandFileExit,
 
   kCommandIDMax,
 };
 
-}
+} // namespace ksesh

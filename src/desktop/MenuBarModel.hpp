@@ -28,6 +28,9 @@ public:
       png.addCommandItem(fManager, commandFileExportAsPng4x);
       png.addCommandItem(fManager, commandFileExportAsPng8x);
       menu.addSubMenu(TRANS("Export as PNG"), png, true);
+#if JUCE_WINDOWS
+      menu.addCommandItem(fManager, commandFileExportAsEmf);
+#endif
       menu.addCommandItem(fManager, commandFileExportAsPdf);
 #if !JUCE_MAC
       menu.addSeparator();

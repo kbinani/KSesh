@@ -125,6 +125,12 @@ public:
       info.setInfo(TRANS("Export as PDF"), {}, {}, 0);
       info.setActive((bool)fContent);
       break;
+#if JUCE_WINDOWS
+    case commandFileExportAsEmf:
+      info.setInfo(TRANS("Export as EMF"), {}, {}, 0);
+      info.setActive((bool)fContent);
+      break;
+#endif
     case commandFileExit:
       info.setInfo(TRANS("Exit"), {}, {}, 0);
       break;
@@ -159,6 +165,11 @@ public:
     case commandFileExportAsPdf:
       exportAsPdf();
       return true;
+#if JUCE_WINDOWS
+    case commandFileExportAsEmf:
+      exportAsEmf();
+      return true;
+#endif
     case commandFileExit:
       warnDirtyThen([]() {
         juce::JUCEApplication::getInstance()->quit();
@@ -387,6 +398,38 @@ private:
     });
   }
 
+  void exportAsEmf() {
+    if (!fExportEmfFileChooser) {
+      fExportEmfFileChooser = std::make_unique<juce::FileChooser>(TRANS("Export as EMF"), juce::File(), "*.emf");
+    }
+    fExportEmfFileChooser->launchAsync(juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::warnAboutOverwriting, [this](juce::FileChooser const &chooser) {
+      auto file = chooser.getResult();
+      if (file == juce::File() || !fContent) {
+        return;
+      }
+      auto str = fContent->toEMF(fFont, fSetting);
+      auto stream = file.createOutputStream();
+      auto title = TRANS("Error");
+      auto message = TRANS("Failed to export as EMF");
+      if (str.empty() || !stream || stream->failedToOpen()) {
+        juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
+        return;
+      }
+      if (!stream->setPosition(0)) {
+        juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
+        return;
+      }
+      if (stream->truncate().failed()) {
+        juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
+        return;
+      }
+      if (!stream->write(str.c_str(), str.size())) {
+        juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
+        return;
+      }
+    });
+  }
+
   void hieroglyphDidChangeSelectedRange(int start, int end, Direction direction) {
     fTextEditor->setSelectedRange(start, end, direction);
   }
@@ -454,6 +497,7 @@ private:
   juce::File fSave;
   bool fDirty = false;
   std::unique_ptr<juce::FileChooser> fOpenFileChooser;
+  std::unique_ptr<juce::FileChooser> fExportEmfFileChooser;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };
