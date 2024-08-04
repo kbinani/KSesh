@@ -760,19 +760,28 @@ public:
     using namespace std;
     string out;
 #if JUCE_WINDOWS
+    // PresentationSetting setting;
+    // setting.fontSize = unitsPerEm;
     auto [widthf, heightf] = getSize(setting);
-    LONG width = (LONG)ceil(widthf);
-    LONG height = (LONG)ceil(heightf);
+    LONG width = (LONG)ceil(widthf / setting.fontSize * unitsPerEm);
+    LONG height = (LONG)ceil(heightf / setting.fontSize * unitsPerEm);
     RECT rc;
     rc.left = 0;
     rc.top = 0;
     rc.right = width;
     rc.bottom = height;
-    HDC hdc = ::CreateEnhMetaFile(nullptr, nullptr, &rc, nullptr);
+    HDC hdc = ::CreateEnhMetaFile(nullptr, nullptr, nullptr, nullptr);
     if (INVALID_HANDLE_VALUE == hdc) {
       return out;
     }
-    ::SetGraphicsMode(hdc, GM_ADVANCED);
+    //::SetGraphicsMode(hdc, GM_ADVANCED);
+    //::ScaleViewportExtEx(hdc, setting.fontSize, unitsPerEm, setting.fontSize, unitsPerEm, nullptr);
+    //::SetMapMode(hdc, MM_LOMETRIC);
+    //::SetViewportOrgEx(hdc, )
+    //    Type = EMR_SETWINDOWORGEX
+    //      Type = EMR_SETWINDOWEXTEX
+    ::SetWindowOrgEx(hdc, 0, 0, nullptr);
+    ::SetWindowExtEx(hdc, width, height, nullptr);
 
     struct Data {
       HDC hdc;
@@ -786,18 +795,34 @@ public:
         return (int)round(v + tx) + dx;
       }
       int y(float v) const {
-        return (int)round(-v + ty) + dy;
+        return (int)round(v + ty) + dy;
       }
       void current(float x, float y) {
         currentX = x;
         currentY = y;
       }
+      void begin() {
+        if (began) {
+          return;
+        }
+        ::BeginPath(hdc);
+        began = true;
+      }
+      bool end() {
+        if (!began) {
+          return false;
+        }
+        ::EndPath(hdc);
+        return true;
+      }
+      bool began = false;
     };
     HbDrawFuncsUniquePtr funcs(hb_draw_funcs_create());
     hb_draw_funcs_set_move_to_func(
         funcs.get(),
         [](auto *, void *data, auto *, float x, float y, auto *) {
           auto &d = *static_cast<Data *>(data);
+          d.begin();
           ::MoveToEx(d.hdc, d.x(x), d.y(y), nullptr);
           d.current(x, y);
         },
@@ -806,6 +831,7 @@ public:
         funcs.get(),
         [](auto *, void *data, auto *, float x, float y, auto *) {
           auto &d = *static_cast<Data *>(data);
+          d.begin();
           ::LineTo(d.hdc, d.x(x), d.y(y));
           d.current(x, y);
         },
@@ -823,6 +849,7 @@ public:
               {d.x(xc2), d.y(yc2)},
               {d.x(toX), d.y(toY)},
           };
+          d.begin();
           ::PolyBezierTo(d.hdc, pt, 3);
           d.current(toX, toY);
         },
@@ -836,6 +863,7 @@ public:
               {d.x(ctlX2), d.y(ctlY2)},
               {d.x(toX), d.y(toY)},
           };
+          d.begin();
           ::PolyBezierTo(d.hdc, pt, 3);
           d.current(toX, toY);
         },
@@ -844,16 +872,19 @@ public:
         funcs.get(),
         [](auto *, void *data, auto *, auto *) {
           auto &d = *static_cast<Data *>(data);
+          d.begin();
           ::CloseFigure(d.hdc);
         },
         nullptr, nullptr);
+    {
+      ScopedHandle<HBRUSH, ::DeleteObject> brush(::CreateSolidBrush(RGB(0, 0, 0)));
+      ::SelectObject(hdc, brush);
 
-    ScopedHandle<HBRUSH, ::DeleteObject> brush(::CreateSolidBrush(RGB(0, 0, 0)));
-    ::SelectObject(hdc, brush);
+      // float const scale = setting.fontSize / (float)unitsPerEm;
+      float dy = 0;
 
-    float const scale = setting.fontSize / (float)unitsPerEm;
-    float dy = 0;
-
+#if 0
+    ::ModifyWorldTransform(hdc, nullptr, MWT_IDENTITY);
     XFORM mtx;
     mtx.eM11 = scale;
     mtx.eM12 = 0;
@@ -862,41 +893,42 @@ public:
     mtx.eDx = setting.padding;
     mtx.eDy = setting.padding;
     ::SetWorldTransform(hdc, &mtx);
+#endif
 
-    hb_font_extents_t extents{};
-    hb_font_get_h_extents(font.get(), &extents);
-    auto descender = extents.descender;
+      hb_font_extents_t extents{};
+      hb_font_get_h_extents(font.get(), &extents);
+      auto descender = extents.descender;
 
-    for (auto const &line : lines) {
-      unsigned int numGlyphs = hb_buffer_get_length(line->buffer.get());
-      hb_glyph_info_t *glyphInfo = hb_buffer_get_glyph_infos(line->buffer.get(), nullptr);
-      hb_glyph_position_t *glyphPos = hb_buffer_get_glyph_positions(line->buffer.get(), nullptr);
-      hb_position_t cursorX = 0;
-      hb_position_t cursorY = -(unitsPerEm + descender);
-      for (unsigned int i = 0; i < numGlyphs; i++) {
-        auto glyphId = glyphInfo[i].codepoint;
-        auto xOffset = glyphPos[i].x_offset;
-        auto yOffset = glyphPos[i].y_offset;
-        auto xAdvance = glyphPos[i].x_advance;
-        auto yAdvance = glyphPos[i].y_advance;
-        float x = cursorX + xOffset;
-        float y = -(cursorY + yOffset);
+      for (auto const &line : lines) {
+        unsigned int numGlyphs = hb_buffer_get_length(line->buffer.get());
+        hb_glyph_info_t *glyphInfo = hb_buffer_get_glyph_infos(line->buffer.get(), nullptr);
+        hb_glyph_position_t *glyphPos = hb_buffer_get_glyph_positions(line->buffer.get(), nullptr);
+        hb_position_t cursorX = 0;
+        hb_position_t cursorY = -(unitsPerEm + descender);
+        for (unsigned int i = 0; i < numGlyphs; i++) {
+          auto glyphId = glyphInfo[i].codepoint;
+          auto xOffset = glyphPos[i].x_offset;
+          auto yOffset = glyphPos[i].y_offset;
+          auto xAdvance = glyphPos[i].x_advance;
+          auto yAdvance = glyphPos[i].y_advance;
+          float x = cursorX + xOffset;
+          float y = -(cursorY + yOffset);
 
-        Data data;
-        data.hdc = hdc;
-        data.tx = x;
-        data.ty = y;
-        data.dx = 0;
-        data.dy = dy;
-        ::BeginPath(hdc);
-        hb_font_draw_glyph(font.get(), glyphId, funcs.get(), &data);
-        ::EndPath(hdc);
-        ::SetPolyFillMode(hdc, ALTERNATE);
-        ::FillPath(hdc);
-        cursorX += xAdvance;
-        cursorY += yAdvance;
+          Data data;
+          data.hdc = hdc;
+          data.tx = x;
+          data.ty = y;
+          data.dx = 0;
+          data.dy = dy;
+          hb_font_draw_glyph(font.get(), glyphId, funcs.get(), &data);
+          if (data.end()) {
+            ::FillPath(hdc);
+          }
+          cursorX += xAdvance;
+          cursorY += yAdvance;
+        }
+        dy += unitsPerEm; // setting.lineSpacing / scale + setting.fontSize / scale;
       }
-      dy += setting.lineSpacing / scale + setting.fontSize / scale;
     }
 
     ScopedHandle<HENHMETAFILE, ::DeleteEnhMetaFile> file(::CloseEnhMetaFile(hdc));
