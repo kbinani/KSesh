@@ -238,6 +238,7 @@ struct CaretLocation {
 };
 
 class Content {
+#if JUCE_WINDOWS
   template <class Handle, auto *deleter>
   struct ScopedHandle {
     explicit ScopedHandle(Handle handle) : handle(handle) {
@@ -253,6 +254,7 @@ class Content {
     }
     Handle handle;
   };
+#endif
 
 public:
   Content(std::u32string const &raw, HbFontUniquePtr const &font) : unitsPerEm(Harfbuzz::UnitsPerEm(font)) {

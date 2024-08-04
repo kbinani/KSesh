@@ -81,9 +81,15 @@ list(APPEND ksesh_files
   src/desktop/Clipboard.hpp
 )
 if (APPLE)
-  list(APPEND ksesh_files src/desktop/Application.mm)
+  list(APPEND ksesh_files
+    src/desktop/Application.mm
+    src/desktop/Clipboard.mm
+  )
 else()
-  list(APPEND ksesh_files src/desktop/Application.cpp)
+  list(APPEND ksesh_files
+    src/desktop/Application.cpp
+    src/desktop/Clipboard.cpp
+  )
 endif()
 
 target_sources(ksesh PRIVATE ${ksesh_files})

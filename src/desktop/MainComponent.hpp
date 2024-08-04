@@ -94,37 +94,37 @@ public:
     case commandFileNew:
       info.setInfo(TRANS("New"), {}, {}, 0);
       info.addDefaultKeypress('n', juce::ModifierKeys::commandModifier);
-      break;
+      return;
     case commandFileOpen:
       info.setInfo(TRANS("Open..."), {}, {}, 0);
       info.addDefaultKeypress('o', juce::ModifierKeys::commandModifier);
-      break;
+      return;
     case commandFileSave:
       info.setInfo(TRANS("Save"), {}, {}, 0);
       info.setActive((bool)fContent);
       info.addDefaultKeypress('s', juce::ModifierKeys::commandModifier);
-      break;
+      return;
     case commandFileSaveAs:
       info.setInfo(TRANS("Save As..."), {}, {}, 0);
       info.setActive((bool)fContent);
       info.addDefaultKeypress('s', juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier);
-      break;
+      return;
     case commandFileExportAsPng1x:
       info.setInfo(TRANS("1x scale"), {}, {}, 0);
       info.setActive((bool)fContent);
-      break;
+      return;
     case commandFileExportAsPng2x:
       info.setInfo(TRANS("2x scale"), {}, {}, 0);
       info.setActive((bool)fContent);
-      break;
+      return;
     case commandFileExportAsPng4x:
       info.setInfo(TRANS("4x scale"), {}, {}, 0);
       info.setActive((bool)fContent);
-      break;
+      return;
     case commandFileExportAsPng8x:
       info.setInfo(TRANS("8x scale"), {}, {}, 0);
       info.setActive((bool)fContent);
-      break;
+      return;
     case commandFileExportAsPdf:
       info.setInfo(TRANS("Export as PDF"), {}, {}, 0);
       info.setActive((bool)fContent);
@@ -133,30 +133,32 @@ public:
     case commandFileExportAsEmf:
       info.setInfo(TRANS("Export as EMF"), {}, {}, 0);
       info.setActive((bool)fContent);
-      break;
+      return;
     case commandEditCopyAsEmf:
       info.setInfo(TRANS("Copy as EMF"), {}, {}, 0);
       info.setActive((bool)fContent);
-      break;
+      return;
 #endif
     case commandFileExit:
       info.setInfo(TRANS("Exit"), {}, {}, 0);
-      break;
+      return;
     case commandEditCopyAsImage1x:
       info.setInfo(TRANS("1x scale"), {}, {}, 0);
       info.setActive((bool)fContent);
-      break;
+      return;
     case commandEditCopyAsImage2x:
       info.setInfo(TRANS("2x scale"), {}, {}, 0);
       info.setActive((bool)fContent);
-      break;
+      return;
     case commandEditCopyAsImage4x:
       info.setInfo(TRANS("4x scale"), {}, {}, 0);
       info.setActive((bool)fContent);
-      break;
+      return;
     case commandEditCopyAsImage8x:
       info.setInfo(TRANS("8x scale"), {}, {}, 0);
       info.setActive((bool)fContent);
+      return;
+    default:
       break;
     }
   }
@@ -480,6 +482,7 @@ private:
     });
   }
 
+#if JUCE_WINDOWS
   void copyAsEmf() {
     if (!fContent) {
       return;
@@ -487,6 +490,7 @@ private:
     auto str = fContent->toEMF(fFont, fSetting);
     writeToClipboard(str, Clipboard::Type::Emf);
   }
+#endif
 
   void copyAsPng(float scale) {
     auto [widthf, heightf] = fContent->getSize(fSetting);

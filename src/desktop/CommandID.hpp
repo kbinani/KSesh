@@ -19,7 +19,9 @@ enum CommandID : juce::CommandID {
 #endif
   commandFileExit,
 
+#if JUCE_WINDOWS
   commandEditCopyAsEmf,
+#endif
   commandEditCopyAsImage1x,
   commandEditCopyAsImage2x,
   commandEditCopyAsImage4x,

@@ -1,5 +1,4 @@
 #include <juce_gui_extra/juce_gui_extra.h>
-#include <juce_opengl/juce_opengl.h>
 
 #include "PDFGen.hpp"
 
