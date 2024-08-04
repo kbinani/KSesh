@@ -142,6 +142,22 @@ public:
     case commandFileExit:
       info.setInfo(TRANS("Exit"), {}, {}, 0);
       break;
+    case commandEditCopyAsImage1x:
+      info.setInfo(TRANS("1x scale"), {}, {}, 0);
+      info.setActive((bool)fContent);
+      break;
+    case commandEditCopyAsImage2x:
+      info.setInfo(TRANS("2x scale"), {}, {}, 0);
+      info.setActive((bool)fContent);
+      break;
+    case commandEditCopyAsImage4x:
+      info.setInfo(TRANS("4x scale"), {}, {}, 0);
+      info.setActive((bool)fContent);
+      break;
+    case commandEditCopyAsImage8x:
+      info.setInfo(TRANS("8x scale"), {}, {}, 0);
+      info.setActive((bool)fContent);
+      break;
     }
   }
 
@@ -190,6 +206,13 @@ public:
       warnDirtyThen([]() {
         juce::JUCEApplication::getInstance()->quit();
       });
+      return true;
+    case commandEditCopyAsImage1x:
+    case commandEditCopyAsImage2x:
+    case commandEditCopyAsImage4x:
+    case commandEditCopyAsImage8x:
+      float scale = powf(2,  info.commandID - commandEditCopyAsImage1x);
+      copyAsPng(scale);
       return true;
     }
     return false;
@@ -361,16 +384,7 @@ private:
       if (file == juce::File() || !fContent) {
         return;
       }
-      PresentationSetting setting = fSetting;
-      auto [widthf, heightf] = fContent->getSize(setting);
-      int width = (int)ceil(widthf * scale);
-      int height = (int)ceil(heightf * scale);
-      juce::Image img(juce::Image::PixelFormat::ARGB, width, height, true);
-      {
-        juce::Graphics g(img);
-        g.addTransform(juce::AffineTransform::scale(scale, scale));
-        fContent->draw(g, fFont, setting);
-      }
+      auto img = fContent->toImage(fFont, fSetting, scale);
       auto stream = file.createOutputStream();
       auto title = TRANS("Error");
       auto message = TRANS("Failed to export as PNG");
@@ -463,11 +477,20 @@ private:
       return;
     }
     auto str = fContent->toEMF(fFont, fSetting);
-    writeToClipboard(str);
+    writeToClipboard(str, Clipboard::Type::Emf);
   }
 
-  void writeToClipboard(std::string const &data) {
-    if (!Clipboard::Store(data, Clipboard::Type::Emf)) {
+  void copyAsPng(float scale) {
+    auto img = fContent->toImage(fFont, fSetting, scale);
+    juce::PNGImageFormat format;
+    juce::MemoryOutputStream stream;
+    format.writeImageToStream(img, stream);
+    std::string_view data((char const *)stream.getData(), stream.getDataSize());
+    writeToClipboard(data, Clipboard::Type::Png);
+  }
+
+  void writeToClipboard(std::string_view data, Clipboard::Type type) {
+    if (!Clipboard::Store(data, type)) {
       auto title = TRANS("Error");
       auto message = TRANS("Failed to write clipboard");
       juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);

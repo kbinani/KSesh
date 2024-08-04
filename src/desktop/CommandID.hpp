@@ -20,6 +20,10 @@ enum CommandID : juce::CommandID {
   commandFileExit,
 
   commandEditCopyAsEmf,
+  commandEditCopyAsImage1x,
+  commandEditCopyAsImage2x,
+  commandEditCopyAsImage4x,
+  commandEditCopyAsImage8x,
 
   kCommandIDMax,
 };

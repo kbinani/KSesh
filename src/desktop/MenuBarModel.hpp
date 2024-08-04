@@ -39,9 +39,15 @@ public:
       menu.addCommandItem(fManager, commandFileExit);
 #endif
     } else if (topLevelMenuIndex == 1) {
-      if (Clipboard::Available(Clipboard::Type::Emf)) {
-        menu.addCommandItem(fManager, commandEditCopyAsEmf);
-      }
+#if JUCE_WINDOWS
+      menu.addCommandItem(fManager, commandEditCopyAsEmf);
+#endif
+      juce::PopupMenu png;
+      png.addCommandItem(fManager, commandEditCopyAsImage1x);
+      png.addCommandItem(fManager, commandEditCopyAsImage2x);
+      png.addCommandItem(fManager, commandEditCopyAsImage4x);
+      png.addCommandItem(fManager, commandEditCopyAsImage8x);
+      menu.addSubMenu(TRANS("Copy as Image"), png, true);
     }
     return menu;
   }
