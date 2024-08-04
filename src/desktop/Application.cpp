@@ -61,7 +61,64 @@ public:
     fLaf->setColourScheme(fSetting.getColorScheme(juce::Desktop::getInstance().isDarkModeActive()));
     juce::LookAndFeel::setDefaultLookAndFeel(fLaf.get());
     juce::Desktop::getInstance().addDarkModeSettingListener(this);
-    fMainWindow = std::make_unique<MainWindow>(getApplicationName(), fFont);
+
+    fCommandManager = std::make_unique<juce::ApplicationCommandManager>();
+    fCommandManager->registerAllCommandsForTarget(this);
+    fMainWindow = std::make_unique<MainWindow>(getApplicationName(), fFont, fCommandManager);
+  }
+
+  void getAllCommands(juce::Array<juce::CommandID> &commands) override {
+    for (int id = applicationCommandIDBegin; id < applicationCommandIDEnd; id++) {
+      commands.add(id);
+    }
+  }
+
+  void getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo &info) override {
+    switch (commandID) {
+    case commandViewThemeAuto:
+      info.setInfo(TRANS("Auto"), {}, {}, 0);
+      info.setTicked(fSetting.colorScheme == AppSetting::ColorScheme::Auto);
+      return;
+    case commandViewThemeDark:
+      info.setInfo(TRANS("Dark"), {}, {}, 0);
+      info.setTicked(fSetting.colorScheme == AppSetting::ColorScheme::Dark);
+      return;
+    case commandViewThemeMidnight:
+      info.setInfo(TRANS("Midnight"), {}, {}, 0);
+      info.setTicked(fSetting.colorScheme == AppSetting::ColorScheme::Midnight);
+      return;
+    case commandViewThemeGray:
+      info.setInfo(TRANS("Gray"), {}, {}, 0);
+      info.setTicked(fSetting.colorScheme == AppSetting::ColorScheme::Gray);
+      return;
+    case commandViewThemeLight:
+      info.setInfo(TRANS("Light"), {}, {}, 0);
+      info.setTicked(fSetting.colorScheme == AppSetting::ColorScheme::Light);
+      return;
+    default:
+      break;
+    }
+  }
+
+  bool perform(juce::ApplicationCommandTarget::InvocationInfo const &info) override {
+    switch (info.commandID) {
+    case commandViewThemeAuto:
+      setColorScheme(AppSetting::ColorScheme::Auto);
+      return true;
+    case commandViewThemeDark:
+      setColorScheme(AppSetting::ColorScheme::Dark);
+      return true;
+    case commandViewThemeMidnight:
+      setColorScheme(AppSetting::ColorScheme::Midnight);
+      return true;
+    case commandViewThemeGray:
+      setColorScheme(AppSetting::ColorScheme::Gray);
+      return true;
+    case commandViewThemeLight:
+      setColorScheme(AppSetting::ColorScheme::Light);
+      return true;
+    }
+    return false;
   }
 
   void shutdown() override {
@@ -69,10 +126,8 @@ public:
   }
 
   void systemRequestedQuit() override {
-    if (auto target = juce::ApplicationCommandManager::findDefaultComponentTarget(); target) {
-      juce::ApplicationCommandTarget::InvocationInfo info(commandFileExit);
-      target->invoke(info, false);
-    }
+    juce::ApplicationCommandTarget::InvocationInfo info(commandFileExit);
+    fCommandManager->invoke(info, false);
   }
 
   void anotherInstanceStarted(juce::String const &) override {
@@ -89,10 +144,21 @@ public:
   }
 
 private:
+  void setColorScheme(AppSetting::ColorScheme scheme) {
+    fSetting.colorScheme = scheme;
+    auto laf = std::make_unique<LookAndFeel>();
+    laf->setColourScheme(fSetting.getColorScheme(juce::Desktop::getInstance().isDarkModeActive()));
+    juce::LookAndFeel::setDefaultLookAndFeel(laf.get());
+    fLaf.swap(laf);
+    fCommandManager->invoke(juce::ApplicationCommandTarget::InvocationInfo(commandUpdateMenuModel), false);
+  }
+
+private:
   std::unique_ptr<MainWindow> fMainWindow;
   std::unique_ptr<LookAndFeel> fLaf;
   HbFontUniquePtr fFont;
   AppSetting fSetting;
+  std::unique_ptr<juce::ApplicationCommandManager> fCommandManager;
 };
 
 std::vector<std::u32string> const SignList::enclosureBeginning = {

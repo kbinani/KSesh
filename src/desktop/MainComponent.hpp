@@ -8,7 +8,7 @@ class MainComponent : public juce::Component, public juce::Timer, public juce::A
   };
 
 public:
-  explicit MainComponent(HbFontUniquePtr const &font) : fFont(font) {
+  MainComponent(HbFontUniquePtr const &font, std::unique_ptr<juce::ApplicationCommandManager> const &commandManager) : fFont(font) {
     int const width = 1280;
     int const height = 720;
 
@@ -41,11 +41,10 @@ public:
     fHorizontalSplitter->setBounds(0, height / 2 + resizerSize / 2, width, resizerSize);
     addAndMakeVisible(*fHorizontalSplitter);
 
-    fCommandManager = std::make_unique<juce::ApplicationCommandManager>();
-    fCommandManager->registerAllCommandsForTarget(this);
-    addKeyListener(fCommandManager->getKeyMappings());
+    commandManager->registerAllCommandsForTarget(this);
+    addKeyListener(commandManager->getKeyMappings());
 
-    fMenuModel = std::make_unique<MenuBarModel>(fCommandManager.get());
+    fMenuModel = std::make_unique<MenuBarModel>(commandManager.get());
 #if JUCE_MAC
     juce::MenuBarModel::setMacMainMenu(fMenuModel.get());
 #else
@@ -84,7 +83,7 @@ public:
   }
 
   void getAllCommands(juce::Array<juce::CommandID> &commands) override {
-    for (int id = kCommandIDFirst + 1; id < kCommandIDMax; id++) {
+    for (int id = mainComponentCommandIDBegin; id < mainComponentCommandIDEnd; id++) {
       commands.add(id);
     }
   }
@@ -158,6 +157,9 @@ public:
       info.setInfo(TRANS("8x scale"), {}, {}, 0);
       info.setActive((bool)fContent);
       return;
+    case commandUpdateMenuModel:
+      info.setInfo("Update menu model", {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      return;
     default:
       break;
     }
@@ -212,9 +214,13 @@ public:
     case commandEditCopyAsImage1x:
     case commandEditCopyAsImage2x:
     case commandEditCopyAsImage4x:
-    case commandEditCopyAsImage8x:
+    case commandEditCopyAsImage8x: {
       float scale = powf(2, info.commandID - commandEditCopyAsImage1x);
       copyAsPng(scale);
+      return true;
+    }
+    case commandUpdateMenuModel:
+      fMenuModel->menuItemsChanged();
       return true;
     }
     return false;
@@ -572,7 +578,6 @@ private:
   std::unique_ptr<SignListComponent> fSignList;
   HbFontUniquePtr const &fFont;
   bool fIgnoreCaretChange = false;
-  std::unique_ptr<juce::ApplicationCommandManager> fCommandManager;
   std::unique_ptr<juce::MenuBarModel> fMenuModel;
 #if !JUCE_MAC
   std::unique_ptr<juce::MenuBarComponent> fMenuComponent;

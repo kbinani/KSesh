@@ -12,6 +12,7 @@ public:
     juce::StringArray names;
     names.add(TRANS("File"));
     names.add(TRANS("Edit"));
+    names.add(TRANS("View"));
     return names;
   }
 
@@ -48,6 +49,14 @@ public:
       png.addCommandItem(fManager, commandEditCopyAsImage4x);
       png.addCommandItem(fManager, commandEditCopyAsImage8x);
       menu.addSubMenu(TRANS("Copy as Image"), png, true);
+    } else if (topLevelMenuIndex == 2) {
+      juce::PopupMenu theme;
+      theme.addCommandItem(fManager, commandViewThemeAuto);
+      theme.addCommandItem(fManager, commandViewThemeDark);
+      theme.addCommandItem(fManager, commandViewThemeMidnight);
+      theme.addCommandItem(fManager, commandViewThemeGray);
+      theme.addCommandItem(fManager, commandViewThemeLight);
+      menu.addSubMenu(TRANS("Theme"), theme, true);
     }
     return menu;
   }

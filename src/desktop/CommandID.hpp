@@ -3,9 +3,8 @@
 namespace ksesh {
 
 enum CommandID : juce::CommandID {
-  kCommandIDFirst = 1,
-
-  commandFileNew,
+  mainComponentCommandIDBegin = 1,
+  commandFileNew = mainComponentCommandIDBegin,
   commandFileOpen,
   commandFileSave,
   commandFileSaveAs,
@@ -27,7 +26,16 @@ enum CommandID : juce::CommandID {
   commandEditCopyAsImage4x,
   commandEditCopyAsImage8x,
 
-  kCommandIDMax,
+  commandUpdateMenuModel,
+  mainComponentCommandIDEnd,
+
+  applicationCommandIDBegin,
+  commandViewThemeAuto = applicationCommandIDBegin,
+  commandViewThemeDark,
+  commandViewThemeMidnight,
+  commandViewThemeGray,
+  commandViewThemeLight,
+  applicationCommandIDEnd,
 };
 
 } // namespace ksesh
