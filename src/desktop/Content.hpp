@@ -760,11 +760,9 @@ public:
     using namespace std;
     string out;
 #if JUCE_WINDOWS
-    // PresentationSetting setting;
-    // setting.fontSize = unitsPerEm;
     auto [widthf, heightf] = getSize(setting);
-    LONG width = (LONG)ceil(widthf);// / setting.fontSize * unitsPerEm);
-    LONG height = (LONG)ceil(heightf);// / setting.fontSize * unitsPerEm);
+    LONG width = (LONG)ceil(widthf);
+    LONG height = (LONG)ceil(heightf);
     RECT rc;
     rc.left = 0;
     rc.top = 0;
@@ -775,11 +773,6 @@ public:
       return out;
     }
     ::SetGraphicsMode(hdc, GM_ADVANCED);
-    //::ScaleViewportExtEx(hdc, setting.fontSize, unitsPerEm, setting.fontSize, unitsPerEm, nullptr);
-    //::SetMapMode(hdc, MM_LOMETRIC);
-    //::SetViewportOrgEx(hdc, )
-    //    Type = EMR_SETWINDOWORGEX
-    //      Type = EMR_SETWINDOWEXTEX
     ::SetWindowOrgEx(hdc, 0, 0, nullptr);
     ::SetWindowExtEx(hdc, width, height, nullptr);
 
@@ -883,27 +876,19 @@ public:
       float const scale = setting.fontSize / (float)unitsPerEm;
       float dy = 0;
 
-#if 1
-    ::ModifyWorldTransform(hdc, nullptr, MWT_IDENTITY);
-    XFORM mtx;
-    mtx.eM11 = scale;
-    mtx.eM12 = 0;
-    mtx.eM21 = 0;
-    mtx.eM22 = scale;
-    mtx.eDx = setting.padding;
-    mtx.eDy = setting.padding;
-    ::SetWorldTransform(hdc, &mtx);
-#endif
+      ::ModifyWorldTransform(hdc, nullptr, MWT_IDENTITY);
+      XFORM mtx;
+      mtx.eM11 = scale;
+      mtx.eM12 = 0;
+      mtx.eM21 = 0;
+      mtx.eM22 = scale;
+      mtx.eDx = setting.padding;
+      mtx.eDy = setting.padding;
+      ::SetWorldTransform(hdc, &mtx);
 
       hb_font_extents_t extents{};
       hb_font_get_h_extents(font.get(), &extents);
       auto descender = extents.descender;
-      /*        data.tx = x;
-        data.ty = y - descender;
-        data.dx = setting.padding;
-        data.dy = height - lineIndex * (setting.fontSize + setting.lineSpacing) - setting.padding - setting.fontSize;
-*/
-      int emHeight = (int)round(heightf / scale);
       for (int lineIndex = 0; lineIndex < (int)lines.size(); lineIndex++) {
         auto const &line = lines[lineIndex];
         unsigned int numGlyphs = hb_buffer_get_length(line->buffer.get());
@@ -925,7 +910,7 @@ public:
           data.tx = x;
           data.ty = y;
           data.dx = 0;
-          data.dy = dy;//emHeight - lineIndex * unitsPerEm - lineIndex * setting.lineSpacing / scale - setting.padding / scale - unitsPerEm;
+          data.dy = dy;
           hb_font_draw_glyph(font.get(), glyphId, funcs.get(), &data);
           if (data.end()) {
             ::FillPath(hdc);
