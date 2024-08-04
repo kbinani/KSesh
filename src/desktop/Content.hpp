@@ -772,6 +772,7 @@ public:
     if (INVALID_HANDLE_VALUE == hdc) {
       return out;
     }
+    ::SetGraphicsMode(hdc, GM_ADVANCED);
 
     struct Data {
       HDC hdc;
@@ -781,14 +782,6 @@ public:
       float tx = 0;
       float currentX = 0;
       float currentY = 0;
-      bool drawn = false;
-      bool filled = false;
-      void fill() {
-        ::EndPath(hdc);
-        ::FillPath(hdc);
-        drawn = false;
-        filled = false;
-      }
       int x(float v) const {
         return (int)round(v + tx) + dx;
       }
@@ -805,10 +798,6 @@ public:
         funcs.get(),
         [](auto *, void *data, auto *, float x, float y, auto *) {
           auto &d = *static_cast<Data *>(data);
-          if (d.drawn && !d.filled) {
-            //d.fill();
-          }
-          //::BeginPath(d.hdc);
           ::MoveToEx(d.hdc, d.x(x), d.y(y), nullptr);
           d.current(x, y);
         },
@@ -818,7 +807,6 @@ public:
         [](auto *, void *data, auto *, float x, float y, auto *) {
           auto &d = *static_cast<Data *>(data);
           ::LineTo(d.hdc, d.x(x), d.y(y));
-          d.drawn = true;
           d.current(x, y);
         },
         nullptr, nullptr);
@@ -836,7 +824,6 @@ public:
               {d.x(toX), d.y(toY)},
           };
           ::PolyBezierTo(d.hdc, pt, 3);
-          d.drawn = true;
           d.current(toX, toY);
         },
         nullptr, nullptr);
@@ -850,7 +837,6 @@ public:
               {d.x(toX), d.y(toY)},
           };
           ::PolyBezierTo(d.hdc, pt, 3);
-          d.drawn = true;
           d.current(toX, toY);
         },
         nullptr, nullptr);
@@ -858,17 +844,9 @@ public:
         funcs.get(),
         [](auto *, void *data, auto *, auto *) {
           auto &d = *static_cast<Data *>(data);
-          //::EndPath(d.hdc);
           ::CloseFigure(d.hdc);
-          //::FillPath(d.hdc);
-          //d.filled = false;
-          //d.drawn = false;
         },
         nullptr, nullptr);
-
-    ScopedHandle<HPEN, ::DeleteObject> pen(::CreatePen(PS_SOLID, 0, RGB(255, 255, 255)));
-    ::SelectObject(hdc, pen);
-    //::Rectangle(hdc, 0, 0, width, height);
 
     ScopedHandle<HBRUSH, ::DeleteObject> brush(::CreateSolidBrush(RGB(0, 0, 0)));
     ::SelectObject(hdc, brush);
@@ -913,6 +891,7 @@ public:
         ::BeginPath(hdc);
         hb_font_draw_glyph(font.get(), glyphId, funcs.get(), &data);
         ::EndPath(hdc);
+        ::SetPolyFillMode(hdc, ALTERNATE);
         ::FillPath(hdc);
         cursorX += xAdvance;
         cursorY += yAdvance;
