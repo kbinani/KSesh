@@ -19,6 +19,8 @@ enum CommandID : juce::CommandID {
 #endif
   commandFileExit,
 
+  commandEditCopyAsEmf,
+
   kCommandIDMax,
 };
 

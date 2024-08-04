@@ -78,6 +78,7 @@ list(APPEND ksesh_files
   src/desktop/PDFGen.hpp
   src/desktop/MenuBarModel.hpp
   src/desktop/CommandID.hpp
+  src/desktop/Clipboard.hpp
 )
 if (APPLE)
   list(APPEND ksesh_files src/desktop/Application.mm)

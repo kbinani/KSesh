@@ -134,6 +134,10 @@ public:
       info.setInfo(TRANS("Export as EMF"), {}, {}, 0);
       info.setActive((bool)fContent);
       break;
+    case commandEditCopyAsEmf:
+      info.setInfo(TRANS("Copy as EMF"), {}, {}, 0);
+      info.setActive((bool)fContent);
+      break;
 #endif
     case commandFileExit:
       info.setInfo(TRANS("Exit"), {}, {}, 0);
@@ -177,6 +181,9 @@ public:
 #if JUCE_WINDOWS
     case commandFileExportAsEmf:
       exportAsEmf();
+      return true;
+    case commandEditCopyAsEmf:
+      copyAsEmf();
       return true;
 #endif
     case commandFileExit:
@@ -449,6 +456,22 @@ private:
         return;
       }
     });
+  }
+
+  void copyAsEmf() {
+    if (!fContent) {
+      return;
+    }
+    auto str = fContent->toEMF(fFont, fSetting);
+    writeToClipboard(str);
+  }
+
+  void writeToClipboard(std::string const &data) {
+    if (!Clipboard::Store(data, Clipboard::Type::Emf)) {
+      auto title = TRANS("Error");
+      auto message = TRANS("Failed to write clipboard");
+      juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
+    }
   }
 
   void hieroglyphDidChangeSelectedRange(int start, int end, Direction direction) {

@@ -16,6 +16,7 @@
 #include "PresentationSetting.hpp"
 #include "Content.hpp"
 #include "AppSetting.hpp"
+#include "Clipboard.hpp"
 #include "HieroglyphComponent.hpp"
 #include "TextEditorComponent.hpp"
 #include "Sign.hpp"

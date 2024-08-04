@@ -10,7 +10,8 @@ public:
 
   juce::StringArray getMenuBarNames() override {
     juce::StringArray names;
-    names.add(TRANS(u8"File"));
+    names.add(TRANS("File"));
+    names.add(TRANS("Edit"));
     return names;
   }
 
@@ -37,6 +38,10 @@ public:
       menu.addSeparator();
       menu.addCommandItem(fManager, commandFileExit);
 #endif
+    } else if (topLevelMenuIndex == 1) {
+      if (Clipboard::Available(Clipboard::Type::Emf)) {
+        menu.addCommandItem(fManager, commandEditCopyAsEmf);
+      }
     }
     return menu;
   }
