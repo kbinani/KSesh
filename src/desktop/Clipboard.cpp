@@ -95,6 +95,13 @@ bool Clipboard::Store(std::string_view data, Type type) {
     [pb setData:ns forType:NSPasteboardTypePNG];
     return true;
   }
+  case Type::Pdf: {
+    NSPasteboard *pb = [NSPasteboard generalPasteboard];
+    [pb declareTypes:[NSArray arrayWithObject:NSPasteboardTypePDF] owner:nil];
+    NSData *ns = [NSData dataWithBytes:data.data() length:data.size()];
+    [pb setData:ns forType:NSPasteboardTypePDF];
+    return true;
+  }
   }
 #endif
   return false;

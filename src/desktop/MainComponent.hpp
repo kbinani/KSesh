@@ -157,6 +157,12 @@ public:
       info.setInfo(TRANS("8x scale"), {}, {}, 0);
       info.setActive((bool)fContent);
       return;
+#if JUCE_MAC
+    case commandEditCopyAsPdf:
+      info.setInfo(TRANS("Copy as PDF"), {}, {}, 0);
+      info.setActive((bool)fContent);
+      return;
+#endif
     case commandUpdateMenuModel:
       info.setInfo("Update menu model", {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       return;
@@ -219,6 +225,11 @@ public:
       copyAsPng(scale);
       return true;
     }
+#if JUCE_MAC
+    case commandEditCopyAsPdf:
+      copyAsPdf();
+      return true;
+#endif
     case commandUpdateMenuModel:
       fMenuModel->menuItemsChanged();
       return true;
@@ -455,6 +466,16 @@ private:
       }
     });
   }
+
+#if JUCE_MAC
+  void copyAsPdf() {
+    if (!fContent) {
+      return;
+    }
+    auto str = fContent->toPDF(fFont, fSetting);
+    Clipboard::Store(str, Clipboard::Type::Pdf);
+  }
+#endif
 
   void exportAsEmf() {
     if (!fExportEmfFileChooser) {

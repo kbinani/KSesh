@@ -9,6 +9,9 @@ public:
     Emf,
 #endif
     Png,
+#if JUCE_MAC
+    Pdf,
+#endif
   };
 
   static bool Store(std::string_view data, Type type);

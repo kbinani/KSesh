@@ -43,6 +43,9 @@ public:
 #if JUCE_WINDOWS
       menu.addCommandItem(fManager, commandEditCopyAsEmf);
 #endif
+#if JUCE_MAC
+      menu.addCommandItem(fManager, commandEditCopyAsPdf);
+#endif
       juce::PopupMenu png;
       png.addCommandItem(fManager, commandEditCopyAsImage1x);
       png.addCommandItem(fManager, commandEditCopyAsImage2x);

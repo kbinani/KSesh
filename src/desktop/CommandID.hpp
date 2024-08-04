@@ -25,6 +25,9 @@ enum CommandID : juce::CommandID {
   commandEditCopyAsImage2x,
   commandEditCopyAsImage4x,
   commandEditCopyAsImage8x,
+#if JUCE_MAC
+  commandEditCopyAsPdf,
+#endif
 
   commandUpdateMenuModel,
   mainComponentCommandIDEnd,
