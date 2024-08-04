@@ -15,7 +15,7 @@ public:
     };
     setContentNonOwned(fMain.get(), true);
 
-#if JUCE_IOS || JUCE_ANDROID
+#if defined(JUCE_IOS) || defined(JUCE_ANDROID)
     setFullScreen(true);
 #else
     setResizable(true, true);

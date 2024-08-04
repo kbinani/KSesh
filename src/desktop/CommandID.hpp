@@ -13,19 +13,19 @@ enum CommandID : juce::CommandID {
   commandFileExportAsPng2x,
   commandFileExportAsPng4x,
   commandFileExportAsPng8x,
-#if JUCE_WINDOWS
+#if defined(JUCE_WINDOWS)
   commandFileExportAsEmf,
 #endif
   commandFileExit,
 
-#if JUCE_WINDOWS
+#if defined(JUCE_WINDOWS)
   commandEditCopyAsEmf,
 #endif
   commandEditCopyAsImage1x,
   commandEditCopyAsImage2x,
   commandEditCopyAsImage4x,
   commandEditCopyAsImage8x,
-#if JUCE_MAC
+#if defined(JUCE_MAC)
   commandEditCopyAsPdf,
 #endif
 

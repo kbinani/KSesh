@@ -31,19 +31,19 @@ public:
       png.addCommandItem(fManager, commandFileExportAsPng4x);
       png.addCommandItem(fManager, commandFileExportAsPng8x);
       menu.addSubMenu(TRANS("Export as PNG"), png, true);
-#if JUCE_WINDOWS
+#if defined(JUCE_WINDOWS)
       menu.addCommandItem(fManager, commandFileExportAsEmf);
 #endif
       menu.addCommandItem(fManager, commandFileExportAsPdf);
-#if !JUCE_MAC
+#if !defined(JUCE_MAC)
       menu.addSeparator();
       menu.addCommandItem(fManager, commandFileExit);
 #endif
     } else if (topLevelMenuIndex == 1) {
-#if JUCE_WINDOWS
+#if defined(JUCE_WINDOWS)
       menu.addCommandItem(fManager, commandEditCopyAsEmf);
 #endif
-#if JUCE_MAC
+#if defined(JUCE_MAC)
       menu.addCommandItem(fManager, commandEditCopyAsPdf);
 #endif
       juce::PopupMenu png;

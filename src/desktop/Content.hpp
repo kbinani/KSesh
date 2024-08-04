@@ -238,7 +238,7 @@ struct CaretLocation {
 };
 
 class Content {
-#if JUCE_WINDOWS
+#if defined(JUCE_WINDOWS)
   template <class Handle, auto *deleter>
   struct ScopedHandle {
     explicit ScopedHandle(Handle handle) : handle(handle) {
@@ -761,7 +761,7 @@ public:
   std::string toEMF(HbFontUniquePtr const &font, PresentationSetting const &setting) const {
     using namespace std;
     string out;
-#if JUCE_WINDOWS
+#if defined(JUCE_WINDOWS)
     auto [widthf, heightf] = getSize(setting);
     LONG width = (LONG)ceil(widthf);
     LONG height = (LONG)ceil(heightf);

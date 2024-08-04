@@ -5,11 +5,11 @@ namespace ksesh {
 class Clipboard {
 public:
   enum class Type {
-#if JUCE_WINDOWS
+#if defined(JUCE_WINDOWS)
     Emf,
 #endif
     Png,
-#if JUCE_MAC
+#if defined(JUCE_MAC)
     Pdf,
 #endif
   };

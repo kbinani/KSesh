@@ -45,7 +45,7 @@ public:
     addKeyListener(commandManager->getKeyMappings());
 
     fMenuModel = std::make_unique<MenuBarModel>(commandManager.get());
-#if JUCE_MAC
+#if defined(JUCE_MAC)
     juce::MenuBarModel::setMacMainMenu(fMenuModel.get());
 #else
     fMenuComponent = std::make_unique<juce::MenuBarComponent>(fMenuModel.get());
@@ -57,14 +57,14 @@ public:
   }
 
   ~MainComponent() {
-#if JUCE_MAC
+#if defined(JUCE_MAC)
     juce::MenuBarModel::setMacMainMenu(nullptr);
 #endif
   }
 
   void resized() override {
     juce::Rectangle<int> bounds(0, 0, getWidth(), getHeight());
-#if !JUCE_MAC
+#if !defined(JUCE_MAC)
     auto menuBarHeight = getLookAndFeel().getDefaultMenuBarHeight();
     fMenuComponent->setBounds(bounds.removeFromTop(menuBarHeight));
 #endif
@@ -128,7 +128,7 @@ public:
       info.setInfo(TRANS("Export as PDF"), {}, {}, 0);
       info.setActive((bool)fContent);
       break;
-#if JUCE_WINDOWS
+#if defined(JUCE_WINDOWS)
     case commandFileExportAsEmf:
       info.setInfo(TRANS("Export as EMF"), {}, {}, 0);
       info.setActive((bool)fContent);
@@ -157,7 +157,7 @@ public:
       info.setInfo(TRANS("8x scale"), {}, {}, 0);
       info.setActive((bool)fContent);
       return;
-#if JUCE_MAC
+#if defined(JUCE_MAC)
     case commandEditCopyAsPdf:
       info.setInfo(TRANS("Copy as PDF"), {}, {}, 0);
       info.setActive((bool)fContent);
@@ -204,7 +204,7 @@ public:
     case commandFileExportAsPdf:
       exportAsPdf();
       return true;
-#if JUCE_WINDOWS
+#if defined(JUCE_WINDOWS)
     case commandFileExportAsEmf:
       exportAsEmf();
       return true;
@@ -225,7 +225,7 @@ public:
       copyAsPng(scale);
       return true;
     }
-#if JUCE_MAC
+#if defined(JUCE_MAC)
     case commandEditCopyAsPdf:
       copyAsPdf();
       return true;
@@ -467,7 +467,7 @@ private:
     });
   }
 
-#if JUCE_MAC
+#if defined(JUCE_MAC)
   void copyAsPdf() {
     if (!fContent) {
       return;
@@ -509,7 +509,7 @@ private:
     });
   }
 
-#if JUCE_WINDOWS
+#if defined(JUCE_WINDOWS)
   void copyAsEmf() {
     if (!fContent) {
       return;
@@ -600,7 +600,7 @@ private:
   HbFontUniquePtr const &fFont;
   bool fIgnoreCaretChange = false;
   std::unique_ptr<juce::MenuBarModel> fMenuModel;
-#if !JUCE_MAC
+#if !defined(JUCE_MAC)
   std::unique_ptr<juce::MenuBarComponent> fMenuComponent;
 #endif
   std::unique_ptr<juce::FileChooser> fExportPdfFileChooser;
