@@ -695,7 +695,7 @@ public:
         auto xAdvance = glyphPos[i].x_advance;
         auto yAdvance = glyphPos[i].y_advance;
         float x = cursorX + xOffset;
-        float y = (cursorY + yOffset);
+        float y = cursorY + yOffset;
 
         Data data;
         data.scale = scale;
@@ -763,8 +763,8 @@ public:
     // PresentationSetting setting;
     // setting.fontSize = unitsPerEm;
     auto [widthf, heightf] = getSize(setting);
-    LONG width = (LONG)ceil(widthf / setting.fontSize * unitsPerEm);
-    LONG height = (LONG)ceil(heightf / setting.fontSize * unitsPerEm);
+    LONG width = (LONG)ceil(widthf);// / setting.fontSize * unitsPerEm);
+    LONG height = (LONG)ceil(heightf);// / setting.fontSize * unitsPerEm);
     RECT rc;
     rc.left = 0;
     rc.top = 0;
@@ -774,7 +774,7 @@ public:
     if (INVALID_HANDLE_VALUE == hdc) {
       return out;
     }
-    //::SetGraphicsMode(hdc, GM_ADVANCED);
+    ::SetGraphicsMode(hdc, GM_ADVANCED);
     //::ScaleViewportExtEx(hdc, setting.fontSize, unitsPerEm, setting.fontSize, unitsPerEm, nullptr);
     //::SetMapMode(hdc, MM_LOMETRIC);
     //::SetViewportOrgEx(hdc, )
@@ -795,7 +795,7 @@ public:
         return (int)round(v + tx) + dx;
       }
       int y(float v) const {
-        return (int)round(v + ty) + dy;
+        return (int)round(-v + ty) + dy;
       }
       void current(float x, float y) {
         currentX = x;
@@ -880,10 +880,10 @@ public:
       ScopedHandle<HBRUSH, ::DeleteObject> brush(::CreateSolidBrush(RGB(0, 0, 0)));
       ::SelectObject(hdc, brush);
 
-      // float const scale = setting.fontSize / (float)unitsPerEm;
+      float const scale = setting.fontSize / (float)unitsPerEm;
       float dy = 0;
 
-#if 0
+#if 1
     ::ModifyWorldTransform(hdc, nullptr, MWT_IDENTITY);
     XFORM mtx;
     mtx.eM11 = scale;
@@ -898,8 +898,14 @@ public:
       hb_font_extents_t extents{};
       hb_font_get_h_extents(font.get(), &extents);
       auto descender = extents.descender;
-
-      for (auto const &line : lines) {
+      /*        data.tx = x;
+        data.ty = y - descender;
+        data.dx = setting.padding;
+        data.dy = height - lineIndex * (setting.fontSize + setting.lineSpacing) - setting.padding - setting.fontSize;
+*/
+      int emHeight = (int)round(heightf / scale);
+      for (int lineIndex = 0; lineIndex < (int)lines.size(); lineIndex++) {
+        auto const &line = lines[lineIndex];
         unsigned int numGlyphs = hb_buffer_get_length(line->buffer.get());
         hb_glyph_info_t *glyphInfo = hb_buffer_get_glyph_infos(line->buffer.get(), nullptr);
         hb_glyph_position_t *glyphPos = hb_buffer_get_glyph_positions(line->buffer.get(), nullptr);
@@ -919,7 +925,7 @@ public:
           data.tx = x;
           data.ty = y;
           data.dx = 0;
-          data.dy = dy;
+          data.dy = dy;//emHeight - lineIndex * unitsPerEm - lineIndex * setting.lineSpacing / scale - setting.padding / scale - unitsPerEm;
           hb_font_draw_glyph(font.get(), glyphId, funcs.get(), &data);
           if (data.end()) {
             ::FillPath(hdc);
@@ -927,7 +933,7 @@ public:
           cursorX += xAdvance;
           cursorY += yAdvance;
         }
-        dy += unitsPerEm; // setting.lineSpacing / scale + setting.fontSize / scale;
+        dy += setting.lineSpacing / scale + setting.fontSize / scale;
       }
     }
 

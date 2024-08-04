@@ -322,7 +322,7 @@ public:
       DeleteEnhMetaFile(f);
     }
 
-    auto c = std::make_shared<Content>(U"t\nW10", fFont);
+    auto c = std::make_shared<Content>(U"i w sDm m A1 r : 1 n km m t : niwt\nB1 W10", fFont);
     auto o = c->toEMF(fFont, PresentationSetting());
     FILE *fp = fopen("result.emf", "wb");
     fwrite(o.data(), o.size(), 1, fp);
