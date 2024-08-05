@@ -179,9 +179,10 @@ public:
     int const h = fRows * (tabButtonHeight + 1);
     fContainer->layout(bounds.getWidth());
     bounds.removeFromTop(h);
-    auto bottomBar = bounds.removeFromBottom(bottomBarHeight);
     fViewport->setBounds(bounds);
-    fShowMdCButton->setBounds(width - fShowMdCButton->getWidth(), height - fShowMdCButton->getHeight(), fShowMdCButton->getWidth(), fShowMdCButton->getHeight());
+    juce::Rectangle<int> bottomBar(0, height - bottomBarHeight, width, bottomBarHeight);
+    bottomBar.removeFromRight(bottomBarHeight);
+    fShowMdCButton->setBounds(bottomBar.removeFromRight(fShowMdCButton->getWidth()));
   }
 
   void mouseEnter(juce::MouseEvent const &e) override {
