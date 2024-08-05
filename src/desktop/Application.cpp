@@ -20,6 +20,7 @@
 #include "TextEditorComponent.hpp"
 #include "Sign.hpp"
 #include "SignListButtonContainer.hpp"
+#include "BottomToolBar.hpp"
 #include "SignListComponent.hpp"
 #include "SplitterComponent.hpp"
 #include "CommandID.hpp"

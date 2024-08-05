@@ -79,6 +79,7 @@ list(APPEND ksesh_files
   src/desktop/MenuBarModel.hpp
   src/desktop/CommandID.hpp
   src/desktop/Clipboard.hpp
+  src/desktop/BottomToolBar.hpp
 )
 if (APPLE)
   list(APPEND ksesh_files

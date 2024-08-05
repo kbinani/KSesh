@@ -223,7 +223,7 @@ private:
   std::vector<SignButton> fSignButtons;
   int fHitSignButton = -1;
   int fMouseDownSign = -1;
-  bool fShowMdC = true;
+  bool fShowMdC = false;
 };
 
 } // namespace ksesh

@@ -30,8 +30,6 @@ class SignListComponent : public juce::Component {
     tabButtonSignSize = 22,
 
     scrollBarWidth = 8,
-
-    bottomBarHeight = 24,
   };
 
 public:
@@ -87,17 +85,6 @@ public:
     fViewport->setViewedComponent(fContainer.get(), false);
     fViewport->setScrollBarsShown(true, false, true, false);
 
-    fShowMdCButton = std::make_unique<juce::ToggleButton>();
-    fShowMdCButton->setButtonText(TRANS("MdC code"));
-    fShowMdCButton->setClickingTogglesState(true);
-    fShowMdCButton->setToggleState(fContainer->isShowMdC(), juce::dontSendNotification);
-    fShowMdCButton->onStateChange = [this]() {
-      fContainer->setShowMdC(fShowMdCButton->getToggleState());
-    };
-    fShowMdCButton->setBounds(0, 0, 200, bottomBarHeight);
-    addAndMakeVisible(*fShowMdCButton);
-    fShowMdCButton->changeWidthToFitText();
-
     setActiveCategory(1);
     layout();
   }
@@ -119,56 +106,48 @@ public:
     float scale = 1.0f / Harfbuzz::UnitsPerEm(fFont);
     float space = 2;
 
-    int h = height - bottomBarHeight;
-    if (h > 0) {
-      g.saveState();
-      g.reduceClipRegion(0, 0, width, h);
-      for (int i = 0; i < (int)fTabButtons.size(); i++) {
-        auto const &tb = fTabButtons[i];
-        if (i == fMouseDownCategory) {
-          g.setColour(activeColor);
-          g.fillRect(tb.x, tb.y, tb.width, tb.height);
-        } else if (i == fActiveCategory) {
-          g.setColour(activeColor);
-          g.fillRect(tb.x, tb.y, tb.width, tb.height);
-        } else if (i == fHitTabButton) {
-          g.setColour(highlightColor);
-          g.fillRect(tb.x, tb.y, tb.width, tb.height);
-        }
-        g.setFont(tabButtonTextSize);
-        if (i == fActiveCategory || i == fMouseDownCategory) {
-          g.setColour(highlightTextColor);
-        } else {
-          g.setColour(textColor);
-        }
-        if (tb.path) {
-          float textWidth = g.getCurrentFont().getStringWidthFloat(tb.name);
-
-          auto bounds = tb.path->getBoundsTransformed(juce::AffineTransform::scale(scale * tabButtonSignSize, scale * tabButtonSignSize));
-          float totalWidth = textWidth + bounds.getWidth();
-          float x0 = tb.x + tb.width * 0.5f - totalWidth * 0.5f;
-          g.drawText(tb.name, juce::Rectangle<float>(x0 + textWidth - textWidth * 2 - space, tb.y, textWidth * 2, tabButtonHeight), juce::Justification::centredRight);
-          g.saveState();
-          float x = x0 + textWidth - bounds.getX() + space;
-          float y = tb.y + tb.height * 0.5f - bounds.getHeight() * 0.5f - bounds.getY();
-          g.addTransform(juce::AffineTransform(scale * tabButtonSignSize, 0, x, 0, scale * tabButtonSignSize, y));
-          g.fillPath(*tb.path);
-          g.restoreState();
-        } else {
-          g.drawFittedText(tb.name, tb.x, tb.y, tb.width, tb.height, juce::Justification::centred, 1);
-        }
-        g.setColour(borderColor);
-        g.drawLine(tb.x + tb.width + 1, tb.y, tb.x + tb.width + 1, tb.y + tb.height, 1);
+    for (int i = 0; i < (int)fTabButtons.size(); i++) {
+      auto const &tb = fTabButtons[i];
+      if (i == fMouseDownCategory) {
+        g.setColour(activeColor);
+        g.fillRect(tb.x, tb.y, tb.width, tb.height);
+      } else if (i == fActiveCategory) {
+        g.setColour(activeColor);
+        g.fillRect(tb.x, tb.y, tb.width, tb.height);
+      } else if (i == fHitTabButton) {
+        g.setColour(highlightColor);
+        g.fillRect(tb.x, tb.y, tb.width, tb.height);
       }
-      g.restoreState();
+      g.setFont(tabButtonTextSize);
+      if (i == fActiveCategory || i == fMouseDownCategory) {
+        g.setColour(highlightTextColor);
+      } else {
+        g.setColour(textColor);
+      }
+      if (tb.path) {
+        float textWidth = g.getCurrentFont().getStringWidthFloat(tb.name);
+
+        auto bounds = tb.path->getBoundsTransformed(juce::AffineTransform::scale(scale * tabButtonSignSize, scale * tabButtonSignSize));
+        float totalWidth = textWidth + bounds.getWidth();
+        float x0 = tb.x + tb.width * 0.5f - totalWidth * 0.5f;
+        g.drawText(tb.name, juce::Rectangle<float>(x0 + textWidth - textWidth * 2 - space, tb.y, textWidth * 2, tabButtonHeight), juce::Justification::centredRight);
+        g.saveState();
+        float x = x0 + textWidth - bounds.getX() + space;
+        float y = tb.y + tb.height * 0.5f - bounds.getHeight() * 0.5f - bounds.getY();
+        g.addTransform(juce::AffineTransform(scale * tabButtonSignSize, 0, x, 0, scale * tabButtonSignSize, y));
+        g.fillPath(*tb.path);
+        g.restoreState();
+      } else {
+        g.drawFittedText(tb.name, tb.x, tb.y, tb.width, tb.height, juce::Justification::centred, 1);
+      }
+      g.setColour(borderColor);
+      g.drawLine(tb.x + tb.width + 1, tb.y, tb.x + tb.width + 1, tb.y + tb.height, 1);
     }
     g.setColour(borderColor);
     for (int i = 0; i < fRows; i++) {
       int y = (i + 1) * (tabButtonHeight + 1);
       g.drawLine(0, y, width, y, 1);
     }
-    g.setColour(highlightColor);
-    g.fillRect(0, height - bottomBarHeight, width, bottomBarHeight);
   }
 
   void resized() override {
@@ -180,9 +159,6 @@ public:
     fContainer->layout(bounds.getWidth());
     bounds.removeFromTop(h);
     fViewport->setBounds(bounds);
-    juce::Rectangle<int> bottomBar(0, height - bottomBarHeight, width, bottomBarHeight);
-    bottomBar.removeFromRight(bottomBarHeight);
-    fShowMdCButton->setBounds(bottomBar.removeFromRight(fShowMdCButton->getWidth()));
   }
 
   void mouseEnter(juce::MouseEvent const &e) override {
@@ -231,6 +207,14 @@ public:
   void setTyping(juce::String const &typing) {
     fTyping = typing;
     setActiveCategory(0);
+  }
+
+  void setShowMdC(bool show) {
+    fContainer->setShowMdC(show);
+  }
+
+  bool isShowMdC() const {
+    return fContainer->isShowMdC();
   }
 
 private:
@@ -418,7 +402,6 @@ private:
   std::vector<Category> fCategories;
   std::vector<TabButton> fTabButtons;
   std::unordered_map<juce::String, Sign> fAllSigns;
-  std::unique_ptr<juce::ToggleButton> fShowMdCButton;
 
   int fRows = 0;
   int fActiveCategory = 0;

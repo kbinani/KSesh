@@ -5,6 +5,7 @@ namespace ksesh {
 class MainComponent : public juce::Component, public juce::Timer, public juce::ApplicationCommandTarget {
   enum : int {
     resizerSize = 8,
+    bottomBarHeight = 24,
   };
 
 public:
@@ -41,6 +42,13 @@ public:
     fHorizontalSplitter->setBounds(0, height / 2 + resizerSize / 2, width, resizerSize);
     addAndMakeVisible(*fHorizontalSplitter);
 
+    fBottomToolBar = std::make_unique<BottomToolBar>();
+    fBottomToolBar->initShowMdC(fSignList->isShowMdC());
+    fBottomToolBar->onChangeShowMdC = [this](bool show) {
+      fSignList->setShowMdC(show);
+    };
+    addAndMakeVisible(*fBottomToolBar);
+
     commandManager->registerAllCommandsForTarget(this);
     addKeyListener(commandManager->getKeyMappings());
 
@@ -68,6 +76,7 @@ public:
     auto menuBarHeight = getLookAndFeel().getDefaultMenuBarHeight();
     fMenuComponent->setBounds(bounds.removeFromTop(menuBarHeight));
 #endif
+    fBottomToolBar->setBounds(bounds.removeFromBottom(bottomBarHeight));
     fHorizontalSplitter->setBounds(bounds);
   }
 
@@ -597,6 +606,7 @@ private:
   std::unique_ptr<TextEditorComponent> fTextEditor;
   std::unique_ptr<HieroglyphComponent> fHieroglyph;
   std::unique_ptr<SignListComponent> fSignList;
+  std::unique_ptr<BottomToolBar> fBottomToolBar;
   HbFontUniquePtr const &fFont;
   bool fIgnoreCaretChange = false;
   std::unique_ptr<juce::MenuBarModel> fMenuModel;
