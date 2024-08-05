@@ -242,6 +242,11 @@ private:
     s.name = JuceStringFromU32String(name);
     s.path = std::make_shared<juce::Path>();
     *s.path = Harfbuzz::CreatePath(sign, fFont);
+    auto found = SignList::MapReverse(sign);
+    s.mcd.reserve(found.size());
+    for (size_t i = 0; i < found.size(); i++) {
+      s.mcd.push_back(JuceStringFromU32String(found[i]));
+    }
     return s;
   }
 
