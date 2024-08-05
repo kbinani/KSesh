@@ -11,20 +11,22 @@ class SignListButtonContainer : public juce::Component {
     int width;
     int height;
     juce::String name;
-    juce::String mcdFirst;
-    juce::String mcdTrailing;
+    juce::String mdcFirst;
+    juce::String mdcTrailing;
     std::shared_ptr<juce::Path> path;
   };
 
   enum : int {
     signButtonFontSize = 14,
-    signButtonMcDFontSize = 12,
+    signButtonMdCFontSize = 12,
     signButtonHeaderHeight = 16,
     signButtonSignSize = 40,
     signButtonWidth = 44,
     signButtonSignHeight = 60 - 16,
-    signButtonMcDHeight = 16,
+    signButtonMdCHeight = 16,
     signButtonMinMargin = 4,
+
+    signButtonMdCMultipleLinesOffset = 4,
   };
 
 public:
@@ -60,15 +62,15 @@ public:
         g.setColour(textColor);
       }
       g.drawText(sb.name, juce::Rectangle<float>(sb.x, sb.y, sb.width, signButtonHeaderHeight).reduced(1), juce::Justification::centred);
-      if (fShowMcD && sb.mcdFirst.isNotEmpty()) {
+      if (fShowMdC && sb.mdcFirst.isNotEmpty()) {
         g.setColour(textColor);
-        g.setFont(signButtonMcDFontSize);
-        auto base = juce::Rectangle<float>(sb.x, sb.y + signButtonHeaderHeight + signButtonSignHeight, sb.width, signButtonMcDHeight).reduced(1);
-        if (sb.mcdTrailing.isEmpty()) {
-          g.drawText(sb.mcdFirst, juce::Rectangle<float>(base.getCentreX() - signButtonWidth, base.getY(), 2 * signButtonWidth, base.getHeight()), juce::Justification::centred);
+        g.setFont(signButtonMdCFontSize);
+        auto base = juce::Rectangle<float>(sb.x, sb.y + signButtonHeaderHeight + signButtonSignHeight, sb.width, signButtonMdCHeight).reduced(1);
+        if (sb.mdcTrailing.isEmpty()) {
+          g.drawText(sb.mdcFirst, juce::Rectangle<float>(base.getCentreX() - signButtonWidth, base.getY(), 2 * signButtonWidth, base.getHeight()), juce::Justification::centred);
         } else {
-          g.drawText(sb.mcdFirst, juce::Rectangle<float>(base.getCentreX() - signButtonWidth, base.getY() - signButtonMcDFontSize, 2 * signButtonWidth, base.getHeight()), juce::Justification::centred);
-          g.drawText(sb.mcdTrailing, juce::Rectangle<float>(base.getCentreX() - signButtonWidth, base.getY(), 2 * signButtonWidth, base.getHeight()), juce::Justification::centred);
+          g.drawText(sb.mdcFirst, juce::Rectangle<float>(base.getCentreX() - signButtonWidth, signButtonMdCMultipleLinesOffset + base.getY() - signButtonMdCFontSize, 2 * signButtonWidth, base.getHeight()), juce::Justification::centred);
+          g.drawText(sb.mdcTrailing, juce::Rectangle<float>(base.getCentreX() - signButtonWidth, signButtonMdCMultipleLinesOffset + base.getY(), 2 * signButtonWidth, base.getHeight()), juce::Justification::centred);
         }
       }
       g.saveState();
@@ -129,8 +131,8 @@ public:
     float scale = signButtonSignSize / (float)Harfbuzz::UnitsPerEm(fFont);
     fSignButtons.clear();
     float rowHeight = signButtonHeaderHeight + signButtonSignHeight;
-    if (fShowMcD) {
-      rowHeight += signButtonMcDHeight;
+    if (fShowMdC) {
+      rowHeight += signButtonMdCHeight;
     }
     for (auto const &it : fSigns) {
       auto bounds = it.path->getBoundsTransformed(juce::AffineTransform::scale(scale, scale));
@@ -149,20 +151,20 @@ public:
       sb.height = rowHeight;
       sb.name = it.name;
       sb.path = it.path;
-      if (it.mcd.size() == 1) {
-        sb.mcdFirst = it.mcd[0];
-      } else if (it.mcd.size() > 1) {
-        for (int i = 0; i < it.mcd.size(); i++) {
+      if (it.mdc.size() == 1) {
+        sb.mdcFirst = it.mdc[0];
+      } else if (it.mdc.size() > 1) {
+        for (int i = 0; i < (int)it.mdc.size(); i++) {
           if (i < 2) {
             if (i > 0) {
-              sb.mcdFirst += ",";
+              sb.mdcFirst += ",";
             }
-            sb.mcdFirst += it.mcd[i];
+            sb.mdcFirst += it.mdc[i];
           } else {
             if (i > 2) {
-              sb.mcdTrailing += ",";
+              sb.mdcTrailing += ",";
             }
-            sb.mcdTrailing += it.mcd[i];
+            sb.mdcTrailing += it.mdc[i];
           }
         }
       }
@@ -174,12 +176,16 @@ public:
     return maxY;
   }
 
-  void setShowMcD(bool show) {
-    if (show == fShowMcD) {
+  void setShowMdC(bool show) {
+    if (show == fShowMdC) {
       return;
     }
-    fShowMcD = show;
+    fShowMdC = show;
     layout(getWidth());
+  }
+
+  bool isShowMdC() const {
+    return fShowMdC;
   }
 
 private:
@@ -217,7 +223,7 @@ private:
   std::vector<SignButton> fSignButtons;
   int fHitSignButton = -1;
   int fMouseDownSign = -1;
-  bool fShowMcD = true;
+  bool fShowMdC = true;
 };
 
 } // namespace ksesh
