@@ -309,9 +309,13 @@ private:
         return;
       }
       open(file);
-      fAppSetting->addToRecentFile(file);
-      updateMenuModel();
+      addToRecentFile(file);
     });
+  }
+
+  void addToRecentFile(juce::File const &file) {
+    fAppSetting->addToRecentFile(file);
+    updateMenuModel();
   }
 
   void updateMenuModel() {
@@ -354,6 +358,7 @@ private:
         if (onSaveFilePathChanged) {
           onSaveFilePathChanged(file, false);
         }
+        addToRecentFile(file);
         if (then) {
           waitModalThen(then);
         }

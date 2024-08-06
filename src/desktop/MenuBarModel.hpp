@@ -81,7 +81,6 @@ public:
           onRecentFileClicked(file);
         }
       }
-      fRecentFiles.clear();
     }
   }
 
