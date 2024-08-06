@@ -5,5 +5,5 @@
   cd "$(dirname "$0")"
   npm run fmt
 
-  git ls-files . | grep -e '\.cpp$' -e '\.hpp$' | xargs -P$(nproc) -n1 clang-format -i
+  git ls-files . | grep -e '\.cpp$' -e '\.hpp$' -e '\.mm$' | xargs -P$(nproc) -n1 clang-format -i
 )
