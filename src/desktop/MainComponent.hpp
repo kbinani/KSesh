@@ -9,7 +9,7 @@ class MainComponent : public juce::Component, public juce::Timer, public juce::A
   };
 
 public:
-  MainComponent(HbFontUniquePtr const &font, std::unique_ptr<juce::ApplicationCommandManager> const &commandManager) : fFont(font) {
+  MainComponent(HbFontUniquePtr const &font, std::unique_ptr<juce::ApplicationCommandManager> const &commandManager, std::shared_ptr<AppSetting> appSetting) : fFont(font), fAppSetting(appSetting) {
     int const width = 1280;
     int const height = 720;
 
@@ -52,13 +52,21 @@ public:
     commandManager->registerAllCommandsForTarget(this);
     addKeyListener(commandManager->getKeyMappings());
 
-    fMenuModel = std::make_unique<MenuBarModel>(commandManager.get());
+    fMenuModel = std::make_unique<MenuBarModel>(commandManager.get(), fAppSetting);
 #if defined(JUCE_MAC)
     juce::MenuBarModel::setMacMainMenu(fMenuModel.get());
 #else
     fMenuComponent = std::make_unique<juce::MenuBarComponent>(fMenuModel.get());
     addAndMakeVisible(*fMenuComponent);
 #endif
+    fMenuModel->onRecentFileClicked = [this](juce::File file) {
+      if (fSave == file) {
+        return;
+      }
+      warnDirtyThen([this, file]() {
+        open(file);
+      });
+    };
 
     setSize(width, height);
     startTimerHz(1);
@@ -240,7 +248,7 @@ public:
       return true;
 #endif
     case commandUpdateMenuModel:
-      fMenuModel->menuItemsChanged();
+      updateMenuModel();
       return true;
     }
     return false;
@@ -300,22 +308,32 @@ private:
       if (file == juce::File()) {
         return;
       }
-      auto stream = file.createInputStream();
-      if (!stream || stream->failedToOpen()) {
-        juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, TRANS("Error"), TRANS("Failed to open"));
-        return;
-      }
-      auto str = stream->readString();
-      auto c = std::make_shared<Content>(U32StringFromJuceString(str), fFont);
-      setContent(c);
-      fSave = file;
-      fDirty = false;
-      fHieroglyph->setSelectedRange(str.length(), str.length(), Direction::Forward);
-      fTextEditor->resetText(str);
-      if (onSaveFilePathChanged) {
-        onSaveFilePathChanged(file, false);
-      }
+      open(file);
+      fAppSetting->addToRecentFile(file);
+      updateMenuModel();
     });
+  }
+
+  void updateMenuModel() {
+    fMenuModel->menuItemsChanged();
+  }
+
+  void open(juce::File const &file) {
+    auto stream = file.createInputStream();
+    if (!stream || stream->failedToOpen()) {
+      juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, TRANS("Error"), TRANS("Failed to open"));
+      return;
+    }
+    auto str = stream->readString();
+    auto c = std::make_shared<Content>(U32StringFromJuceString(str), fFont);
+    setContent(c);
+    fSave = file;
+    fDirty = false;
+    fHieroglyph->setSelectedRange(str.length(), str.length(), Direction::Forward);
+    fTextEditor->resetText(str);
+    if (onSaveFilePathChanged) {
+      onSaveFilePathChanged(file, false);
+    }
   }
 
   void saveDocumentWithNewName(std::function<void()> then = nullptr) {
@@ -609,7 +627,7 @@ private:
   std::unique_ptr<BottomToolBar> fBottomToolBar;
   HbFontUniquePtr const &fFont;
   bool fIgnoreCaretChange = false;
-  std::unique_ptr<juce::MenuBarModel> fMenuModel;
+  std::unique_ptr<MenuBarModel> fMenuModel;
 #if !defined(JUCE_MAC)
   std::unique_ptr<juce::MenuBarComponent> fMenuComponent;
 #endif
@@ -622,6 +640,7 @@ private:
   bool fDirty = false;
   std::unique_ptr<juce::FileChooser> fOpenFileChooser;
   std::unique_ptr<juce::FileChooser> fExportEmfFileChooser;
+  std::shared_ptr<AppSetting> fAppSetting;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };

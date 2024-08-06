@@ -2,7 +2,7 @@
 
 namespace ksesh {
 
-struct AppSetting {
+class AppSetting {
 public:
   enum ColorScheme {
     Auto = -1,
@@ -11,10 +11,35 @@ public:
     Gray = 2,
     Light = 3,
   };
-  ColorScheme colorScheme = Light;
+
+  AppSetting() {
+    fRecentFiles.setMaxNumberOfItems(10);
+  }
+
+  ColorScheme getColorScheme() const {
+    return fColorScheme;
+  }
+
+  void setColorScheme(ColorScheme scheme) {
+    fColorScheme = scheme;
+  }
+
+  std::vector<juce::File> createRecentFilesMenu(juce::PopupMenu &menu, int baseId) {
+    fRecentFiles.removeNonExistentFiles();
+    std::vector<juce::File> files;
+    for (int i = 0; i < fRecentFiles.getNumFiles(); i++) {
+      files.push_back(fRecentFiles.getFile(i));
+    }
+    fRecentFiles.createPopupMenuItems(menu, baseId, true, false);
+    return files;
+  }
+
+  void addToRecentFile(juce::File const &file) {
+    fRecentFiles.addFile(file);
+  }
 
   juce::LookAndFeel_V4::ColourScheme getColorScheme(bool darkModeActive) {
-    switch (colorScheme) {
+    switch (fColorScheme) {
     case Dark:
       return juce::LookAndFeel_V4::getDarkColourScheme();
     case Midnight:
@@ -32,6 +57,10 @@ public:
       }
     }
   }
+
+private:
+  ColorScheme fColorScheme = Light;
+  juce::RecentlyOpenedFilesList fRecentFiles;
 };
 
 } // namespace ksesh

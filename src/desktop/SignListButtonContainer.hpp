@@ -22,7 +22,7 @@ class SignListButtonContainer : public juce::Component {
     signButtonHeaderHeight = 16,
     signButtonSignSize = 40,
     signButtonWidth = 44,
-    signButtonSignHeight = 60 - 16,
+    signButtonSignHeight = 60 - signButtonHeaderHeight,
     signButtonMdCHeight = 16,
     signButtonMinMargin = 4,
 

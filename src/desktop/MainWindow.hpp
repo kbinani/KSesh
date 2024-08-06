@@ -4,11 +4,17 @@ namespace ksesh {
 
 class MainWindow : public juce::DocumentWindow {
 public:
-  MainWindow(juce::String name, HbFontUniquePtr const &font, std::unique_ptr<juce::ApplicationCommandManager> const &commandManager) : juce::DocumentWindow(name,
-                                                                                                                                                            juce::Desktop::getInstance().getDefaultLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId),
-                                                                                                                                                            juce::DocumentWindow::allButtons) {
+  MainWindow(
+      juce::String name,
+      HbFontUniquePtr const &font,
+      std::unique_ptr<juce::ApplicationCommandManager> const &commandManager,
+      std::shared_ptr<AppSetting> appSetting)
+      : juce::DocumentWindow(
+            name,
+            juce::Desktop::getInstance().getDefaultLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId),
+            juce::DocumentWindow::allButtons) {
     setUsingNativeTitleBar(true);
-    fMain = std::make_unique<MainComponent>(font, commandManager);
+    fMain = std::make_unique<MainComponent>(font, commandManager, appSetting);
     fMain->onSaveFilePathChanged = [this](juce::File const &file, bool modified) {
       auto name = file == juce::File() ? TRANS("Unnamed") : file.getFullPathName();
       setName(JUCE_APPLICATION_NAME_STRING + juce::String(" - ") + name + (modified ? " *" : ""));

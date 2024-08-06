@@ -5,8 +5,12 @@
 namespace ksesh {
 
 class MenuBarModel : public juce::MenuBarModel {
+  enum : int {
+    recentFilesMenuIdOffset = 1000,
+  };
+
 public:
-  explicit MenuBarModel(juce::ApplicationCommandManager *manager) : fManager(manager) {}
+  MenuBarModel(juce::ApplicationCommandManager *manager, std::shared_ptr<AppSetting> setting) : fManager(manager), fSetting(setting) {}
 
   juce::StringArray getMenuBarNames() override {
     juce::StringArray names;
@@ -21,6 +25,9 @@ public:
     if (topLevelMenuIndex == 0) {
       menu.addCommandItem(fManager, commandFileNew);
       menu.addCommandItem(fManager, commandFileOpen);
+      juce::PopupMenu recent;
+      fRecentFiles = fSetting->createRecentFilesMenu(recent, recentFilesMenuIdOffset);
+      menu.addSubMenu(TRANS("Open Recent"), recent, recent.getNumItems() > 0);
       menu.addSeparator();
       menu.addCommandItem(fManager, commandFileSave);
       menu.addCommandItem(fManager, commandFileSaveAs);
@@ -65,10 +72,26 @@ public:
   }
 
   void menuItemSelected(int menuItemID, int topLevelMenuIndex) override {
+    if (topLevelMenuIndex == 0) {
+      int index = menuItemID - recentFilesMenuIdOffset;
+      if (0 <= index && index < (int)fRecentFiles.size()) {
+        if (onRecentFileClicked) {
+          auto file = fRecentFiles[index];
+          fSetting->addToRecentFile(file);
+          onRecentFileClicked(file);
+        }
+      }
+      fRecentFiles.clear();
+    }
   }
+
+public:
+  std::function<void(juce::File)> onRecentFileClicked;
 
 private:
   juce::ApplicationCommandManager *const fManager;
+  std::shared_ptr<AppSetting> fSetting;
+  std::vector<juce::File> fRecentFiles;
 };
 
 } // namespace ksesh
