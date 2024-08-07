@@ -15,7 +15,7 @@ public:
   };
 
   static bool Store(std::string_view data, Type type) {
-#if JUCE_WINDOWS
+#if defined(JUCE_WINDOWS)
     if (!::OpenClipboard(nullptr)) {
       return false;
     }
@@ -29,23 +29,16 @@ public:
     }
     switch (type) {
     case Type::Emf: {
-      HGLOBAL mem = ::GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE | GMEM_ZEROINIT, data.size());
-      if (!mem) {
-        return false;
-      }
-      void *ptr = GlobalLock(mem);
-      if (!ptr) {
-        return false;
-      }
-      memcpy(ptr, data.data(), data.size());
-      HENHMETAFILE f = ::SetEnhMetaFileBits(data.size(), (BYTE *const)ptr);
+      HENHMETAFILE f = ::SetEnhMetaFileBits(data.size(), (BYTE *const)data.data());
       if (INVALID_HANDLE_VALUE == f) {
-        ::GlobalUnlock(mem);
-        ::GlobalFree(mem);
         return false;
       }
-      ::GlobalUnlock(mem);
-      return (bool)::SetClipboardData(CF_ENHMETAFILE, f);
+      if (::SetClipboardData(CF_ENHMETAFILE, f)) {
+        return true;
+      } else {
+        ::DeleteEnhMetaFile(f);
+        return false;
+      }
     }
     case Type::Png: {
       juce::PNGImageFormat format;
@@ -64,33 +57,34 @@ public:
       if (!mem) {
         return false;
       }
-      BITMAPINFO *info = (BITMAPINFO *)::GlobalLock(mem);
-      if (!info) {
+      BITMAPINFOHEADER *header = (BITMAPINFOHEADER *)::GlobalLock(mem);
+      if (!header) {
         ::GlobalFree(mem);
         return false;
       }
-      info->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-      info->bmiHeader.biWidth = width;
-      info->bmiHeader.biHeight = height;
-      info->bmiHeader.biPlanes = 1;
-      info->bmiHeader.biBitCount = bitCount;
-      info->bmiHeader.biCompression = BI_RGB;
-      info->bmiHeader.biSizeImage = stride * height;
-      info->bmiHeader.biXPelsPerMeter = 0;
-      info->bmiHeader.biYPelsPerMeter = 0;
-      info->bmiHeader.biClrUsed = 0;
-      info->bmiHeader.biClrImportant = 0;
-      uint8_t *dst = (uint8_t *)info + sizeof(BITMAPINFOHEADER);
+      header->biSize = sizeof(BITMAPINFOHEADER);
+      header->biWidth = width;
+      header->biHeight = height;
+      header->biPlanes = 1;
+      header->biBitCount = bitCount;
+      header->biCompression = BI_RGB;
+      header->biSizeImage = stride * height;
+      uint8_t *dst = (uint8_t *)header + sizeof(BITMAPINFOHEADER);
       for (int y = 0; y < height; y++) {
         uint8_t *linePtr = bitmapData.getLinePointer(height - y - 1);
         memcpy(dst + y * stride, linePtr, std::min(stride, bitmapData.lineStride));
       }
       ::GlobalUnlock(mem);
-      return (bool)::SetClipboardData(CF_DIB, mem);
+      if (::SetClipboardData(CF_DIB, mem)) {
+        return true;
+      } else {
+        ::GlobalFree(mem);
+        return false;
+      }
     }
     }
 #endif
-#if JUCE_MAC
+#if defined(JUCE_MAC)
     switch (type) {
     case Type::Png: {
       NSPasteboard *pb = [NSPasteboard generalPasteboard];
