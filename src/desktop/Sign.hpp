@@ -4,7 +4,8 @@ namespace ksesh {
 
 struct Sign {
   juce::String name;
-  std::vector<juce::String> mdc;
+  juce::String mdcFirst;
+  juce::String mdcTrailing;
   std::shared_ptr<juce::Path> path;
 };
 

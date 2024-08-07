@@ -70,7 +70,7 @@ public:
 
     for (auto const &it : SignList::Signs()) {
       auto s = makeSign(it.first, it.second);
-      fAllSigns[s.name] = s;
+      fAllSigns[s->name] = s;
     }
 
     fViewport = std::make_unique<juce::Viewport>();
@@ -248,15 +248,34 @@ private:
     return Category(name, path);
   }
 
-  Sign makeSign(std::u32string const &name, std::u32string const &sign) {
-    Sign s;
-    s.name = JuceStringFromU32String(name);
-    s.path = std::make_shared<juce::Path>();
-    *s.path = Harfbuzz::CreatePath(sign, fFont);
+  std::shared_ptr<Sign> makeSign(std::u32string const &name, std::u32string const &sign) {
+    auto s = std::make_shared<Sign>();
+    s->name = JuceStringFromU32String(name);
+    s->path = std::make_shared<juce::Path>();
+    *s->path = Harfbuzz::CreatePath(sign, fFont);
+
     auto found = SignList::MapReverse(sign);
-    s.mdc.reserve(found.size());
+    std::vector<juce::String> mdc;
+    mdc.reserve(found.size());
     for (size_t i = 0; i < found.size(); i++) {
-      s.mdc.push_back(JuceStringFromU32String(found[i]));
+      mdc.push_back(JuceStringFromU32String(found[i]));
+    }
+    if (mdc.size() == 1) {
+      s->mdcFirst = mdc[0];
+    } else if (mdc.size() > 1) {
+      for (int i = 0; i < (int)mdc.size(); i++) {
+        if (i < 2) {
+          if (i > 0) {
+            s->mdcFirst += ",";
+          }
+          s->mdcFirst += mdc[i];
+        } else {
+          if (i > 2) {
+            s->mdcTrailing += ",";
+          }
+          s->mdcTrailing += mdc[i];
+        }
+      }
     }
     return s;
   }
@@ -292,7 +311,7 @@ private:
   }
 
   void filterSigns() {
-    std::vector<Sign> signs;
+    std::vector<std::shared_ptr<Sign>> signs;
     auto activeCategory = fCategories[fActiveCategory];
     if (activeCategory.name == "typing") {
       if (fTyping.isNotEmpty()) {
@@ -401,7 +420,7 @@ private:
   HbFontUniquePtr const &fFont;
   std::vector<Category> fCategories;
   std::vector<TabButton> fTabButtons;
-  std::unordered_map<juce::String, Sign> fAllSigns;
+  std::unordered_map<juce::String, std::shared_ptr<Sign>> fAllSigns;
 
   int fRows = 0;
   int fActiveCategory = 0;

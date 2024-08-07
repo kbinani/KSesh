@@ -32,7 +32,7 @@ class SignListButtonContainer : public juce::Component {
 public:
   explicit SignListButtonContainer(HbFontUniquePtr const &font) : fFont(font) {}
 
-  void setSigns(std::vector<Sign> const &signs) {
+  void setSigns(std::vector<std::shared_ptr<Sign>> const &signs) {
     fSigns = signs;
     layout(getWidth());
   }
@@ -116,7 +116,7 @@ public:
       auto const &sb = fSignButtons[fMouseDownSign];
       auto const &sign = fSigns[fMouseDownSign];
       if (juce::Rectangle<float>(sb.x, sb.y, sb.width, sb.height).contains(e.getPosition().toFloat()) && onClickSign) {
-        onClickSign(sign);
+        onClickSign(*sign);
       }
     }
     fMouseDownSign = -1;
@@ -135,7 +135,7 @@ public:
       rowHeight += signButtonMdCHeight;
     }
     for (auto const &it : fSigns) {
-      auto bounds = it.path->getBoundsTransformed(juce::AffineTransform::scale(scale, scale));
+      auto bounds = it->path->getBoundsTransformed(juce::AffineTransform::scale(scale, scale));
       int buttonWidth = signButtonWidth;
       if (bounds.getWidth() + signButtonMinMargin * 2 > signButtonWidth) {
         buttonWidth = (int)ceil(bounds.getWidth() + signButtonMinMargin * 2);
@@ -149,25 +149,10 @@ public:
       sb.y = y;
       sb.width = buttonWidth;
       sb.height = rowHeight;
-      sb.name = it.name;
-      sb.path = it.path;
-      if (it.mdc.size() == 1) {
-        sb.mdcFirst = it.mdc[0];
-      } else if (it.mdc.size() > 1) {
-        for (int i = 0; i < (int)it.mdc.size(); i++) {
-          if (i < 2) {
-            if (i > 0) {
-              sb.mdcFirst += ",";
-            }
-            sb.mdcFirst += it.mdc[i];
-          } else {
-            if (i > 2) {
-              sb.mdcTrailing += ",";
-            }
-            sb.mdcTrailing += it.mdc[i];
-          }
-        }
-      }
+      sb.name = it->name;
+      sb.path = it->path;
+      sb.mdcFirst = it->mdcFirst;
+      sb.mdcTrailing = it->mdcTrailing;
       fSignButtons.push_back(sb);
       x += buttonWidth + 1;
       maxY = y + rowHeight;
@@ -219,7 +204,7 @@ public:
 
 private:
   HbFontUniquePtr const &fFont;
-  std::vector<Sign> fSigns;
+  std::vector<std::shared_ptr<Sign>> fSigns;
   std::vector<SignButton> fSignButtons;
   int fHitSignButton = -1;
   int fMouseDownSign = -1;
