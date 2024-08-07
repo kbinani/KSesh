@@ -9,7 +9,7 @@ class MainComponent : public juce::Component, public juce::Timer, public juce::A
   };
 
 public:
-  MainComponent(HbFontUniquePtr const &font, std::unique_ptr<juce::ApplicationCommandManager> const &commandManager, std::shared_ptr<AppSetting> appSetting) : fFont(font), fAppSetting(appSetting) {
+  MainComponent(std::shared_ptr<hb_font_t> const &font, std::unique_ptr<juce::ApplicationCommandManager> const &commandManager, std::shared_ptr<AppSetting> appSetting) : fFont(font), fAppSetting(appSetting) {
     int const width = 1280;
     int const height = 720;
 
@@ -630,7 +630,7 @@ private:
   std::unique_ptr<HieroglyphComponent> fHieroglyph;
   std::unique_ptr<SignListComponent> fSignList;
   std::unique_ptr<BottomToolBar> fBottomToolBar;
-  HbFontUniquePtr const &fFont;
+  std::shared_ptr<hb_font_t> fFont;
   bool fIgnoreCaretChange = false;
   std::unique_ptr<MenuBarModel> fMenuModel;
 #if !defined(JUCE_MAC)

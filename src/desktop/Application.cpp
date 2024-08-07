@@ -58,7 +58,7 @@ public:
                                         nullptr,
                                         nullptr));
     HbFaceUniquePtr face(hb_face_create(blob.get(), 0));
-    fFont.reset(hb_font_create(face.get()));
+    fFont = HbMakeSharedFontPtr(hb_font_create(face.get()));
     fLaf = std::make_unique<LookAndFeel>();
     fLaf->setColourScheme(fSetting->getColorScheme(juce::Desktop::getInstance().isDarkModeActive()));
     juce::LookAndFeel::setDefaultLookAndFeel(fLaf.get());
@@ -158,7 +158,7 @@ private:
 private:
   std::unique_ptr<MainWindow> fMainWindow;
   std::unique_ptr<LookAndFeel> fLaf;
-  HbFontUniquePtr fFont;
+  std::shared_ptr<hb_font_t> fFont;
   std::shared_ptr<AppSetting> fSetting;
   std::unique_ptr<juce::ApplicationCommandManager> fCommandManager;
 };

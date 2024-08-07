@@ -30,7 +30,7 @@ class SignListButtonContainer : public juce::Component {
   };
 
 public:
-  explicit SignListButtonContainer(HbFontUniquePtr const &font) : fFont(font) {
+  explicit SignListButtonContainer(std::shared_ptr<hb_font_t> const &font) : fFont(font) {
     for (auto const &it : SignList::Signs()) {
       auto s = makeSign(it.first, it.second);
       fAllSigns[s->name] = s;
@@ -324,7 +324,7 @@ public:
   std::function<void(Sign const &)> onClickSign;
 
 private:
-  HbFontUniquePtr const &fFont;
+  std::shared_ptr<hb_font_t> fFont;
   std::vector<std::shared_ptr<Sign>> fSigns;
   std::vector<SignButton> fSignButtons;
   int fHitSignButton = -1;

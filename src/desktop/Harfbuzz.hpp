@@ -11,6 +11,10 @@ using HbFontUniquePtr = std::unique_ptr<hb_font_t, juce::FunctionPointerDestruct
 using HbBufferUniquePtr = std::unique_ptr<hb_buffer_t, juce::FunctionPointerDestructor<hb_buffer_destroy>>;
 using HbDrawFuncsUniquePtr = std::unique_ptr<hb_draw_funcs_t, juce::FunctionPointerDestructor<hb_draw_funcs_destroy>>;
 
+inline std::shared_ptr<hb_font_t> HbMakeSharedFontPtr(hb_font_t *ptr) {
+  return std::shared_ptr<hb_font_t>(ptr, hb_font_destroy);
+}
+
 struct GlyphInformation {
   hb_codepoint_t glyphId;
   hb_position_t x;
@@ -73,7 +77,7 @@ class Harfbuzz {
   }
 
 public:
-  static juce::Path CreatePath(int glyphId, HbFontUniquePtr const &font, int dx = 0, int dy = 0) {
+  static juce::Path CreatePath(int glyphId, std::shared_ptr<hb_font_t> const &font, int dx = 0, int dy = 0) {
     Data data;
     data.dx = dx;
     data.dy = dy;
@@ -81,7 +85,7 @@ public:
     return data.path;
   }
 
-  static juce::Path CreatePath(std::u32string const &t, HbFontUniquePtr const &font) {
+  static juce::Path CreatePath(std::u32string const &t, std::shared_ptr<hb_font_t> const &font) {
     juce::Path ret;
     HbBufferUniquePtr buffer(CreateBuffer(t, font));
     std::vector<GlyphInformation> glyphs;
@@ -95,7 +99,7 @@ public:
     return ret;
   }
 
-  static hb_buffer_t *CreateBuffer(std::u32string const &t, HbFontUniquePtr const &font) {
+  static hb_buffer_t *CreateBuffer(std::u32string const &t, std::shared_ptr<hb_font_t> const &font) {
     std::u8string utf8 = U8StringFromU32String(t);
 
     HbBufferUniquePtr buffer(hb_buffer_create());
@@ -108,7 +112,7 @@ public:
     return buffer.release();
   }
 
-  static void CreateGlyphInformations(HbBufferUniquePtr const &buffer, HbFontUniquePtr const &font, std::vector<GlyphInformation> &out) {
+  static void CreateGlyphInformations(HbBufferUniquePtr const &buffer, std::shared_ptr<hb_font_t> const &font, std::vector<GlyphInformation> &out) {
     out.clear();
 
     hb_font_extents_t extents{};
@@ -137,7 +141,7 @@ public:
     }
   }
 
-  static unsigned int UnitsPerEm(HbFontUniquePtr const &font) {
+  static unsigned int UnitsPerEm(std::shared_ptr<hb_font_t> const &font) {
     return hb_face_get_upem(hb_font_get_face(font.get()));
   }
 };

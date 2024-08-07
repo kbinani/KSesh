@@ -36,7 +36,7 @@ struct Cluster {
 
 class Line {
 public:
-  Line(int rawOffset, std::u32string const &raw, HbFontUniquePtr const &font) : rawOffset(rawOffset), raw(raw) {
+  Line(int rawOffset, std::u32string const &raw, std::shared_ptr<hb_font_t> const &font) : rawOffset(rawOffset), raw(raw) {
     using namespace std;
     using namespace std::literals::string_literals;
     vector<CharBase> chars;
@@ -257,7 +257,7 @@ class Content {
 #endif
 
 public:
-  Content(std::u32string const &raw, HbFontUniquePtr const &font) : unitsPerEm(Harfbuzz::UnitsPerEm(font)) {
+  Content(std::u32string const &raw, std::shared_ptr<hb_font_t> const &font) : unitsPerEm(Harfbuzz::UnitsPerEm(font)) {
     using namespace std;
     u32string::size_type offset = 0;
     while (offset < raw.size()) {
@@ -276,7 +276,7 @@ public:
   CaretLocation closestPosition(
       std::optional<int> current,
       juce::Point<float> point,
-      HbFontUniquePtr const &font,
+      std::shared_ptr<hb_font_t> const &font,
       PresentationSetting const &setting) {
     float const padding = setting.padding;
     float const fontSize = setting.fontSize;
@@ -454,7 +454,7 @@ public:
       int selectionStart,
       int selectionEnd,
       Direction direction,
-      HbFontUniquePtr const &font,
+      std::shared_ptr<hb_font_t> const &font,
       PresentationSetting const &setting) {
     float fontSize = setting.fontSize;
     float lineSpacing = setting.lineSpacing;
@@ -565,7 +565,7 @@ public:
     }
   }
 
-  std::string toPDF(HbFontUniquePtr const &font, PresentationSetting const &setting) const {
+  std::string toPDF(std::shared_ptr<hb_font_t> const &font, PresentationSetting const &setting) const {
     using namespace std;
     float scale = setting.fontSize / (float)unitsPerEm;
     optional<juce::Rectangle<float>> bb;
@@ -735,7 +735,7 @@ public:
     return std::make_pair(width, height);
   }
 
-  void draw(juce::Graphics &g, HbFontUniquePtr const &font, PresentationSetting const &setting) const {
+  void draw(juce::Graphics &g, std::shared_ptr<hb_font_t> const &font, PresentationSetting const &setting) const {
     float upem = (float)unitsPerEm;
     float const scale = setting.fontSize / upem;
     float const padding = setting.padding / scale;
@@ -758,7 +758,7 @@ public:
     g.restoreState();
   }
 
-  std::string toEMF(HbFontUniquePtr const &font, PresentationSetting const &setting) const {
+  std::string toEMF(std::shared_ptr<hb_font_t> const &font, PresentationSetting const &setting) const {
     using namespace std;
     string out;
 #if defined(JUCE_WINDOWS)

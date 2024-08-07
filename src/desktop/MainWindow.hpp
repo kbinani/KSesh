@@ -6,7 +6,7 @@ class MainWindow : public juce::DocumentWindow {
 public:
   MainWindow(
       juce::String name,
-      HbFontUniquePtr const &font,
+      std::shared_ptr<hb_font_t> const &font,
       std::unique_ptr<juce::ApplicationCommandManager> const &commandManager,
       std::shared_ptr<AppSetting> appSetting)
       : juce::DocumentWindow(

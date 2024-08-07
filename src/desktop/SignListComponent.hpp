@@ -33,7 +33,7 @@ class SignListComponent : public juce::Component {
   };
 
 public:
-  explicit SignListComponent(HbFontUniquePtr const &font) : fFont(font) {
+  explicit SignListComponent(std::shared_ptr<hb_font_t> const &font) : fFont(font) {
     using namespace std::literals::string_literals;
     fCategories.push_back(Category("typing"));
     fCategories.push_back(makeCategory("A", U"𓀀"s));
@@ -293,7 +293,7 @@ public:
 private:
   std::unique_ptr<juce::Viewport> fViewport;
   std::unique_ptr<SignListButtonContainer> fContainer;
-  HbFontUniquePtr const &fFont;
+  std::shared_ptr<hb_font_t> fFont;
   std::vector<Category> fCategories;
   std::vector<TabButton> fTabButtons;
 

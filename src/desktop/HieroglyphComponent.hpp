@@ -4,7 +4,7 @@ namespace ksesh {
 
 class HieroglyphComponent : public juce::Component {
 public:
-  explicit HieroglyphComponent(HbFontUniquePtr const &font) : fFont(font) {
+  explicit HieroglyphComponent(std::shared_ptr<hb_font_t> const &font) : fFont(font) {
     setMouseCursor(juce::MouseCursor::IBeamCursor);
   }
 
@@ -133,7 +133,7 @@ public:
 
 private:
   PresentationSetting fSetting;
-  HbFontUniquePtr const &fFont;
+  std::shared_ptr<hb_font_t> fFont;
   std::shared_ptr<Content> fContent;
   Cursor fCursor;
   std::optional<int> fDown;
