@@ -107,7 +107,7 @@ private:
     juce::StringArray items;
     for (int i = 0; i < fRecentFiles.getNumFiles(); i++) {
       auto file = fRecentFiles.getFile(i);
-#if JUCE_MAC
+#if defined(JUCE_MAC)
       if (auto item = Bookmark(file); item.isNotEmpty()) {
         items.add(item);
       }
@@ -152,7 +152,7 @@ private:
     if (recentFiles.isString()) {
       juce::String rf = recentFiles;
       auto items = juce::StringArray::fromLines(rf);
-#if JUCE_MAC
+#if defined(JUCE_MAC)
       for (auto const &item : items) {
         if (auto file = FromBookmark(item); file != juce::File()) {
           fRecentFiles.addFile(file);
@@ -166,7 +166,7 @@ private:
     }
   }
 
-#if JUCE_MAC
+#if defined(JUCE_MAC)
   static juce::String Bookmark(juce::File const &f) {
     juce::URL u(f);
     juce::String s = u.toString(false);

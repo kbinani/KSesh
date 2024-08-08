@@ -80,6 +80,7 @@ list(APPEND ksesh_files
   src/desktop/CommandID.hpp
   src/desktop/Clipboard.hpp
   src/desktop/BottomToolBar.hpp
+  src/desktop/AboutComponent.hpp
 )
 if (APPLE)
   list(APPEND ksesh_files src/desktop/Application.mm)

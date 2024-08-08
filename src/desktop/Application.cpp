@@ -25,6 +25,7 @@
 #include "SplitterComponent.hpp"
 #include "CommandID.hpp"
 #include "MenuBarModel.hpp"
+#include "AboutComponent.hpp"
 #include "MainComponent.hpp"
 #include "MainWindow.hpp"
 #include "LookAndFeel.hpp"

@@ -79,13 +79,16 @@ public:
   }
 
   void resized() override {
-    juce::Rectangle<int> bounds(0, 0, getWidth(), getHeight());
+    auto bounds = getLocalBounds();
 #if !defined(JUCE_MAC)
     auto menuBarHeight = getLookAndFeel().getDefaultMenuBarHeight();
     fMenuComponent->setBounds(bounds.removeFromTop(menuBarHeight));
 #endif
     fBottomToolBar->setBounds(bounds.removeFromBottom(bottomBarHeight));
     fHorizontalSplitter->setBounds(bounds);
+    if (fAbout) {
+      fAbout->setBounds(getLocalBounds());
+    }
   }
 
   void timerCallback() override {
@@ -183,6 +186,9 @@ public:
     case commandUpdateMenuModel:
       info.setInfo("Update menu model", {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       return;
+    case commandHelpAbout:
+      info.setInfo(TRANS("About"), {}, {}, 0);
+      return;
     default:
       break;
     }
@@ -250,11 +256,31 @@ public:
     case commandUpdateMenuModel:
       updateMenuModel();
       return true;
+    case commandHelpAbout:
+      showAboutComponent();
+      return true;
     }
     return false;
   }
 
 private:
+  void showAboutComponent() {
+    if (fAbout) {
+      return;
+    }
+    fAbout = std::make_unique<AboutComponent>();
+    fAbout->setBounds(getLocalBounds());
+    fAbout->onClickClose = [this]() {
+      hideAboutComponent();
+    };
+    addAndMakeVisible(*fAbout);
+  }
+
+  void hideAboutComponent() {
+    removeChildComponent(fAbout.get());
+    fAbout.reset();
+  }
+
   void warnDirtyThen(std::function<void()> then) {
     if (!then) {
       return;
@@ -646,6 +672,7 @@ private:
   std::unique_ptr<juce::FileChooser> fOpenFileChooser;
   std::unique_ptr<juce::FileChooser> fExportEmfFileChooser;
   std::shared_ptr<AppSetting> fAppSetting;
+  std::unique_ptr<AboutComponent> fAbout;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };

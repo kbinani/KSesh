@@ -17,12 +17,14 @@ public:
     names.add(TRANS("File"));
     names.add(TRANS("Edit"));
     names.add(TRANS("View"));
+    names.add(TRANS("Help"));
     return names;
   }
 
   juce::PopupMenu getMenuForIndex(int topLevelMenuIndex, juce::String const &menuName) override {
     juce::PopupMenu menu;
     if (topLevelMenuIndex == 0) {
+      // File
       menu.addCommandItem(fManager, commandFileNew);
       menu.addCommandItem(fManager, commandFileOpen);
       juce::PopupMenu recent;
@@ -47,6 +49,7 @@ public:
       menu.addCommandItem(fManager, commandFileExit);
 #endif
     } else if (topLevelMenuIndex == 1) {
+      // Edit
 #if defined(JUCE_WINDOWS)
       menu.addCommandItem(fManager, commandEditCopyAsEmf);
 #endif
@@ -60,6 +63,7 @@ public:
       png.addCommandItem(fManager, commandEditCopyAsImage8x);
       menu.addSubMenu(TRANS("Copy as Image"), png, true);
     } else if (topLevelMenuIndex == 2) {
+      // View
       juce::PopupMenu theme;
       theme.addCommandItem(fManager, commandViewThemeAuto);
       theme.addCommandItem(fManager, commandViewThemeDark);
@@ -67,6 +71,8 @@ public:
       theme.addCommandItem(fManager, commandViewThemeGray);
       theme.addCommandItem(fManager, commandViewThemeLight);
       menu.addSubMenu(TRANS("Theme"), theme, true);
+    } else if (topLevelMenuIndex == 3) {
+      menu.addCommandItem(fManager, commandHelpAbout);
     }
     return menu;
   }
