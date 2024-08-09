@@ -29,6 +29,7 @@ enum CommandID : juce::CommandID {
   commandEditCopyAsPdf,
 #endif
   commandHelpAbout,
+  commandHelpExample,
 
   commandUpdateMenuModel,
   mainComponentCommandIDEnd,

@@ -89,6 +89,9 @@ public:
     if (fAbout) {
       fAbout->setBounds(getLocalBounds());
     }
+    if (fExample) {
+      fExample->setBounds(getLocalBounds());
+    }
   }
 
   void timerCallback() override {
@@ -189,6 +192,9 @@ public:
     case commandHelpAbout:
       info.setInfo(TRANS("About"), {}, {}, 0);
       return;
+    case commandHelpExample:
+      info.setInfo(TRANS("Example"), {}, {}, 0);
+      return;
     default:
       break;
     }
@@ -259,13 +265,35 @@ public:
     case commandHelpAbout:
       showAboutComponent();
       return true;
+    case commandHelpExample:
+      showExampleComponent();
+      return true;
     }
     return false;
   }
 
 private:
+  void showExampleComponent() {
+    if (fAbout || fExample) {
+      return;
+    }
+    fTextEditor->blur();
+    fExample = std::make_unique<ExampleComponent>(fFont, fAppSetting);
+    fExample->setBounds(getLocalBounds());
+    fExample->onClickClose = [this]() {
+      hideExampleComponent();
+    };
+    addAndMakeVisible(*fExample);
+  }
+
+  void hideExampleComponent() {
+    removeChildComponent(fExample.get());
+    fExample.reset();
+    fTextEditor->focus();
+  }
+
   void showAboutComponent() {
-    if (fAbout) {
+    if (fAbout || fExample) {
       return;
     }
     fTextEditor->blur();
@@ -675,6 +703,7 @@ private:
   std::unique_ptr<juce::FileChooser> fExportEmfFileChooser;
   std::shared_ptr<AppSetting> fAppSetting;
   std::unique_ptr<AboutComponent> fAbout;
+  std::unique_ptr<ExampleComponent> fExample;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };

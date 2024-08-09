@@ -25,19 +25,20 @@ class AboutComponent : public juce::Component {
     juce::AttributedString fString;
   };
 
-  static void AddParagraph(juce::String const &title, std::optional<juce::String> url, juce::String const &lines, juce::AttributedString &str) {
+  void addParagraph(juce::String const &title, std::optional<juce::String> url, juce::String const &lines, juce::AttributedString &str) {
+    auto color = getLookAndFeel().findColour(juce::TextEditor::textColourId);
     juce::Font regular(juce::FontOptions(14));
     juce::Font bold = regular.boldened();
-    str.append(title + "\n", bold, juce::Colours::black);
-    str.append("\n", regular, juce::Colours::black);
+    str.append(title + "\n", bold, color);
+    str.append("\n", regular, color);
     if (url) {
-      str.append(*url + "\n", regular, juce::Colours::black);
-      str.append("\n", regular, juce::Colours::black);
+      str.append(*url + "\n", regular, color);
+      str.append("\n", regular, color);
     }
     for (auto const &line : juce::StringArray::fromLines(lines.trimStart())) {
-      str.append(line + "\n", regular, juce::Colours::black);
+      str.append(line + "\n", regular, color);
     }
-    str.append("\n", regular, juce::Colours::black);
+    str.append("\n", regular, color);
   }
 
 public:
@@ -54,7 +55,7 @@ public:
     path.startNewSubPath(15, 5);
     path.lineTo(5, 15);
     fCloseButton->setShape(path, false, true, false);
-    fCloseButton->setOutline(juce::Colours::black, 5);
+    fCloseButton->setOutline(getLookAndFeel().findColour(juce::TextEditor::textColourId), 5);
     fCloseButton->onClick = [this]() {
       if (onClickClose) {
         onClickClose();
@@ -62,19 +63,19 @@ public:
     };
     addAndMakeVisible(*fCloseButton);
 
-    AddParagraph("About KSesh",
+    addParagraph("About KSesh",
                  "https://github.com/kbinani/KSesh",
                  juce::String::fromUTF8(BinaryData::KSesh_txt, BinaryData::KSesh_txtSize),
                  fContent->fString);
-    AddParagraph("Egyptian Text Font",
+    addParagraph("Egyptian Text Font",
                  "https://github.com/microsoft/font-tools/tree/main/EgyptianOpenType/font",
                  juce::String::fromUTF8(BinaryData::Egyptian_Text_Font_txt, BinaryData::Egyptian_Text_Font_txtSize),
                  fContent->fString);
-    AddParagraph("JUCE Framework",
+    addParagraph("JUCE Framework",
                  "https://github.com/juce-framework/JUCE, https://github.com/kbinani/JUCE",
                  juce::String::fromUTF8(BinaryData::JUCE_Framework_txt, BinaryData::JUCE_Framework_txtSize),
                  fContent->fString);
-    AddParagraph("PDFGen",
+    addParagraph("PDFGen",
                  "https://github.com/AndreRenaud/PDFGen",
                  juce::String::fromUTF8(BinaryData::PDFGen_txt, BinaryData::PDFGen_txtSize),
                  fContent->fString);
@@ -82,7 +83,7 @@ public:
 
   void paint(juce::Graphics &g) override {
     g.fillAll(juce::Colours::black.withAlpha(0.5f));
-    g.setColour(juce::Colours::white);
+    g.setColour(getLookAndFeel().findColour(juce::TextButton::buttonColourId));
     auto bounds = getLocalBounds().reduced(aboutComponentMargin).toFloat();
     g.fillRoundedRectangle(bounds, 8);
   }

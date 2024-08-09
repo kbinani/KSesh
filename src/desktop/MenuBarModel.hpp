@@ -72,6 +72,9 @@ public:
       theme.addCommandItem(fManager, commandViewThemeLight);
       menu.addSubMenu(TRANS("Theme"), theme, true);
     } else if (topLevelMenuIndex == 3) {
+      // Help
+      menu.addCommandItem(fManager, commandHelpExample);
+      menu.addSeparator();
       menu.addCommandItem(fManager, commandHelpAbout);
     }
     return menu;

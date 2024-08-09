@@ -81,6 +81,7 @@ list(APPEND ksesh_files
   src/desktop/Clipboard.hpp
   src/desktop/BottomToolBar.hpp
   src/desktop/AboutComponent.hpp
+  src/desktop/ExampleComponent.hpp
 )
 if (APPLE)
   list(APPEND ksesh_files src/desktop/Application.mm)

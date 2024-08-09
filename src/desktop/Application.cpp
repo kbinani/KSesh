@@ -26,6 +26,7 @@
 #include "CommandID.hpp"
 #include "MenuBarModel.hpp"
 #include "AboutComponent.hpp"
+#include "ExampleComponent.hpp"
 #include "MainComponent.hpp"
 #include "MainWindow.hpp"
 #include "LookAndFeel.hpp"
