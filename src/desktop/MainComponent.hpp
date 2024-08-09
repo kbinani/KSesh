@@ -268,6 +268,7 @@ private:
     if (fAbout) {
       return;
     }
+    fTextEditor->blur();
     fAbout = std::make_unique<AboutComponent>();
     fAbout->setBounds(getLocalBounds());
     fAbout->onClickClose = [this]() {
@@ -279,6 +280,7 @@ private:
   void hideAboutComponent() {
     removeChildComponent(fAbout.get());
     fAbout.reset();
+    fTextEditor->focus();
   }
 
   void warnDirtyThen(std::function<void()> then) {

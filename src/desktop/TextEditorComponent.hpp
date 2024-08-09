@@ -102,6 +102,10 @@ public:
     fEditor->grabKeyboardFocus();
   }
 
+  void blur() {
+    fEditor->giveAwayKeyboardFocus();
+  }
+
   void setSelectedRange(int start, int end, Direction direction) {
     fEditor->setHighlightedRegion(juce::Range<int>(start, end));
   }
