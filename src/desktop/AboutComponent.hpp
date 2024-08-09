@@ -62,7 +62,7 @@ public:
     };
     addAndMakeVisible(*fCloseButton);
 
-    AddParagraph("About KSesh", std::nullopt, R"(
+    AddParagraph("About KSesh", "https://github.com/kbinani/KSesh", R"(
 KSesh: An Interactive Hieroglyphic Editor
 
 Copyright (C) 2024 kbinani
@@ -175,7 +175,7 @@ FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
 OTHER DEALINGS IN THE FONT SOFTWARE.)",
                  fContent->fString);
 
-    AddParagraph("JUCE Framework", "https://github.com/juce-framework/JUCE", R"(
+    AddParagraph("JUCE Framework", "https://github.com/juce-framework/JUCE, https://github.com/kbinani/JUCE", R"(
 # The JUCE Framework
 
 The JUCE Framework is an open source framework licensed under a combination of
@@ -247,7 +247,7 @@ For more information, please refer to <http://unlicense.org>)",
     bounds.reduce(aboutComponentMargin, aboutComponentMargin);
     fContainer->setBounds(bounds);
     auto b = fContent->getBounds().withWidth(bounds.getWidth());
-    auto textHeight = std::max<float>(bounds.getHeight(), fContent->getTextHeight(bounds.getWidth()));
+    auto textHeight = std::max<float>(bounds.getHeight(), fContent->getTextHeight(bounds.getWidth() - 2 * aboutComponentPadding));
     fContent->setBounds(b.withHeight(textHeight));
     fCloseButton->setBounds(juce::Rectangle<int>(bounds.removeFromTop(20).removeFromRight(20)).translated(-10, 10));
   }
