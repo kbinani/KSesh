@@ -94,7 +94,11 @@ juce_add_binary_data(ksesh-binary-data
   NAMESPACE ksesh::BinaryData
   HEADER_NAME BinaryData.hpp
   SOURCES
-    deps/font-tools/EgyptianOpenType/font/eot.ttf
+    "deps/font-tools/EgyptianOpenType/font/eot.ttf"
+    "res/license/Egyptian Text Font.txt"
+    "res/license/JUCE Framework.txt"
+    "res/license/KSesh.txt"
+    "res/license/PDFGen.txt"
 )
 
 target_compile_definitions(ksesh
