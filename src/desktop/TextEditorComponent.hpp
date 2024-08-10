@@ -3,21 +3,22 @@
 namespace ksesh {
 
 class TextEditorComponent : public juce::Component {
+  class TextEditor : public juce::TextEditor {
+  public:
+    void focusLost(juce::Component::FocusChangeType reason) override {
+      if (reason == juce::Component::focusChangedByTabKey) {
+        grabKeyboardFocus();
+      }
+    }
+  };
+
 public:
   TextEditorComponent() {
-    fEditor = std::make_unique<juce::TextEditor>();
+    fEditor = std::make_unique<TextEditor>();
     fEditor->setMultiLine(true);
     fEditor->setFont(juce::Font(juce::FontOptions(24)));
     fEditor->setReturnKeyStartsNewLine(true);
-    fEditor->onTextChange = [this]() {
-      this->_onTextChange();
-    };
-    fEditor->onCaretPositionChange = [this]() {
-      this->_onCaretPositionChange();
-    };
-    fEditor->onSelectionChange = [this]() {
-      this->_onCaretPositionChange();
-    };
+    bind();
     addAndMakeVisible(fEditor.get());
   }
 
@@ -111,12 +112,15 @@ public:
   }
 
   void resetText(juce::String const &s) {
-    fEditor->onTextChange = nullptr;
-    fEditor->onCaretPositionChange = nullptr;
-    fEditor->onSelectionChange = nullptr;
+    unbind();
     fEditor->setText(s);
     fEditor->setHighlightedRegion(juce::Range<int>(s.length(), s.length()));
     fEditor->setCaretPosition(s.length());
+    bind();
+  }
+
+private:
+  void bind() {
     fEditor->onTextChange = [this]() {
       this->_onTextChange();
     };
@@ -128,7 +132,12 @@ public:
     };
   }
 
-private:
+  void unbind() {
+    fEditor->onTextChange = nullptr;
+    fEditor->onCaretPositionChange = nullptr;
+    fEditor->onSelectionChange = nullptr;
+  }
+
   juce::Range<int> getSelectedRange() const {
     auto range = fEditor->getHighlightedRegion();
     auto caret = fEditor->getCaretPosition();
@@ -167,7 +176,7 @@ public:
   std::function<void(juce::String const &, int start, int end, Direction)> onCaretPositionChange;
 
 private:
-  std::unique_ptr<juce::TextEditor> fEditor;
+  std::unique_ptr<TextEditor> fEditor;
   int fPrev = 0;
   Direction fDirection = Direction::Forward;
 
