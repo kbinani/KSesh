@@ -23,8 +23,7 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
       }
     }
 
-    void paint(juce::Graphics &g) override {
-      juce::TextEditor::paint(g);
+    void paintOverChildren(juce::Graphics &g) override {
       if (!fContent) {
         return;
       }
@@ -39,6 +38,9 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
       setting.padding = defaultIndent;
       setting.fontSize = base.fontSize;
       setting.lineSpacingRatio = (fSetting->getEditorFontSize() + base.lineSpacing()) / base.fontSize;
+      g.saveState();
+      auto vp = getViewPosition();
+      g.addTransform(juce::AffineTransform::translation(-vp.getX(), -vp.getY()));
       fContent->draw(
           g,
           fSelectedRange.getStart(),
@@ -50,6 +52,7 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
           highlightTextColor,
           caretColor,
           highlightColor);
+      g.restoreState();
     }
 
     void setContent(std::shared_ptr<Content> const &c) {
@@ -93,7 +96,7 @@ public:
 
   explicit TextEditorComponent(std::shared_ptr<hb_font_t> const &font, std::shared_ptr<AppSetting> const &setting) : fFont(font), fSetting(setting) {
     fEditor = std::make_unique<TextEditor>(setting);
-    fEditor->setMultiLine(true);
+    fEditor->setMultiLine(true, false);
     fEditor->setReturnKeyStartsNewLine(true);
     bind();
     addAndMakeVisible(fEditor.get());
