@@ -152,8 +152,10 @@ public:
   void resetText(juce::String const &s) {
     unbind();
     fEditor->setText(s);
+    auto c = std::make_shared<Content>(U32StringFromJuceString(s), fFont);
     fEditor->setHighlightedRegion(juce::Range<int>(s.length(), s.length()));
     fEditor->setCaretPosition(s.length());
+    fEditor->setContent(c);
     bind();
   }
 
