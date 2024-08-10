@@ -9,6 +9,10 @@ public:
 
   void drawTextEditorOutline(juce::Graphics &, int width, int height, juce::TextEditor &) override {
   }
+
+  int getMenuWindowFlags() override {
+    return 0;
+  }
 };
 
 } // namespace ksesh
