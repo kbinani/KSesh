@@ -3,13 +3,68 @@
 namespace ksesh {
 
 class TextEditorComponent : public juce::Component, public juce::ChangeListener {
-  class TextEditor : public juce::TextEditor {
+  enum : int {
+    defaultIndent = 4,
+  };
+
+  class TextEditor : public juce::TextEditor, public juce::ChangeListener {
   public:
+    explicit TextEditor(std::shared_ptr<AppSetting> const &setting) : fSetting(setting) {
+      setting->addChangeListener(this);
+    }
+
+    ~TextEditor() {
+      fSetting->removeChangeListener(this);
+    }
+
     void focusLost(juce::Component::FocusChangeType reason) override {
       if (reason == juce::Component::focusChangedByTabKey) {
         grabKeyboardFocus();
       }
     }
+
+    void paint(juce::Graphics &g) override {
+      juce::TextEditor::paint(g);
+      if (!fContent) {
+        return;
+      }
+      auto textColor = getLookAndFeel().findColour(juce::TextEditor::ColourIds::textColourId);
+      auto presentation = fSetting->getPresentationSetting();
+      auto editorFontSize = fSetting->getEditorFontSize();
+      float lineHeight = presentation.fontSize + editorFontSize + presentation.lineSpacing();
+      float upem = (float)fContent->unitsPerEm;
+      float const scale = presentation.fontSize / upem;
+      float dy = 0;
+      g.saveState();
+      g.addTransform(juce::AffineTransform::scale(scale, scale).translated(defaultIndent, defaultIndent));
+      g.setColour(textColor);
+      for (auto const &line : fContent->lines) {
+        for (auto const &glyph : line->glyphs) {
+          auto path = Harfbuzz::CreatePath(glyph.glyphId, fContent->font, glyph.x, glyph.y + dy);
+          if (path.getBounds().isEmpty()) {
+            continue;
+          }
+          g.fillPath(path);
+        }
+        dy += lineHeight / scale;
+      }
+      g.restoreState();
+    }
+
+    void setContent(std::shared_ptr<Content> const &c) {
+      fContent = c;
+      repaint();
+    }
+
+    void changeListenerCallback(juce::ChangeBroadcaster *source) override {
+      if (source != fSetting.get()) {
+        return;
+      }
+    }
+
+  private:
+    std::shared_ptr<AppSetting> fSetting;
+    std::shared_ptr<Content> fContent;
   };
 
 public:
@@ -20,12 +75,12 @@ public:
   };
 
   explicit TextEditorComponent(std::shared_ptr<hb_font_t> const &font, std::shared_ptr<AppSetting> const &setting) : fFont(font), fSetting(setting) {
-    fEditor = std::make_unique<TextEditor>();
+    fEditor = std::make_unique<TextEditor>(setting);
     fEditor->setMultiLine(true);
-    fEditor->setFont(juce::Font(juce::FontOptions(setting->getEditorFontSize())));
     fEditor->setReturnKeyStartsNewLine(true);
     bind();
     addAndMakeVisible(fEditor.get());
+    applySetting();
     setting->addChangeListener(this);
   }
 
@@ -106,10 +161,19 @@ public:
     if (source != fSetting.get()) {
       return;
     }
-    fEditor->setFont(juce::Font(juce::FontOptions(fSetting->getEditorFontSize())));
+    applySetting();
   }
 
 private:
+  void applySetting() {
+    auto presentation = fSetting->getPresentationSetting();
+    float editorFontSize = fSetting->getEditorFontSize();
+    auto fontSize = presentation.fontSize;
+    fEditor->setIndents(defaultIndent, fontSize + defaultIndent);
+    fEditor->setLineSpacing((editorFontSize + fontSize + presentation.lineSpacing()) / editorFontSize);
+    fEditor->setFont(juce::Font(juce::FontOptions(editorFontSize)));
+  }
+
   static juce::String GetTypingAtCaret(juce::String const &text, int start, int end) {
     if (start < 1) {
       return "";
@@ -189,6 +253,7 @@ private:
     auto range = getSelectedRange();
     auto c = std::make_shared<Content>(U32StringFromJuceString(text), fFont);
     auto typing = GetTypingAtCaret(text, range.getStart(), range.getEnd());
+    fEditor->setContent(c);
     fDelegate->textEditorComponentDidChangeContent(c, typing, range.getStart(), range.getEnd(), fDirection);
   }
 
