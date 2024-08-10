@@ -755,6 +755,59 @@ public:
     g.restoreState();
   }
 
+  void draw(juce::Graphics &g, int start, int end, Direction direction, PresentationSetting const &setting, float caretWidth, juce::Colour const &textColor, juce::Colour const &highlightTextColor, juce::Colour const &caretColor, juce::Colour const &highlightColor) {
+    auto cursor = this->cursor(start, end, direction, setting);
+
+    g.saveState();
+    g.setColour(highlightColor);
+    for (auto const &rect : cursor.selectionRects) {
+      g.fillRect(rect);
+    }
+    g.restoreState();
+
+    float const upem = (float)unitsPerEm;
+    float const scale = setting.fontSize / upem;
+    float const padding = setting.padding / scale;
+    float const lineSpacing = setting.lineSpacing() / scale;
+    float dx = padding;
+    float dy = padding;
+    g.saveState();
+    g.addTransform(juce::AffineTransform::scale(scale, scale));
+    juce::Range<int> selection(start, end);
+    for (auto const &line : lines) {
+      if (start == end) {
+        g.setColour(textColor);
+      }
+      for (auto const &glyph : line->glyphs) {
+        auto path = Harfbuzz::CreatePath(glyph.glyphId, font, glyph.x + dx, glyph.y + dy);
+        if (path.getBounds().isEmpty()) {
+          continue;
+        }
+        if (start != end) {
+          bool selected = false;
+          for (auto const &ch : line->chars) {
+            if (!ch.sign || ch.cluster != (int)glyph.cluster) {
+              continue;
+            }
+            if (selection.getIntersectionWith({line->rawOffset + ch.rawOffset, line->rawOffset + ch.rawOffset + (int)ch.raw.size()}).getLength() == (int)ch.raw.size()) {
+              selected = true;
+              break;
+            }
+          }
+          g.setColour(selected ? highlightTextColor : textColor);
+        }
+        g.fillPath(path);
+      }
+      dy += lineSpacing + upem;
+    }
+    g.restoreState();
+
+    if (cursor.rect) {
+      g.setColour(caretColor);
+      g.fillRect(cursor.rect->expanded(caretWidth * 0.5f, 0));
+    }
+  }
+
   std::string toEMF(PresentationSetting const &setting) const {
     using namespace std;
     string out;

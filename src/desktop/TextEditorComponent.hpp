@@ -29,26 +29,27 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
         return;
       }
       auto textColor = getLookAndFeel().findColour(juce::TextEditor::ColourIds::textColourId);
-      auto presentation = fSetting->getPresentationSetting();
-      auto editorFontSize = fSetting->getEditorFontSize();
-      float lineHeight = presentation.fontSize + editorFontSize + presentation.lineSpacing();
-      float upem = (float)fContent->unitsPerEm;
-      float const scale = presentation.fontSize / upem;
-      float dy = 0;
-      g.saveState();
-      g.addTransform(juce::AffineTransform::scale(scale, scale).translated(defaultIndent, defaultIndent));
-      g.setColour(textColor);
-      for (auto const &line : fContent->lines) {
-        for (auto const &glyph : line->glyphs) {
-          auto path = Harfbuzz::CreatePath(glyph.glyphId, fContent->font, glyph.x, glyph.y + dy);
-          if (path.getBounds().isEmpty()) {
-            continue;
-          }
-          g.fillPath(path);
-        }
-        dy += lineHeight / scale;
-      }
-      g.restoreState();
+      auto highlightTextColor = getLookAndFeel().findColour(juce::TextEditor::ColourIds::highlightedTextColourId);
+      auto caretColor = getLookAndFeel().findColour(juce::CaretComponent::caretColourId);
+      auto highlightColor = getLookAndFeel().findColour(juce::TextEditor::highlightColourId);
+
+      float constexpr caretWidth = 2;
+      PresentationSetting base = fSetting->getPresentationSetting();
+      PresentationSetting setting;
+      setting.padding = defaultIndent;
+      setting.fontSize = base.fontSize;
+      setting.lineSpacingRatio = (fSetting->getEditorFontSize() + base.lineSpacing()) / base.fontSize;
+      fContent->draw(
+          g,
+          fSelectedRange.getStart(),
+          fSelectedRange.getEnd(),
+          fDirection,
+          setting,
+          caretWidth,
+          textColor,
+          highlightTextColor,
+          caretColor,
+          highlightColor);
     }
 
     void setContent(std::shared_ptr<Content> const &c) {
@@ -62,9 +63,25 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
       }
     }
 
+    void setSelectedRange(juce::Range<int> range, Direction direction) {
+      fSelectedRange = range;
+      fDirection = direction;
+      repaint();
+    }
+
+    juce::RectangleList<int> getTextBounds(juce::Range<int> textRange) const override {
+      juce::RectangleList<int> ret;
+      for (auto const &range : juce::TextEditor::getTextBounds(textRange)) {
+        ret.addWithoutMerging(range.withHeight(fSetting->getEditorFontSize()));
+      }
+      return ret;
+    }
+
   private:
     std::shared_ptr<AppSetting> fSetting;
     std::shared_ptr<Content> fContent;
+    juce::Range<int> fSelectedRange;
+    Direction fDirection = Direction::Forward;
   };
 
 public:
@@ -240,11 +257,12 @@ private:
       fDirection = Direction::Forward;
     }
     fPrev = pos;
+    auto range = getSelectedRange();
     if (fDelegate) {
-      auto range = getSelectedRange();
       auto typing = GetTypingAtCaret(fEditor->getText(), range.getStart(), range.getEnd());
       fDelegate->textEditorComponentDidChangeCaretPosition(typing, range.getStart(), range.getEnd(), fDirection);
     }
+    fEditor->setSelectedRange(range, fDirection);
   }
 
   void _onTextChange() {
@@ -256,6 +274,7 @@ private:
     auto c = std::make_shared<Content>(U32StringFromJuceString(text), fFont);
     auto typing = GetTypingAtCaret(text, range.getStart(), range.getEnd());
     fEditor->setContent(c);
+    fEditor->setSelectedRange(range, fDirection);
     fDelegate->textEditorComponentDidChangeContent(c, typing, range.getStart(), range.getEnd(), fDirection);
   }
 
