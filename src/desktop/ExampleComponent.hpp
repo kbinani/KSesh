@@ -17,11 +17,7 @@ class ExampleComponent : public juce::Component {
 
 public:
   ExampleComponent(std::shared_ptr<hb_font_t> const &font, std::shared_ptr<AppSetting> const &setting) : fFont(font) {
-    fViewer = std::make_unique<HieroglyphComponent>(setting);
-    addAndMakeVisible(*fViewer);
-
     fEditor = std::make_unique<TextEditorComponent>(font, setting);
-    fEditor->fDelegate = fViewer.get();
     addAndMakeVisible(*fEditor);
 
     fExamples = {
@@ -39,7 +35,6 @@ A#1234 A#4132)"},
     addAndMakeVisible(*fSelector);
     auto e = fExamples[0];
     auto c = std::make_shared<Content>(U32StringFromJuceString(e.content), font);
-    fViewer->setContent(c);
     fEditor->resetText(e.content);
     fSelector->setSelectedId(1);
     fSelector->onChange = [this]() {
@@ -73,8 +68,7 @@ A#1234 A#4132)"},
 
     bounds.removeFromTop(space);
 
-    fEditor->setBounds(bounds.removeFromLeft(bounds.getWidth() / 2));
-    fViewer->setBounds(bounds);
+    fEditor->setBounds(bounds);
   }
 
   void paint(juce::Graphics &g) override {
@@ -91,7 +85,6 @@ private:
     if (0 <= index && index < (int)fExamples.size()) {
       auto e = fExamples[index];
       auto c = std::make_shared<Content>(U32StringFromJuceString(e.content), fFont);
-      fViewer->setContent(c);
       fEditor->resetText(e.content);
       fEditor->focus();
     }
@@ -101,7 +94,6 @@ public:
   std::function<void()> onClickClose;
   std::unique_ptr<TextEditorComponent> fEditor;
   std::unique_ptr<juce::ShapeButton> fClose;
-  std::unique_ptr<HieroglyphComponent> fViewer;
   std::shared_ptr<hb_font_t> fFont;
   std::unique_ptr<juce::ComboBox> fSelector;
   std::vector<Example> fExamples;
