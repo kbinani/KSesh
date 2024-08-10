@@ -215,6 +215,9 @@ private:
     return juce::File();
   }
 
+public:
+  PresentationSetting fPresentation;
+
 private:
   ColorScheme fColorScheme = Light;
   juce::RecentlyOpenedFilesList fRecentFiles;

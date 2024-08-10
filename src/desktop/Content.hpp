@@ -279,7 +279,7 @@ public:
       PresentationSetting const &setting) {
     float const padding = setting.padding;
     float const fontSize = setting.fontSize;
-    float const lineSpacing = setting.lineSpacing;
+    float const lineSpacing = setting.lineSpacing();
 
     if (lines.empty()) {
       return CaretLocation(0, Direction::Forward);
@@ -454,7 +454,7 @@ public:
       Direction direction,
       PresentationSetting const &setting) {
     float fontSize = setting.fontSize;
-    float lineSpacing = setting.lineSpacing;
+    float lineSpacing = setting.lineSpacing();
     float padding = setting.padding;
 
     float upem = unitsPerEm;
@@ -556,7 +556,7 @@ public:
         if (bb) {
           ret.selectionRects.push_back(*bb);
         }
-        dy += setting.lineSpacing + setting.fontSize;
+        dy += setting.lineSpacing() + setting.fontSize;
       }
       return ret;
     }
@@ -575,7 +575,7 @@ public:
       } else {
         bb = bounds;
       }
-      dy += setting.lineSpacing + setting.fontSize;
+      dy += setting.lineSpacing() + setting.fontSize;
     }
     if (!bb) {
       return {};
@@ -701,7 +701,7 @@ public:
         data.tx = x;
         data.ty = y - descender;
         data.dx = setting.padding;
-        data.dy = height - lineIndex * (setting.fontSize + setting.lineSpacing) - setting.padding - setting.fontSize;
+        data.dy = height - lineIndex * (setting.fontSize + setting.lineSpacing()) - setting.padding - setting.fontSize;
         data.buffer.push_back({.op = 'm', .x1 = 0, .y1 = 0});
         hb_font_draw_glyph(font.get(), glyphId, funcs.get(), &data);
         if (data.buffer.size() > 1) {
@@ -736,7 +736,7 @@ public:
     float upem = (float)unitsPerEm;
     float const scale = setting.fontSize / upem;
     float const padding = setting.padding / scale;
-    float const lineSpacing = setting.lineSpacing / scale;
+    float const lineSpacing = setting.lineSpacing() / scale;
     float dx = padding;
     float dy = padding;
     g.saveState();
@@ -917,7 +917,7 @@ public:
           cursorX += xAdvance;
           cursorY += yAdvance;
         }
-        dy += setting.lineSpacing / scale + setting.fontSize / scale;
+        dy += setting.lineSpacing() / scale + setting.fontSize / scale;
       }
     }
 

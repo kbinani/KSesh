@@ -28,7 +28,7 @@ public:
     float const upem = (float)fContent->unitsPerEm;
     float const scale = fSetting.fontSize / upem;
     float const padding = fSetting.padding / scale;
-    float const lineSpacing = fSetting.lineSpacing / scale;
+    float const lineSpacing = fSetting.lineSpacing() / scale;
     float dx = padding;
     float dy = padding;
     g.saveState();
