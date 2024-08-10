@@ -174,17 +174,16 @@ private:
     if (recentFiles.isString()) {
       juce::String rf = recentFiles;
       auto items = juce::StringArray::fromLines(rf);
+      for (int i = items.size() - 1; i >= 0; i--) {
+        auto const &item = items[i];
 #if defined(JUCE_MAC)
-      for (auto const &item : items) {
         if (auto file = FromBookmark(item); file != juce::File()) {
           fRecentFiles.addFile(file);
         }
-      }
 #else
-      for (auto const &item : items) {
         fRecentFiles.addFile(juce::File(item));
-      }
 #endif
+      }
     }
   }
 

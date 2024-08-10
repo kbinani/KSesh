@@ -728,7 +728,7 @@ public:
     }
     float upem = (float)unitsPerEm;
     float const scale = setting.fontSize / upem;
-    float height = setting.padding * 2 + setting.fontSize * lines.size() + setting.padding * (lines.size() - 1);
+    float height = setting.padding * 2 + setting.fontSize * lines.size() + setting.lineSpacing() * (lines.size() - 1);
     float width = setting.padding * 2;
     for (auto const &line : lines) {
       auto bb = (line->boundingBox * scale).translated(setting.padding, setting.padding);
