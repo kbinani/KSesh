@@ -2,7 +2,7 @@
 
 namespace ksesh {
 
-class HieroglyphComponent : public juce::Component, public TextEditorComponent::Delegate, public juce::ChangeListener {
+class HieroglyphComponent : public juce::Component, public juce::ChangeListener {
 public:
   explicit HieroglyphComponent(std::shared_ptr<AppSetting> const &setting) : fSetting(setting) {
     setMouseCursor(juce::MouseCursor::IBeamCursor);
@@ -22,56 +22,17 @@ public:
     auto highlightTextColor = getLookAndFeel().findColour(juce::TextEditor::ColourIds::highlightedTextColourId);
     auto caretColor = getLookAndFeel().findColour(juce::CaretComponent::caretColourId);
     auto highlightColor = getLookAndFeel().findColour(juce::TextEditor::highlightColourId);
-
-    g.saveState();
-    g.setColour(highlightColor);
-    for (auto const &rect : fCursor.selectionRects) {
-      g.fillRect(rect);
-    }
-    g.restoreState();
-
-    auto setting = fSetting->getPresentationSetting();
-    float const upem = (float)fContent->unitsPerEm;
-    float const scale = setting.fontSize / upem;
-    float const padding = setting.padding / scale;
-    float const lineSpacing = setting.lineSpacing() / scale;
-    float dx = padding;
-    float dy = padding;
-    g.saveState();
-    g.addTransform(juce::AffineTransform::scale(scale, scale));
-    juce::Range<int> selection(fStart, fEnd);
-    for (auto const &line : fContent->lines) {
-      if (fStart == fEnd) {
-        g.setColour(textColor);
-      }
-      for (auto const &glyph : line->glyphs) {
-        auto path = Harfbuzz::CreatePath(glyph.glyphId, fContent->font, glyph.x + dx, glyph.y + dy);
-        if (path.getBounds().isEmpty()) {
-          continue;
-        }
-        if (fStart != fEnd) {
-          bool selected = false;
-          for (auto const &ch : line->chars) {
-            if (!ch.sign || ch.cluster != (int)glyph.cluster) {
-              continue;
-            }
-            if (selection.getIntersectionWith({line->rawOffset + ch.rawOffset, line->rawOffset + ch.rawOffset + (int)ch.raw.size()}).getLength() == (int)ch.raw.size()) {
-              selected = true;
-              break;
-            }
-          }
-          g.setColour(selected ? highlightTextColor : textColor);
-        }
-        g.fillPath(path);
-      }
-      dy += lineSpacing + upem;
-    }
-    g.restoreState();
-
-    if (fCursor.rect) {
-      g.setColour(caretColor);
-      g.fillRect(fCursor.rect->expanded(caretWidth * 0.5f, 0));
-    }
+    fContent->draw(
+        g,
+        fStart,
+        fEnd,
+        fDirection,
+        fSetting->getPresentationSetting(),
+        caretWidth,
+        textColor,
+        highlightTextColor,
+        caretColor,
+        highlightColor);
   }
 
   void lookAndFeelChanged() override {
@@ -124,15 +85,6 @@ public:
       fCursor = fContent->cursor(start, end, direction, fSetting->getPresentationSetting());
     }
     repaint();
-  }
-
-  void textEditorComponentDidChangeCaretPosition(juce::String const &typing, int start, int end, Direction direction) override {
-    setSelectedRange(start, end, direction);
-  }
-
-  void textEditorComponentDidChangeContent(std::shared_ptr<Content> content, juce::String const &typing, int start, int end, Direction direction) override {
-    fContent = content;
-    setSelectedRange(start, end, direction);
   }
 
   void changeListenerCallback(juce::ChangeBroadcaster *source) override {

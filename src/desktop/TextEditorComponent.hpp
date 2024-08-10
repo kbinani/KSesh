@@ -282,7 +282,7 @@ private:
   }
 
 public:
-  Delegate *fDelegate;
+  Delegate *fDelegate = nullptr;
 
 private:
   std::unique_ptr<TextEditor> fEditor;
