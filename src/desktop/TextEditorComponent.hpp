@@ -13,7 +13,13 @@ class TextEditorComponent : public juce::Component {
   };
 
 public:
-  TextEditorComponent() {
+  struct Delegate {
+    virtual ~Delegate(){};
+    virtual void textEditorComponentDidChangeContent(std::shared_ptr<Content> content, juce::String const &typing, int start, int end, Direction) = 0;
+    virtual void textEditorComponentDidChangeCaretPosition(juce::String const &typing, int start, int end, Direction) = 0;
+  };
+
+  explicit TextEditorComponent(std::shared_ptr<hb_font_t> const &font) : fFont(font) {
     fEditor = std::make_unique<TextEditor>();
     fEditor->setMultiLine(true);
     fEditor->setFont(juce::Font(juce::FontOptions(24)));
@@ -28,34 +34,6 @@ public:
 
   void lookAndFeelChanged() override {
     fEditor->applyColourToAllText(getLookAndFeel().findColour(juce::TextEditor::textColourId));
-  }
-
-  static juce::String GetTypingAtCaret(juce::String const &text, int start, int end) {
-    if (start < 1) {
-      return "";
-    }
-    auto leading = U32StringFromJuceString(text.substring(0, start));
-    auto first = leading.back();
-    int offset = (int)leading.size();
-    if (U'0' <= first && first <= U'9') {
-      for (int i = offset - 1; i >= 0; i--) {
-        auto ch = leading[i];
-        offset = i;
-        if (ch < U'0' || U'9' < ch) {
-          break;
-        }
-      }
-    }
-    for (int i = offset - 1; i >= 0; i--) {
-      auto ch = leading[i];
-      if ((U'A' <= ch && ch <= U'Z') || (U'a' <= ch && ch <= U'z')) {
-        offset = i;
-      } else {
-        break;
-      }
-    }
-    auto typing = leading.substr(offset);
-    return JuceStringFromU32String(typing);
   }
 
   juce::String insert(juce::String const &s) {
@@ -120,6 +98,34 @@ public:
   }
 
 private:
+  static juce::String GetTypingAtCaret(juce::String const &text, int start, int end) {
+    if (start < 1) {
+      return "";
+    }
+    auto leading = U32StringFromJuceString(text.substring(0, start));
+    auto first = leading.back();
+    int offset = (int)leading.size();
+    if (U'0' <= first && first <= U'9') {
+      for (int i = offset - 1; i >= 0; i--) {
+        auto ch = leading[i];
+        offset = i;
+        if (ch < U'0' || U'9' < ch) {
+          break;
+        }
+      }
+    }
+    for (int i = offset - 1; i >= 0; i--) {
+      auto ch = leading[i];
+      if ((U'A' <= ch && ch <= U'Z') || (U'a' <= ch && ch <= U'z')) {
+        offset = i;
+      } else {
+        break;
+      }
+    }
+    auto typing = leading.substr(offset);
+    return JuceStringFromU32String(typing);
+  }
+
   void bind() {
     fEditor->onTextChange = [this]() {
       this->_onTextChange();
@@ -156,29 +162,32 @@ private:
       fDirection = Direction::Forward;
     }
     fPrev = pos;
-    if (onCaretPositionChange) {
+    if (fDelegate) {
       auto range = getSelectedRange();
-      onCaretPositionChange(fEditor->getText(), range.getStart(), range.getEnd(), fDirection);
+      auto typing = GetTypingAtCaret(fEditor->getText(), range.getStart(), range.getEnd());
+      fDelegate->textEditorComponentDidChangeCaretPosition(typing, range.getStart(), range.getEnd(), fDirection);
     }
   }
 
   void _onTextChange() {
-    if (!onTextChange) {
+    if (!fDelegate) {
       return;
     }
     auto text = fEditor->getText();
     auto range = getSelectedRange();
-    onTextChange(text, range.getStart(), range.getEnd(), fDirection);
+    auto c = std::make_shared<Content>(U32StringFromJuceString(text), fFont);
+    auto typing = GetTypingAtCaret(text, range.getStart(), range.getEnd());
+    fDelegate->textEditorComponentDidChangeContent(c, typing, range.getStart(), range.getEnd(), fDirection);
   }
 
 public:
-  std::function<void(juce::String const &, int start, int end, Direction)> onTextChange;
-  std::function<void(juce::String const &, int start, int end, Direction)> onCaretPositionChange;
+  Delegate *fDelegate;
 
 private:
   std::unique_ptr<TextEditor> fEditor;
   int fPrev = 0;
   Direction fDirection = Direction::Forward;
+  std::shared_ptr<hb_font_t> fFont;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TextEditorComponent)
 };

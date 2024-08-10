@@ -2,7 +2,7 @@
 
 namespace ksesh {
 
-class MainComponent : public juce::Component, public juce::Timer, public juce::ApplicationCommandTarget {
+class MainComponent : public juce::Component, public juce::Timer, public juce::ApplicationCommandTarget, public TextEditorComponent::Delegate {
   enum : int {
     resizerSize = 8,
     bottomBarHeight = 24,
@@ -13,16 +13,11 @@ public:
     int const width = 1280;
     int const height = 720;
 
-    fTextEditor = std::make_unique<TextEditorComponent>();
+    fTextEditor = std::make_unique<TextEditorComponent>(font);
     fTextEditor->setBounds(0, 0, width / 2 - resizerSize / 2, height / 2 - resizerSize / 2);
-    fTextEditor->onTextChange = [this](juce::String const &text, int start, int end, Direction direction) {
-      this->textEditorDidChangeText(text, start, end, direction);
-    };
-    fTextEditor->onCaretPositionChange = [this](juce::String const &text, int start, int end, Direction direction) {
-      this->textEditorDidChangeCaretPosition(text, start, end, direction);
-    };
+    fTextEditor->fDelegate = this;
 
-    fHieroglyph = std::make_unique<HieroglyphComponent>(font);
+    fHieroglyph = std::make_unique<HieroglyphComponent>();
     fHieroglyph->setBounds(width / 2 + resizerSize / 2, 0, width / 2 - resizerSize / 2, height / 2 - resizerSize / 2);
     fHieroglyph->onSelectedRangeChange = [this](int start, int end, Direction direction) {
       this->hieroglyphDidChangeSelectedRange(start, end, direction);
@@ -498,7 +493,7 @@ private:
       {
         juce::Graphics g(img);
         g.addTransform(juce::AffineTransform::scale(scale, scale));
-        fContent->draw(g, fFont, fSetting);
+        fContent->draw(g, fSetting);
       }
       auto stream = file.createOutputStream();
       auto title = TRANS("Error");
@@ -532,7 +527,7 @@ private:
       if (file == juce::File() || !fContent) {
         return;
       }
-      auto str = fContent->toPDF(fFont, fSetting);
+      auto str = fContent->toPDF(fSetting);
       auto stream = file.createOutputStream();
       auto title = TRANS("Error");
       auto message = TRANS("Failed to export as PDF");
@@ -560,7 +555,7 @@ private:
     if (!fContent) {
       return;
     }
-    auto str = fContent->toPDF(fFont, fSetting);
+    auto str = fContent->toPDF(fSetting);
     Clipboard::Store(str, Clipboard::Type::Pdf);
   }
 #endif
@@ -574,7 +569,7 @@ private:
       if (file == juce::File() || !fContent) {
         return;
       }
-      auto str = fContent->toEMF(fFont, fSetting);
+      auto str = fContent->toEMF(fSetting);
       auto stream = file.createOutputStream();
       auto title = TRANS("Error");
       auto message = TRANS("Failed to export as EMF");
@@ -602,7 +597,7 @@ private:
     if (!fContent) {
       return;
     }
-    auto str = fContent->toEMF(fFont, fSetting);
+    auto str = fContent->toEMF(fSetting);
     writeToClipboard(str, Clipboard::Type::Emf);
   }
 #endif
@@ -616,7 +611,7 @@ private:
       juce::Graphics g(img);
       g.fillAll(juce::Colours::white);
       g.addTransform(juce::AffineTransform::scale(scale, scale));
-      fContent->draw(g, fFont, fSetting);
+      fContent->draw(g, fSetting);
     }
     juce::PNGImageFormat format;
     juce::MemoryOutputStream stream;
@@ -637,19 +632,16 @@ private:
     fTextEditor->setSelectedRange(start, end, direction);
   }
 
-  void textEditorDidChangeCaretPosition(juce::String const &text, int start, int end, Direction direction) {
+  void textEditorComponentDidChangeCaretPosition(juce::String const &typing, int start, int end, Direction direction) override {
     if (!fIgnoreCaretChange) {
-      auto typing = TextEditorComponent::GetTypingAtCaret(text, start, end);
       fSignList->setTyping(typing);
       fHieroglyph->setSelectedRange(start, end, direction);
     }
   }
 
-  void textEditorDidChangeText(juce::String const &text, int start, int end, Direction direction) {
-    auto str = U32StringFromJuceString(text);
-    setContent(std::make_shared<Content>(str, fFont));
+  void textEditorComponentDidChangeContent(std::shared_ptr<Content> content, juce::String const &typing, int start, int end, Direction direction) override {
+    setContent(content);
     if (!fIgnoreCaretChange) {
-      auto typing = TextEditorComponent::GetTypingAtCaret(text, start, end);
       fSignList->setTyping(typing);
       fHieroglyph->setSelectedRange(start, end, direction);
     }

@@ -257,7 +257,7 @@ class Content {
 #endif
 
 public:
-  Content(std::u32string const &raw, std::shared_ptr<hb_font_t> const &font) : unitsPerEm(Harfbuzz::UnitsPerEm(font)) {
+  Content(std::u32string const &raw, std::shared_ptr<hb_font_t> const &font) : unitsPerEm(Harfbuzz::UnitsPerEm(font)), font(font) {
     using namespace std;
     u32string::size_type offset = 0;
     while (offset < raw.size()) {
@@ -276,7 +276,6 @@ public:
   CaretLocation closestPosition(
       std::optional<int> current,
       juce::Point<float> point,
-      std::shared_ptr<hb_font_t> const &font,
       PresentationSetting const &setting) {
     float const padding = setting.padding;
     float const fontSize = setting.fontSize;
@@ -319,7 +318,6 @@ public:
             it.location,
             it.location,
             it.direction,
-            font,
             setting);
         if (!cursor.rect) {
           continue;
@@ -454,7 +452,6 @@ public:
       int selectionStart,
       int selectionEnd,
       Direction direction,
-      std::shared_ptr<hb_font_t> const &font,
       PresentationSetting const &setting) {
     float fontSize = setting.fontSize;
     float lineSpacing = setting.lineSpacing;
@@ -565,7 +562,7 @@ public:
     }
   }
 
-  std::string toPDF(std::shared_ptr<hb_font_t> const &font, PresentationSetting const &setting) const {
+  std::string toPDF(PresentationSetting const &setting) const {
     using namespace std;
     float scale = setting.fontSize / (float)unitsPerEm;
     optional<juce::Rectangle<float>> bb;
@@ -735,7 +732,7 @@ public:
     return std::make_pair(width, height);
   }
 
-  void draw(juce::Graphics &g, std::shared_ptr<hb_font_t> const &font, PresentationSetting const &setting) const {
+  void draw(juce::Graphics &g, PresentationSetting const &setting) const {
     float upem = (float)unitsPerEm;
     float const scale = setting.fontSize / upem;
     float const padding = setting.padding / scale;
@@ -758,7 +755,7 @@ public:
     g.restoreState();
   }
 
-  std::string toEMF(std::shared_ptr<hb_font_t> const &font, PresentationSetting const &setting) const {
+  std::string toEMF(PresentationSetting const &setting) const {
     using namespace std;
     string out;
 #if defined(JUCE_WINDOWS)
@@ -945,6 +942,7 @@ public:
 
   std::vector<std::shared_ptr<Line>> lines;
   unsigned int const unitsPerEm;
+  std::shared_ptr<hb_font_t> font;
 };
 
 } // namespace ksesh

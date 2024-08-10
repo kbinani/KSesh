@@ -2,9 +2,9 @@
 
 namespace ksesh {
 
-class HieroglyphComponent : public juce::Component {
+class HieroglyphComponent : public juce::Component, public TextEditorComponent::Delegate {
 public:
-  explicit HieroglyphComponent(std::shared_ptr<hb_font_t> const &font) : fFont(font) {
+  HieroglyphComponent() {
     setMouseCursor(juce::MouseCursor::IBeamCursor);
   }
 
@@ -25,7 +25,7 @@ public:
     }
     g.restoreState();
 
-    float const upem = (float)Harfbuzz::UnitsPerEm(fFont);
+    float const upem = (float)fContent->unitsPerEm;
     float const scale = fSetting.fontSize / upem;
     float const padding = fSetting.padding / scale;
     float const lineSpacing = fSetting.lineSpacing / scale;
@@ -39,7 +39,7 @@ public:
         g.setColour(textColor);
       }
       for (auto const &glyph : line->glyphs) {
-        auto path = Harfbuzz::CreatePath(glyph.glyphId, fFont, glyph.x + dx, glyph.y + dy);
+        auto path = Harfbuzz::CreatePath(glyph.glyphId, fContent->font, glyph.x + dx, glyph.y + dy);
         if (path.getBounds().isEmpty()) {
           continue;
         }
@@ -77,7 +77,7 @@ public:
       return;
     }
     if (e.mods.isLeftButtonDown()) {
-      auto position = fContent->closestPosition(std::nullopt, e.getPosition().toFloat(), fFont, fSetting);
+      auto position = fContent->closestPosition(std::nullopt, e.getPosition().toFloat(), fSetting);
       fDown = position.location;
       setSelectedRange(position.location, position.location, position.direction);
       if (onSelectedRangeChange) {
@@ -92,7 +92,7 @@ public:
     }
     if (e.mods.isLeftButtonDown()) {
       if (fDown) {
-        auto position = fContent->closestPosition(*fDown, e.getPosition().toFloat(), fFont, fSetting);
+        auto position = fContent->closestPosition(*fDown, e.getPosition().toFloat(), fSetting);
         int start = std::min<int>(position.location, *fDown);
         int end = std::max<int>(position.location, *fDown);
         setSelectedRange(start, end, position.direction);
@@ -115,7 +115,7 @@ public:
     fEnd = end;
     fDirection = direction;
     if (fContent) {
-      fCursor = fContent->cursor(start, end, direction, fFont, fSetting);
+      fCursor = fContent->cursor(start, end, direction, fSetting);
     }
     repaint();
   }
@@ -123,9 +123,18 @@ public:
   void setPresentationSetting(PresentationSetting s) {
     fSetting = s;
     if (fContent) {
-      fCursor = fContent->cursor(fStart, fEnd, fDirection, fFont, fSetting);
+      fCursor = fContent->cursor(fStart, fEnd, fDirection, fSetting);
       repaint();
     }
+  }
+
+  void textEditorComponentDidChangeCaretPosition(juce::String const &typing, int start, int end, Direction direction) override {
+    setSelectedRange(start, end, direction);
+  }
+
+  void textEditorComponentDidChangeContent(std::shared_ptr<Content> content, juce::String const &typing, int start, int end, Direction direction) override {
+    fContent = content;
+    setSelectedRange(start, end, direction);
   }
 
 public:
@@ -133,7 +142,6 @@ public:
 
 private:
   PresentationSetting fSetting;
-  std::shared_ptr<hb_font_t> fFont;
   std::shared_ptr<Content> fContent;
   Cursor fCursor;
   std::optional<int> fDown;
