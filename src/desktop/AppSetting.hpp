@@ -2,7 +2,7 @@
 
 namespace ksesh {
 
-class AppSetting {
+class AppSetting : public juce::ChangeBroadcaster {
 public:
   enum ColorScheme {
     Auto = -1,
@@ -23,6 +23,7 @@ public:
 
   void setColorScheme(ColorScheme scheme) {
     fColorScheme = scheme;
+    sendSynchronousChangeMessage();
     save();
   }
 
@@ -38,6 +39,7 @@ public:
 
   void addToRecentFile(juce::File const &file) {
     fRecentFiles.addFile(file);
+    sendSynchronousChangeMessage();
     save();
   }
 
@@ -59,6 +61,26 @@ public:
         return juce::LookAndFeel_V4::getLightColourScheme();
       }
     }
+  }
+
+  float getEditorFontSize() const {
+    return fEditorFontSize;
+  }
+
+  void setEditorFontSize(float s) {
+    if (fEditorFontSize != s) {
+      fEditorFontSize = s;
+      sendSynchronousChangeMessage();
+    }
+  }
+
+  PresentationSetting getPresentationSetting() const {
+    return fPresentation;
+  }
+
+  void setPresentationSetting(PresentationSetting s) {
+    fPresentation = s;
+    sendSynchronousChangeMessage();
   }
 
 private:
@@ -215,12 +237,11 @@ private:
     return juce::File();
   }
 
-public:
-  PresentationSetting fPresentation;
-
 private:
   ColorScheme fColorScheme = Light;
   juce::RecentlyOpenedFilesList fRecentFiles;
+  PresentationSetting fPresentation;
+  float fEditorFontSize = 24;
 };
 
 } // namespace ksesh

@@ -2,10 +2,15 @@
 
 namespace ksesh {
 
-class HieroglyphComponent : public juce::Component, public TextEditorComponent::Delegate {
+class HieroglyphComponent : public juce::Component, public TextEditorComponent::Delegate, public juce::ChangeListener {
 public:
-  HieroglyphComponent() {
+  explicit HieroglyphComponent(std::shared_ptr<AppSetting> const &setting) : fSetting(setting) {
     setMouseCursor(juce::MouseCursor::IBeamCursor);
+    fSetting->addChangeListener(this);
+  }
+
+  ~HieroglyphComponent() {
+    fSetting->removeChangeListener(this);
   }
 
   void paint(juce::Graphics &g) override {
@@ -25,10 +30,11 @@ public:
     }
     g.restoreState();
 
+    auto setting = fSetting->getPresentationSetting();
     float const upem = (float)fContent->unitsPerEm;
-    float const scale = fSetting.fontSize / upem;
-    float const padding = fSetting.padding / scale;
-    float const lineSpacing = fSetting.lineSpacing() / scale;
+    float const scale = setting.fontSize / upem;
+    float const padding = setting.padding / scale;
+    float const lineSpacing = setting.lineSpacing() / scale;
     float dx = padding;
     float dy = padding;
     g.saveState();
@@ -77,7 +83,7 @@ public:
       return;
     }
     if (e.mods.isLeftButtonDown()) {
-      auto position = fContent->closestPosition(std::nullopt, e.getPosition().toFloat(), fSetting);
+      auto position = fContent->closestPosition(std::nullopt, e.getPosition().toFloat(), fSetting->getPresentationSetting());
       fDown = position.location;
       setSelectedRange(position.location, position.location, position.direction);
       if (onSelectedRangeChange) {
@@ -92,7 +98,7 @@ public:
     }
     if (e.mods.isLeftButtonDown()) {
       if (fDown) {
-        auto position = fContent->closestPosition(*fDown, e.getPosition().toFloat(), fSetting);
+        auto position = fContent->closestPosition(*fDown, e.getPosition().toFloat(), fSetting->getPresentationSetting());
         int start = std::min<int>(position.location, *fDown);
         int end = std::max<int>(position.location, *fDown);
         setSelectedRange(start, end, position.direction);
@@ -115,17 +121,9 @@ public:
     fEnd = end;
     fDirection = direction;
     if (fContent) {
-      fCursor = fContent->cursor(start, end, direction, fSetting);
+      fCursor = fContent->cursor(start, end, direction, fSetting->getPresentationSetting());
     }
     repaint();
-  }
-
-  void setPresentationSetting(PresentationSetting s) {
-    fSetting = s;
-    if (fContent) {
-      fCursor = fContent->cursor(fStart, fEnd, fDirection, fSetting);
-      repaint();
-    }
   }
 
   void textEditorComponentDidChangeCaretPosition(juce::String const &typing, int start, int end, Direction direction) override {
@@ -137,11 +135,21 @@ public:
     setSelectedRange(start, end, direction);
   }
 
+  void changeListenerCallback(juce::ChangeBroadcaster *source) override {
+    if (source != fSetting.get()) {
+      return;
+    }
+    if (fContent) {
+      fCursor = fContent->cursor(fStart, fEnd, fDirection, fSetting->getPresentationSetting());
+      repaint();
+    }
+  }
+
 public:
   std::function<void(int start, int end, Direction direction)> onSelectedRangeChange;
 
 private:
-  PresentationSetting fSetting;
+  std::shared_ptr<AppSetting> fSetting;
   std::shared_ptr<Content> fContent;
   Cursor fCursor;
   std::optional<int> fDown;

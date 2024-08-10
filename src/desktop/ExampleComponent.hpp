@@ -17,11 +17,10 @@ class ExampleComponent : public juce::Component {
 
 public:
   ExampleComponent(std::shared_ptr<hb_font_t> const &font, std::shared_ptr<AppSetting> const &setting) : fFont(font) {
-    fViewer = std::make_unique<HieroglyphComponent>();
-    fViewer->setPresentationSetting(setting->fPresentation);
+    fViewer = std::make_unique<HieroglyphComponent>(setting);
     addAndMakeVisible(*fViewer);
 
-    fEditor = std::make_unique<TextEditorComponent>(font, setting->fPresentation);
+    fEditor = std::make_unique<TextEditorComponent>(font, setting);
     fEditor->fDelegate = fViewer.get();
     addAndMakeVisible(*fEditor);
 

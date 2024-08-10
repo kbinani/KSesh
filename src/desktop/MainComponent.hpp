@@ -13,16 +13,15 @@ public:
     int const width = 1280;
     int const height = 720;
 
-    fTextEditor = std::make_unique<TextEditorComponent>(font, appSetting->fPresentation);
+    fTextEditor = std::make_unique<TextEditorComponent>(font, appSetting);
     fTextEditor->setBounds(0, 0, width / 2 - resizerSize / 2, height / 2 - resizerSize / 2);
     fTextEditor->fDelegate = this;
 
-    fHieroglyph = std::make_unique<HieroglyphComponent>();
+    fHieroglyph = std::make_unique<HieroglyphComponent>(appSetting);
     fHieroglyph->setBounds(width / 2 + resizerSize / 2, 0, width / 2 - resizerSize / 2, height / 2 - resizerSize / 2);
     fHieroglyph->onSelectedRangeChange = [this](int start, int end, Direction direction) {
       this->hieroglyphDidChangeSelectedRange(start, end, direction);
     };
-    fHieroglyph->setPresentationSetting(appSetting->fPresentation);
 
     fVerticalSplitter = std::make_unique<SplitterComponent>(fTextEditor.get(), fHieroglyph.get(), true);
     fVerticalSplitter->setBounds(width / 2 - resizerSize / 2, 0, resizerSize, height / 2 - resizerSize / 2);
@@ -486,14 +485,14 @@ private:
       if (file == juce::File() || !fContent) {
         return;
       }
-      auto [widthf, heightf] = fContent->getSize(fAppSetting->fPresentation);
+      auto [widthf, heightf] = fContent->getSize(fAppSetting->getPresentationSetting());
       int width = (int)ceil(widthf * scale);
       int height = (int)ceil(heightf * scale);
       juce::Image img(juce::Image::PixelFormat::ARGB, width, height, true);
       {
         juce::Graphics g(img);
         g.addTransform(juce::AffineTransform::scale(scale, scale));
-        fContent->draw(g, fAppSetting->fPresentation);
+        fContent->draw(g, fAppSetting->getPresentationSetting());
       }
       auto stream = file.createOutputStream();
       auto title = TRANS("Error");
@@ -527,7 +526,7 @@ private:
       if (file == juce::File() || !fContent) {
         return;
       }
-      auto str = fContent->toPDF(fAppSetting->fPresentation);
+      auto str = fContent->toPDF(fAppSetting->getPresentationSetting());
       auto stream = file.createOutputStream();
       auto title = TRANS("Error");
       auto message = TRANS("Failed to export as PDF");
@@ -569,7 +568,7 @@ private:
       if (file == juce::File() || !fContent) {
         return;
       }
-      auto str = fContent->toEMF(fAppSetting->fPresentation);
+      auto str = fContent->toEMF(fAppSetting->getPresentationSetting());
       auto stream = file.createOutputStream();
       auto title = TRANS("Error");
       auto message = TRANS("Failed to export as EMF");
@@ -597,13 +596,13 @@ private:
     if (!fContent) {
       return;
     }
-    auto str = fContent->toEMF(fAppSetting->fPresentation);
+    auto str = fContent->toEMF(fAppSetting->getPresentationSetting());
     writeToClipboard(str, Clipboard::Type::Emf);
   }
 #endif
 
   void copyAsPng(float scale) {
-    auto [widthf, heightf] = fContent->getSize(fAppSetting->fPresentation);
+    auto [widthf, heightf] = fContent->getSize(fAppSetting->getPresentationSetting());
     int width = (int)ceil(widthf * scale);
     int height = (int)ceil(heightf * scale);
     juce::Image img(juce::Image::PixelFormat::ARGB, width, height, true);
@@ -611,7 +610,7 @@ private:
       juce::Graphics g(img);
       g.fillAll(juce::Colours::white);
       g.addTransform(juce::AffineTransform::scale(scale, scale));
-      fContent->draw(g, fAppSetting->fPresentation);
+      fContent->draw(g, fAppSetting->getPresentationSetting());
     }
     juce::PNGImageFormat format;
     juce::MemoryOutputStream stream;

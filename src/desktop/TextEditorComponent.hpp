@@ -2,7 +2,7 @@
 
 namespace ksesh {
 
-class TextEditorComponent : public juce::Component {
+class TextEditorComponent : public juce::Component, public juce::ChangeListener {
   class TextEditor : public juce::TextEditor {
   public:
     void focusLost(juce::Component::FocusChangeType reason) override {
@@ -19,13 +19,18 @@ public:
     virtual void textEditorComponentDidChangeCaretPosition(juce::String const &typing, int start, int end, Direction) = 0;
   };
 
-  explicit TextEditorComponent(std::shared_ptr<hb_font_t> const &font, PresentationSetting setting) : fFont(font), fSetting(setting) {
+  explicit TextEditorComponent(std::shared_ptr<hb_font_t> const &font, std::shared_ptr<AppSetting> const &setting) : fFont(font), fSetting(setting) {
     fEditor = std::make_unique<TextEditor>();
     fEditor->setMultiLine(true);
-    fEditor->setFont(juce::Font(juce::FontOptions(24)));
+    fEditor->setFont(juce::Font(juce::FontOptions(setting->getEditorFontSize())));
     fEditor->setReturnKeyStartsNewLine(true);
     bind();
     addAndMakeVisible(fEditor.get());
+    setting->addChangeListener(this);
+  }
+
+  ~TextEditorComponent() {
+    fSetting->removeChangeListener(this);
   }
 
   void resized() override {
@@ -95,6 +100,13 @@ public:
     fEditor->setHighlightedRegion(juce::Range<int>(s.length(), s.length()));
     fEditor->setCaretPosition(s.length());
     bind();
+  }
+
+  void changeListenerCallback(juce::ChangeBroadcaster *source) override {
+    if (source != fSetting.get()) {
+      return;
+    }
+    fEditor->setFont(juce::Font(juce::FontOptions(fSetting->getEditorFontSize())));
   }
 
 private:
@@ -180,11 +192,6 @@ private:
     fDelegate->textEditorComponentDidChangeContent(c, typing, range.getStart(), range.getEnd(), fDirection);
   }
 
-  void setPresentationSetting(PresentationSetting setting) {
-    fSetting = setting;
-    // TODO:
-  }
-
 public:
   Delegate *fDelegate;
 
@@ -193,7 +200,7 @@ private:
   int fPrev = 0;
   Direction fDirection = Direction::Forward;
   std::shared_ptr<hb_font_t> fFont;
-  PresentationSetting fSetting;
+  std::shared_ptr<AppSetting> fSetting;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TextEditorComponent)
 };
