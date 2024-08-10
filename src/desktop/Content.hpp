@@ -228,7 +228,11 @@ using CursorLocation = std::variant<CursorLocationLeft, CursorLocationRight, Cur
 
 struct Cursor {
   std::optional<juce::Rectangle<float>> rect;
-  std::vector<juce::Rectangle<float>> selectionRects;
+  struct SelectionRect {
+    int lineIndex;
+    juce::Rectangle<float> rect;
+  };
+  std::vector<SelectionRect> selectionRects;
 };
 
 struct CaretLocation {
@@ -517,10 +521,10 @@ public:
           Cursor ret;
           ret.rect = juce::Rectangle<float>(dx + bounds.getRight(), dy + bounds.getY(), 0, bounds.getHeight());
           if (loc.block) {
-            ret.selectionRects.push_back(juce::Rectangle<float>(dx + bounds.getX(),
-                                                                dy + bounds.getY(),
-                                                                bounds.getWidth(),
-                                                                bounds.getHeight()));
+            ret.selectionRects.push_back({lineIndex, juce::Rectangle<float>(dx + bounds.getX(),
+                                                                            dy + bounds.getY(),
+                                                                            bounds.getWidth(),
+                                                                            bounds.getHeight())});
           }
           return ret;
         }
@@ -530,7 +534,8 @@ public:
       juce::Range<int> selection(selectionStart, selectionEnd);
       float dx = padding;
       float dy = padding;
-      for (auto const &line : lines) {
+      for (int lineIndex = 0; lineIndex < (int)lines.size(); lineIndex++) {
+        auto const &line = lines[lineIndex];
         std::optional<juce::Rectangle<float>> bb;
 
         for (auto const &ch : line->chars) {
@@ -554,7 +559,7 @@ public:
           }
         }
         if (bb) {
-          ret.selectionRects.push_back(*bb);
+          ret.selectionRects.push_back({lineIndex, *bb});
         }
         dy += setting.lineSpacing() + setting.fontSize;
       }
@@ -755,20 +760,43 @@ public:
     g.restoreState();
   }
 
-  void draw(juce::Graphics &g, int start, int end, Direction direction, PresentationSetting const &setting, float caretWidth, juce::Colour const &textColor, juce::Colour const &highlightTextColor, juce::Colour const &caretColor, juce::Colour const &highlightColor) {
+  void draw(
+      juce::Graphics &g,
+      int start,
+      int end,
+      Direction direction,
+      PresentationSetting const &setting,
+      float caretWidth,
+      juce::Colour const &textColor,
+      juce::Colour const &highlightTextColor,
+      juce::Colour const &caretColor,
+      juce::Colour const &highlightColor,
+      std::optional<float> maxWidth = std::nullopt) {
     auto cursor = this->cursor(start, end, direction, setting);
-
-    g.saveState();
-    g.setColour(highlightColor);
-    for (auto const &rect : cursor.selectionRects) {
-      g.fillRect(rect);
-    }
-    g.restoreState();
 
     float const upem = (float)unitsPerEm;
     float const scale = setting.fontSize / upem;
     float const padding = setting.padding / scale;
     float const lineSpacing = setting.lineSpacing() / scale;
+
+    g.saveState();
+    g.setColour(highlightColor);
+    for (auto const &rect : cursor.selectionRects) {
+      auto line = lines[rect.lineIndex];
+      auto bounds = line->boundingBox * scale;
+      bool shrink = false;
+      if (maxWidth && bounds.getWidth() > *maxWidth) {
+        shrink = true;
+        g.saveState();
+        g.addTransform(juce::AffineTransform::scale(*maxWidth / bounds.getWidth(), 1));
+      }
+      g.fillRect(rect.rect);
+      if (shrink) {
+        g.restoreState();
+      }
+    }
+    g.restoreState();
+
     float dx = padding;
     float dy = padding;
     g.saveState();
@@ -777,6 +805,13 @@ public:
     for (auto const &line : lines) {
       if (start == end) {
         g.setColour(textColor);
+      }
+      auto bounds = line->boundingBox * scale;
+      bool shrink = false;
+      if (maxWidth && bounds.getWidth() > *maxWidth) {
+        shrink = true;
+        g.saveState();
+        g.addTransform(juce::AffineTransform::scale(*maxWidth / bounds.getWidth(), 1));
       }
       for (auto const &glyph : line->glyphs) {
         auto path = Harfbuzz::CreatePath(glyph.glyphId, font, glyph.x + dx, glyph.y + dy);
@@ -797,6 +832,9 @@ public:
           g.setColour(selected ? highlightTextColor : textColor);
         }
         g.fillPath(path);
+      }
+      if (shrink) {
+        g.restoreState();
       }
       dy += lineSpacing + upem;
     }

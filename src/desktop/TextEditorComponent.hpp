@@ -51,7 +51,8 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
           textColor,
           highlightTextColor,
           caretColor,
-          highlightColor);
+          highlightColor,
+          getTextWidth());
       g.restoreState();
     }
 
