@@ -554,7 +554,7 @@ private:
     if (!fContent) {
       return;
     }
-    auto str = fContent->toPDF(fSetting);
+    auto str = fContent->toPDF(fAppSetting->getPresentationSetting());
     Clipboard::Store(str, Clipboard::Type::Pdf);
   }
 #endif
