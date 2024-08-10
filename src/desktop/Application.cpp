@@ -54,6 +54,9 @@ public:
 
   void initialise(juce::String const &) override {
     fSetting = std::make_shared<AppSetting>();
+
+    juce::LocalisedStrings::setCurrentMappings(CurrentLocalisedStrings());
+
     HbBlobUniquePtr blob(hb_blob_create(BinaryData::eot_ttf,
                                         BinaryData::eot_ttfSize,
                                         HB_MEMORY_MODE_READONLY,
@@ -148,6 +151,28 @@ public:
   }
 
 private:
+  static juce::LocalisedStrings *CurrentLocalisedStrings() {
+#if defined(JUCE_WINDOWS)
+    LANGID lang = GetSystemDefaultUILanguage();
+    if (lang == 0x0411) {
+      return Japanese();
+    }
+    return nullptr;
+#elif defined(JUCE_MAC)
+    NSString *language = [[NSLocale preferredLanguages] firstObject];
+    if ([language isEqualToString:@"ja-JP"]) {
+      return Japanese();
+    }
+    return nullptr;
+#else
+    return nullptr;
+#endif
+  }
+
+  static juce::LocalisedStrings *Japanese() {
+    return new juce::LocalisedStrings(juce::String::fromUTF8(BinaryData::japanese_txt, BinaryData::japanese_txtSize), false);
+  }
+
   void setColorScheme(AppSetting::ColorScheme scheme) {
     fSetting->setColorScheme(scheme);
     auto laf = std::make_unique<LookAndFeel>();

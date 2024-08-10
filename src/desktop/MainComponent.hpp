@@ -118,7 +118,7 @@ public:
       info.addDefaultKeypress('n', juce::ModifierKeys::commandModifier);
       return;
     case commandFileOpen:
-      info.setInfo(TRANS("Open..."), {}, {}, 0);
+      info.setInfo(TRANS("Open") + "...", {}, {}, 0);
       info.addDefaultKeypress('o', juce::ModifierKeys::commandModifier);
       return;
     case commandFileSave:
@@ -127,7 +127,7 @@ public:
       info.addDefaultKeypress('s', juce::ModifierKeys::commandModifier);
       return;
     case commandFileSaveAs:
-      info.setInfo(TRANS("Save As..."), {}, {}, 0);
+      info.setInfo(TRANS("Save As") + "...", {}, {}, 0);
       info.setActive((bool)fContent);
       info.addDefaultKeypress('s', juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier);
       return;

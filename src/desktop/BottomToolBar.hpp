@@ -6,7 +6,7 @@ class BottomToolBar : public juce::Component {
 public:
   BottomToolBar() {
     fShowMdCButton = std::make_unique<juce::ToggleButton>();
-    fShowMdCButton->setButtonText(TRANS("MdC code"));
+    fShowMdCButton->setButtonText("MdC");
     fShowMdCButton->setClickingTogglesState(true);
     fShowMdCButton->onStateChange = [this]() {
       if (onChangeShowMdC) {
