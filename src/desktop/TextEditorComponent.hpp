@@ -14,13 +14,13 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
   public:
     explicit TextEditor(std::shared_ptr<AppSetting> const &setting) : fSetting(setting) {
       setting->addChangeListener(this);
-      NEEDS_TRANS("Cut");
-      NEEDS_TRANS("Copy");
-      NEEDS_TRANS("Paste");
-      NEEDS_TRANS("Delete");
-      NEEDS_TRANS("Select All");
-      NEEDS_TRANS("Undo");
-      NEEDS_TRANS("Redo");
+      (void)NEEDS_TRANS("Cut");
+      (void)NEEDS_TRANS("Copy");
+      (void)NEEDS_TRANS("Paste");
+      (void)NEEDS_TRANS("Delete");
+      (void)NEEDS_TRANS("Select All");
+      (void)NEEDS_TRANS("Undo");
+      (void)NEEDS_TRANS("Redo");
     }
 
     ~TextEditor() {
