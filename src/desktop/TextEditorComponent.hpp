@@ -34,6 +34,22 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
     }
 
     void paintOverChildren(juce::Graphics &g) override {
+      PresentationSetting setting = getRenderSetting();
+      auto borderColor = getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId);
+      float lineHeight = setting.fontSize + setting.lineSpacing();
+      float dy = fSetting->getPresentationSetting().lineSpacing() * 0.5f;
+      float textWidth = getTextWidth();
+      int lines = (int)ceil(std::max<int>(getHeight(), getTextHeight()) / lineHeight);
+      auto vp = getViewPosition();
+
+      g.saveState();
+      g.setColour(borderColor);
+      for (int i = 0; i < lines; i++) {
+        float y = setting.padding + (i + 1) * lineHeight;
+        g.drawHorizontalLine(y - vp.getY() - dy, defaultIndent - vp.getX(), textWidth - defaultIndent - vp.getX());
+      }
+      g.restoreState();
+
       if (!fContent) {
         return;
       }
@@ -43,8 +59,6 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
       auto highlightColor = getLookAndFeel().findColour(juce::TextEditor::highlightColourId);
 
       float constexpr caretWidth = 2;
-      PresentationSetting setting = getRenderSetting();
-      g.saveState();
       float scrollbarWidth = getLookAndFeel().getDefaultScrollbarWidth();
       auto bounds = getLocalBounds();
       juce::Rectangle<int> clip(
@@ -53,7 +67,7 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
           bounds.getWidth() - scrollbarWidth - 2 * defaultIndent,
           bounds.getHeight() - scrollbarWidth - topClippingHeight - defaultIndent);
       g.reduceClipRegion(clip);
-      auto vp = getViewPosition();
+      g.saveState();
       g.addTransform(juce::AffineTransform::translation(-vp.getX(), -vp.getY()));
       fContent->draw(
           g,
