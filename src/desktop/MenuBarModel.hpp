@@ -64,6 +64,7 @@ public:
       menu.addSubMenu(TRANS("Copy as Image"), png, true);
     } else if (topLevelMenuIndex == 2) {
       // View
+      menu.addCommandItem(fManager, commandViewTogglePreviewVisibility);
       juce::PopupMenu theme;
       theme.addCommandItem(fManager, commandViewThemeAuto);
       theme.addCommandItem(fManager, commandViewThemeDark);

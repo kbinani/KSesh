@@ -183,6 +183,10 @@ public:
     case commandUpdateMenuModel:
       info.setInfo("Update menu model", {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       return;
+    case commandViewTogglePreviewVisibility:
+      info.setInfo(TRANS("Preview"), {}, {}, 0);
+      info.setTicked(fHieroglyph->isVisible());
+      return;
     case commandHelpAbout:
       info.setInfo(TRANS("About"), {}, {}, 0);
       return;
@@ -261,6 +265,9 @@ public:
       return true;
     case commandHelpExample:
       showExampleComponent();
+      return true;
+    case commandViewTogglePreviewVisibility:
+      fHieroglyph->setVisible(!fHieroglyph->isVisible());
       return true;
     }
     return false;

@@ -28,6 +28,7 @@ enum CommandID : juce::CommandID {
 #if defined(JUCE_MAC)
   commandEditCopyAsPdf,
 #endif
+  commandViewTogglePreviewVisibility,
   commandHelpAbout,
   commandHelpExample,
 

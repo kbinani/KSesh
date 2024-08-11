@@ -2,7 +2,7 @@
 
 namespace ksesh {
 
-class SplitterComponent : public juce::Component {
+class SplitterComponent : public juce::Component, public juce::ComponentListener {
   enum : int {
     resizerSize = 8,
   };
@@ -35,11 +35,31 @@ public:
     addAndMakeVisible(trailing);
     setMouseCursor(vertical ? juce::MouseCursor::LeftRightResizeCursor
                             : juce::MouseCursor::UpDownResizeCursor);
+    fLeading->addComponentListener(this);
+    fTrailing->addComponentListener(this);
+  }
+
+  ~SplitterComponent() {
+    fLeading->removeComponentListener(this);
+    fTrailing->removeComponentListener(this);
   }
 
   void resized() override {
     int const width = getWidth();
     int const height = getHeight();
+    if (!fLeading->isVisible() && !fTrailing->isVisible()) {
+      fResizer->setVisible(false);
+      return;
+    } else if (!fLeading->isVisible() || !fTrailing->isVisible()) {
+      fResizer->setVisible(false);
+      if (fLeading->isVisible()) {
+        fLeading->setBounds(0, 0, width, height);
+      } else if (fTrailing->isVisible()) {
+        fTrailing->setBounds(0, 0, width, height);
+      }
+      return;
+    }
+    fResizer->setVisible(true);
     if (fVertical) {
       int w = (width - resizerSize) * fRatio;
       fLeading->setBounds(0, 0, w, height);
@@ -90,6 +110,10 @@ public:
   void mouseExit(juce::MouseEvent const &e) override {
     fResizer->fMouseOver = false;
     fResizer->repaint();
+  }
+
+  void componentVisibilityChanged(juce::Component &comp) override {
+    resized();
   }
 
 private:
