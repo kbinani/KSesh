@@ -301,6 +301,17 @@ public:
     float minDistance = std::numeric_limits<float>::max();
     CaretLocation nearest(line->rawOffset, Direction::Forward);
     std::vector<CaretLocation> test;
+    if (!line->chars.empty()) {
+      auto last = line->chars[line->chars.size() - 1];
+      auto location = line->rawOffset + last.rawOffset + (int)last.raw.size();
+      auto cursor = this->cursor(location, location, Direction::Forward, setting);
+      if (cursor.rect) {
+        auto center = cursor.rect->rect.getCentre();
+        float distance = hypotf(point.x - center.x, point.y - center.y);
+        minDistance = distance;
+        nearest = CaretLocation(location, Direction::Forward);
+      }
+    }
     for (int i = 0; i < (int)line->chars.size(); i++) {
       auto ch = line->chars[i];
       if (!ch.sign) {
@@ -314,9 +325,6 @@ public:
         test.push_back(CaretLocation(end, Direction::Backward));
       } else if (i < current) {
         test.push_back(CaretLocation(start, Direction::Forward));
-        if (i == (int)line->chars.size() - 1) {
-          test.push_back(CaretLocation(end, Direction::Forward));
-        }
       } else {
         test.push_back(CaretLocation(end, Direction::Backward));
       }
