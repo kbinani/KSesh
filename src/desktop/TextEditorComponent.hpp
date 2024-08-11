@@ -9,6 +9,8 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
   };
 
   class TextEditor : public juce::TextEditor, public juce::ChangeListener {
+    using super = juce::TextEditor;
+
   public:
     explicit TextEditor(std::shared_ptr<AppSetting> const &setting) : fSetting(setting) {
       setting->addChangeListener(this);
@@ -34,11 +36,7 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
       auto highlightColor = getLookAndFeel().findColour(juce::TextEditor::highlightColourId);
 
       float constexpr caretWidth = 2;
-      PresentationSetting base = fSetting->getPresentationSetting();
-      PresentationSetting setting;
-      setting.padding = defaultIndent;
-      setting.fontSize = base.fontSize;
-      setting.lineSpacingRatio = (fSetting->getEditorFontSize() + base.lineSpacing()) / base.fontSize;
+      PresentationSetting setting = getRenderSetting();
       g.saveState();
       float scrollbarWidth = getLookAndFeel().getDefaultScrollbarWidth();
       auto bounds = getLocalBounds();
@@ -61,7 +59,7 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
           highlightTextColor,
           caretColor,
           highlightColor,
-          getTextWidth() - scrollbarWidth);
+          getMaxWidth());
       g.restoreState();
     }
 
@@ -88,6 +86,50 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
         ret.addWithoutMerging(range.withHeight(fSetting->getEditorFontSize()));
       }
       return ret;
+    }
+
+    int indexAtPosition(float const x, float const y) const override {
+      auto ret = super::indexAtPosition(x, y);
+      if (!fContent) {
+        return ret;
+      }
+      auto p = fSetting->getPresentationSetting();
+      float tx = x;
+      float ty = y + p.fontSize;
+      float lineHeight = p.fontSize + p.lineSpacing() + fSetting->getEditorFontSize();
+      int lineIndex = std::clamp<int>((int)floor(ty / lineHeight), 0, (int)fContent->lines.size());
+      float offset = ty - lineIndex * lineHeight;
+      if (0 <= offset && offset <= p.fontSize) {
+        auto setting = getRenderSetting();
+        auto maxWidth = getMaxWidth();
+        float const upem = (float)fContent->unitsPerEm;
+        float const scale = setting.fontSize / upem;
+        auto line = fContent->lines[lineIndex];
+        auto bounds = line->boundingBox * scale;
+        float drawScale = 1;
+        if (bounds.getWidth() > maxWidth) {
+          drawScale = maxWidth / bounds.getWidth();
+        }
+        auto pos = fContent->closestPosition(getCaretPosition(), {tx / drawScale, ty}, setting);
+        return pos.location;
+      } else {
+        return ret;
+      }
+    }
+
+  private:
+    float getMaxWidth() const {
+      float scrollbarWidth = getLookAndFeel().getDefaultScrollbarWidth();
+      return getTextWidth() - scrollbarWidth;
+    }
+
+    PresentationSetting getRenderSetting() const {
+      PresentationSetting base = fSetting->getPresentationSetting();
+      PresentationSetting setting;
+      setting.padding = defaultIndent;
+      setting.fontSize = base.fontSize;
+      setting.lineSpacingRatio = (fSetting->getEditorFontSize() + base.lineSpacing()) / base.fontSize;
+      return setting;
     }
 
   private:
