@@ -88,7 +88,7 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
       return ret;
     }
 
-    int indexAtPosition(float const x, float const y) const override {
+    int indexAtPosition(float x, float y) const override {
       auto ret = super::indexAtPosition(x, y);
       if (!fContent) {
         return ret;
@@ -97,7 +97,7 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
       float tx = x;
       float ty = y + p.fontSize;
       float lineHeight = p.fontSize + p.lineSpacing() + fSetting->getEditorFontSize();
-      int lineIndex = std::clamp<int>((int)floor(ty / lineHeight), 0, (int)fContent->lines.size());
+      int lineIndex = std::clamp<int>((int)floor(ty / lineHeight), 0, (int)fContent->lines.size() - 1);
       float offset = ty - lineIndex * lineHeight;
       if (0 <= offset && offset <= p.fontSize) {
         auto setting = getRenderSetting();
