@@ -3,6 +3,8 @@
 namespace ksesh {
 
 class LookAndFeel : public juce::LookAndFeel_V4 {
+  using super = juce::LookAndFeel_V4;
+
 public:
   LookAndFeel() {
   }
@@ -12,6 +14,21 @@ public:
 
   int getMenuWindowFlags() override {
     return 0;
+  }
+
+  int getDefaultMenuBarHeight() override {
+    return 23;
+  }
+
+  void getIdealPopupMenuItemSize(juce::String const &text, const bool isSeparator, int standardMenuItemHeight, int &idealWidth, int &idealHeight) override {
+    int w, h;
+    super::getIdealPopupMenuItemSize(text, isSeparator, standardMenuItemHeight, w, h);
+    idealWidth = w;
+    if (isSeparator) {
+      idealHeight = h;
+    } else {
+      idealHeight = std::max<int>(getDefaultMenuBarHeight(), h);
+    }
   }
 };
 
