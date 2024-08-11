@@ -314,6 +314,9 @@ public:
         test.push_back(CaretLocation(end, Direction::Backward));
       } else if (i < current) {
         test.push_back(CaretLocation(start, Direction::Forward));
+        if (i == (int)line->chars.size() - 1) {
+          test.push_back(CaretLocation(end, Direction::Forward));
+        }
       } else {
         test.push_back(CaretLocation(end, Direction::Backward));
       }
