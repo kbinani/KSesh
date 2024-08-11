@@ -227,11 +227,11 @@ struct CursorLocationEnd {
 using CursorLocation = std::variant<CursorLocationLeft, CursorLocationRight, CursorLocationEnd>;
 
 struct Cursor {
-  std::optional<juce::Rectangle<float>> rect;
   struct SelectionRect {
     int lineIndex;
     juce::Rectangle<float> rect;
   };
+  std::optional<SelectionRect> rect;
   std::vector<SelectionRect> selectionRects;
 };
 
@@ -326,7 +326,7 @@ public:
         if (!cursor.rect) {
           continue;
         }
-        auto center = cursor.rect->getCentre();
+        auto center = cursor.rect->rect.getCentre();
         float distance = hypotf(point.x - center.x, point.y - center.y);
         if (distance <= minDistance) {
           minDistance = distance;
@@ -477,11 +477,11 @@ public:
         auto line = this->lines[lineIndex];
         auto bounds = (line->boundingBox * scale).expanded(setting.caretExpand);
         Cursor ret;
-        ret.rect = juce::Rectangle<float>(
-            dx + bounds.getX() + bounds.getWidth(),
-            dy + bounds.getY(),
-            0,
-            bounds.getHeight());
+        ret.rect = {lineIndex, juce::Rectangle<float>(
+                                   dx + bounds.getX() + bounds.getWidth(),
+                                   dy + bounds.getY(),
+                                   0,
+                                   bounds.getHeight())};
         return ret;
       } else {
         int lineIndex;
@@ -503,7 +503,7 @@ public:
         auto line = this->lines[lineIndex];
         if (clusterIndex < 0 || (int)line->clusters.size() <= clusterIndex) {
           Cursor ret;
-          ret.rect = juce::Rectangle<float>(dx, dy, 0, fontSize);
+          ret.rect = {lineIndex, juce::Rectangle<float>(dx, dy, 0, fontSize)};
           return ret;
         }
         auto cluster = line->clusters[clusterIndex];
@@ -514,12 +514,12 @@ public:
         auto bounds = ((*cluster.bounds) * scale).expanded(setting.caretExpand);
         if (std::holds_alternative<CursorLocationLeft>(*location)) {
           Cursor ret;
-          ret.rect = juce::Rectangle<float>(dx + bounds.getX(), dy + bounds.getY(), 0, bounds.getHeight());
+          ret.rect = {lineIndex, juce::Rectangle<float>(dx + bounds.getX(), dy + bounds.getY(), 0, bounds.getHeight())};
           return ret;
         } else {
           auto loc = std::get<CursorLocationRight>(*location);
           Cursor ret;
-          ret.rect = juce::Rectangle<float>(dx + bounds.getRight(), dy + bounds.getY(), 0, bounds.getHeight());
+          ret.rect = {lineIndex, juce::Rectangle<float>(dx + bounds.getRight(), dy + bounds.getY(), 0, bounds.getHeight())};
           if (loc.block) {
             ret.selectionRects.push_back({lineIndex, juce::Rectangle<float>(dx + bounds.getX(),
                                                                             dy + bounds.getY(),
@@ -842,7 +842,20 @@ public:
 
     if (cursor.rect) {
       g.setColour(caretColor);
-      g.fillRect(cursor.rect->expanded(caretWidth * 0.5f, 0));
+      auto line = lines[cursor.rect->lineIndex];
+      auto bounds = line->boundingBox * scale;
+      bool shrink = false;
+      float scale = 1;
+      if (maxWidth && bounds.getWidth() > *maxWidth) {
+        shrink = true;
+        g.saveState();
+        scale = *maxWidth / bounds.getWidth();
+        g.addTransform(juce::AffineTransform::scale(scale, 1));
+      }
+      g.fillRect(cursor.rect->rect.expanded(caretWidth * 0.5f / scale, 0));
+      if (shrink) {
+        g.restoreState();
+      }
     }
   }
 
