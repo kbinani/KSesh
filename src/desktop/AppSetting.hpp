@@ -23,8 +23,7 @@ public:
 
   void setColorScheme(ColorScheme scheme) {
     fColorScheme = scheme;
-    sendSynchronousChangeMessage();
-    save();
+    onChange();
   }
 
   std::vector<juce::File> createRecentFilesMenu(juce::PopupMenu &menu, int baseId) {
@@ -39,8 +38,7 @@ public:
 
   void addToRecentFile(juce::File const &file) {
     fRecentFiles.addFile(file);
-    sendSynchronousChangeMessage();
-    save();
+    onChange();
   }
 
   juce::LookAndFeel_V4::ColourScheme getColorScheme(bool darkModeActive) {
@@ -70,7 +68,7 @@ public:
   void setEditorFontSize(float s) {
     if (fEditorFontSize != s) {
       fEditorFontSize = s;
-      sendSynchronousChangeMessage();
+      onChange();
     }
   }
 
@@ -80,10 +78,27 @@ public:
 
   void setPresentationSetting(PresentationSetting s) {
     fPresentation = s;
-    sendSynchronousChangeMessage();
+    onChange();
+  }
+
+  bool isPreviewEnabled() const {
+    return fEnablePreview;
+  }
+
+  void setPreviewEnabled(bool v) {
+    if (v == fEnablePreview) {
+      return;
+    }
+    fEnablePreview = v;
+    onChange();
   }
 
 private:
+  void onChange() {
+    sendSynchronousChangeMessage();
+    save();
+  }
+
   void save() {
     auto file = ConfigFilePath();
     if (file == juce::File()) {
@@ -138,6 +153,8 @@ private:
 #endif
     }
     o->setProperty(juce::Identifier("recent_files"), items.joinIntoString("\n"));
+    o->setProperty("enable_preview", fEnablePreview);
+    o->setProperty("version", int(1));
     juce::JSON::writeToStream(*stream, obj, {});
   }
 
@@ -184,6 +201,10 @@ private:
         fRecentFiles.addFile(juce::File(item));
 #endif
       }
+    }
+    auto enablePreview = o->getProperty("enable_preview");
+    if (enablePreview.isBool()) {
+      fEnablePreview = (bool)enablePreview;
     }
   }
 
@@ -241,6 +262,7 @@ private:
   juce::RecentlyOpenedFilesList fRecentFiles;
   PresentationSetting fPresentation;
   float fEditorFontSize = 24;
+  bool fEnablePreview = true;
 };
 
 } // namespace ksesh

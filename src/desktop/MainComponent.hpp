@@ -25,6 +25,7 @@ public:
 
     fVerticalSplitter = std::make_unique<SplitterComponent>(fTextEditor.get(), fHieroglyph.get(), true);
     fVerticalSplitter->setBounds(width / 2 - resizerSize / 2, 0, resizerSize, height / 2 - resizerSize / 2);
+    fHieroglyph->setVisible(appSetting->isPreviewEnabled());
 
     fSignList = std::make_unique<SignListComponent>(font);
     fSignList->setBounds(0, height / 2 + resizerSize / 2, width, height / 2 - resizerSize / 2);
@@ -266,9 +267,12 @@ public:
     case commandHelpExample:
       showExampleComponent();
       return true;
-    case commandViewTogglePreviewVisibility:
-      fHieroglyph->setVisible(!fHieroglyph->isVisible());
+    case commandViewTogglePreviewVisibility: {
+      bool visible = !fHieroglyph->isVisible();
+      fHieroglyph->setVisible(visible);
+      fAppSetting->setPreviewEnabled(visible);
       return true;
+    }
     }
     return false;
   }
