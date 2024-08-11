@@ -41,14 +41,21 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
       float textWidth = getTextWidth();
       int lines = (int)ceil(std::max<int>(getHeight(), getTextHeight()) / lineHeight);
       auto vp = getViewPosition();
+      float scrollbarWidth = getLookAndFeel().getDefaultScrollbarWidth();
+      auto bounds = getLocalBounds();
 
-      g.saveState();
+      juce::Rectangle<int> clip(
+          defaultIndent,
+          topClippingHeight,
+          bounds.getWidth() - scrollbarWidth - 2 * defaultIndent,
+          bounds.getHeight() - scrollbarWidth - topClippingHeight - defaultIndent);
+      g.reduceClipRegion(clip);
+
       g.setColour(borderColor);
       for (int i = 0; i < lines; i++) {
         float y = setting.padding + (i + 1) * lineHeight;
         g.drawHorizontalLine(y - vp.getY() - dy, defaultIndent - vp.getX(), textWidth - defaultIndent - vp.getX());
       }
-      g.restoreState();
 
       if (!fContent) {
         return;
@@ -59,15 +66,6 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
       auto highlightColor = getLookAndFeel().findColour(juce::TextEditor::highlightColourId);
 
       float constexpr caretWidth = 2;
-      float scrollbarWidth = getLookAndFeel().getDefaultScrollbarWidth();
-      auto bounds = getLocalBounds();
-      juce::Rectangle<int> clip(
-          defaultIndent,
-          topClippingHeight,
-          bounds.getWidth() - scrollbarWidth - 2 * defaultIndent,
-          bounds.getHeight() - scrollbarWidth - topClippingHeight - defaultIndent);
-      g.reduceClipRegion(clip);
-      g.saveState();
       g.addTransform(juce::AffineTransform::translation(-vp.getX(), -vp.getY()));
       fContent->draw(
           g,
@@ -81,7 +79,6 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
           caretColor,
           highlightColor,
           getMaxWidth());
-      g.restoreState();
     }
 
     void setContent(std::shared_ptr<Content> const &c) {
