@@ -5,7 +5,7 @@ namespace ksesh {
 class TextEditorComponent : public juce::Component, public juce::ChangeListener {
   enum : int {
     defaultIndent = 4,
-    topClippingHeight = 1,
+    clipExpand = 1,
   };
 
   class TextEditor : public juce::TextEditor, public juce::ChangeListener {
@@ -42,13 +42,15 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
       int lines = (int)ceil(std::max<int>(getHeight(), getTextHeight()) / lineHeight);
       auto vp = getViewPosition();
       float scrollbarWidth = getLookAndFeel().getDefaultScrollbarWidth();
+      float vScrollbarWidth = isVerticalScrollBarShown() ? scrollbarWidth + 2 : 0;
+      float hScrollbarHeight = isHorizontalScrollBarShown() ? scrollbarWidth : 0;
       auto bounds = getLocalBounds();
 
       juce::Rectangle<int> clip(
-          defaultIndent,
-          topClippingHeight,
-          bounds.getWidth() - scrollbarWidth - 2 * defaultIndent,
-          bounds.getHeight() - scrollbarWidth - topClippingHeight - defaultIndent);
+          clipExpand,
+          clipExpand,
+          bounds.getWidth() - vScrollbarWidth - 2 * clipExpand,
+          bounds.getHeight() - hScrollbarHeight - 2 * clipExpand);
       g.reduceClipRegion(clip);
 
       g.setColour(borderColor);
