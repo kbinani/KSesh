@@ -2,6 +2,8 @@
 
 #include "PDFGen.hpp"
 
+#include <algorithm>
+
 static int pdf_save_object_stream(struct pdf_doc *pdf, std::string &out, int index) {
   struct pdf_object *object = pdf_get_object(pdf, index);
   if (!object) {
