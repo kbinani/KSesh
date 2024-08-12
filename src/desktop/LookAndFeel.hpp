@@ -17,7 +17,7 @@ public:
   }
 
   int getDefaultMenuBarHeight() override {
-    return 23;
+    return 24;
   }
 
   void getIdealPopupMenuItemSize(juce::String const &text, const bool isSeparator, int standardMenuItemHeight, int &idealWidth, int &idealHeight) override {
