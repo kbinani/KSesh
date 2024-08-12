@@ -3,5 +3,14 @@ node_modules
 *.js
 *.map
 *.ttf
+*.pfx
 /xcode
 /build
+/pkg/windows-store/AppPackages
+/pkg/windows-store/BundleArtifacts
+/pkg/windows-store/bin
+/pkg/windows-store/obj
+/pkg/windows-store/Package.appxmanifest
+/pkg/windows-store/Package.wapproj
+/pkg/windows-store/Package.wapproj.user
+/pkg/windows-store/Package.assets.cache

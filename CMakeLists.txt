@@ -25,7 +25,7 @@ if (MSVC)
   )
   set(ksesh_icon_small "res/app-icon/windows/icon_512x512.png")
   set(ksesh_icon_big "res/app-icon/windows/icon_512x512@2x.png")
-elseif(APPLE)
+elseif (APPLE)
   set(CMAKE_OSX_DEPLOYMENT_TARGET "${ksesh_macos_deployment_target}")
   set(CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "${ksesh_apple_development_team_id}")
   set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
@@ -125,7 +125,7 @@ if (MSVC)
   )
   target_compile_options(ksesh PRIVATE $<$<CONFIG:Release>:/Zi>)
   target_link_options(ksesh PRIVATE $<$<CONFIG:Release>:/DEBUG>)
-elseif(APPLE)
+elseif (APPLE)
   foreach (target IN ITEMS ksesh ksesh-binary-data)
     set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH $<IF:$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>,YES,NO>)
   endforeach()
@@ -142,3 +142,18 @@ target_link_libraries(ksesh
 )
 
 source_group(TREE ${CMAKE_CURRENT_LIST_DIR} FILES ${ksesh_files})
+
+if (MSVC)
+  configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/pkg/windows-store/Package.wapproj.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/pkg/windows-store/Package.wapproj
+  )
+  configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/pkg/windows-store/Package.appxmanifest.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/pkg/windows-store/Package.appxmanifest
+  )
+  include_external_msproject(Package "${CMAKE_CURRENT_SOURCE_DIR}/pkg/windows-store/Package.wapproj"
+    TYPE C7167F0D-BC9F-4E6E-AFE1-012C56B48DB5
+    GUID 7F81454A-13E7-4AC5-9B69-CCD8BCF2C2B3
+  )
+endif()
