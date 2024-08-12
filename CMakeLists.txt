@@ -23,11 +23,15 @@ if (MSVC)
     $<$<CONFIG:MinSizeRel>:/MT>
     /MP
   )
+  set(ksesh_icon_small "res/app-icon/windows/icon_512x512.png")
+  set(ksesh_icon_big "res/app-icon/windows/icon_512x512@2x.png")
 elseif(APPLE)
   set(CMAKE_OSX_DEPLOYMENT_TARGET "${ksesh_macos_deployment_target}")
   set(CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "${ksesh_apple_development_team_id}")
   set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
   add_compile_options(-Wno-shorten-64-to-32)
+  set(ksesh_icon_small "res/app-icon/macos/icon_512x512.png")
+  set(ksesh_icon_big "res/app-icon/macos/icon_512x512@2x.png")
 endif()
 
 add_subdirectory(deps/JUCE)
@@ -53,6 +57,8 @@ juce_add_gui_app(ksesh
       </dict>
     </plist>"
   COMPANY_COPYRIGHT "Copyright © 2024 kbinani"
+  ICON_BIG "${ksesh_icon_big}"
+  ICON_SMALL "${ksesh_icon_small}"
 )
 
 list(APPEND ksesh_files
