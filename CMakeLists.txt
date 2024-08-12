@@ -36,13 +36,16 @@ endif()
 
 add_subdirectory(deps/JUCE)
 
+# Developer accidentally uploaded an app binary to the appstoreconnect with wrong version number.
+# The appstoreconnect doesn't allow version numbers to go down, so we apply a higher value than CFBundleShortVersionString.
+math(EXPR ksesh_bundle_version_major "${PROJECT_VERSION_MAJOR} + 1")
 juce_add_gui_app(ksesh
   PRODUCT_NAME "KSesh"
   APP_SANDBOX_ENABLED TRUE
   APP_SANDBOX_INHERIT FALSE
   APP_SANDBOX_OPTIONS "com.apple.security.files.user-selected.read-write;com.apple.security.files.bookmarks.app-scope"
   VERSION "${CMAKE_PROJECT_VERSION}"
-  BUILD_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}"
+  BUILD_VERSION "${ksesh_bundle_version_major}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}"
   BUNDLE_ID "com.github.kbinani.ksesh"
   HARDENED_RUNTIME_ENABLED TRUE
   PLIST_TO_MERGE "
