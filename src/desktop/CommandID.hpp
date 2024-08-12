@@ -18,6 +18,8 @@ enum CommandID : juce::CommandID {
 #endif
   commandFileExit,
 
+  commandEditCopyAsUnicodeWithoutFormatControl,
+  commandEditCopyAsUnicodeWithFormatControl,
 #if defined(JUCE_WINDOWS)
   commandEditCopyAsEmf,
 #endif

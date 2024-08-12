@@ -50,6 +50,8 @@ public:
 #endif
     } else if (topLevelMenuIndex == 1) {
       // Edit
+      menu.addCommandItem(fManager, commandEditCopyAsUnicodeWithoutFormatControl);
+      menu.addCommandItem(fManager, commandEditCopyAsUnicodeWithFormatControl);
 #if defined(JUCE_WINDOWS)
       menu.addCommandItem(fManager, commandEditCopyAsEmf);
 #endif

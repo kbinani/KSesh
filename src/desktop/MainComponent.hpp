@@ -146,6 +146,14 @@ public:
       info.setInfo(TRANS("Export as PDF"), {}, {}, 0);
       info.setActive((bool)fContent);
       break;
+    case commandEditCopyAsUnicodeWithoutFormatControl:
+      info.setInfo(TRANS("Copy text"), {}, {}, 0);
+      info.setActive((bool)fContent);
+      break;
+    case commandEditCopyAsUnicodeWithFormatControl:
+      info.setInfo(TRANS("Copy text with format control"), {}, {}, 0);
+      info.setActive((bool)fContent);
+      break;
 #if defined(JUCE_WINDOWS)
     case commandFileExportAsEmf:
       info.setInfo(TRANS("Export as EMF"), {}, {}, 0);
@@ -232,6 +240,12 @@ public:
     case commandFileExportAsPdf:
       exportAsPdf();
       return true;
+    case commandEditCopyAsUnicodeWithoutFormatControl:
+      copyWithoutFormatControl();
+      return true;
+    case commandEditCopyAsUnicodeWithFormatControl:
+      copyWithFormatControl();
+      return true;
 #if defined(JUCE_WINDOWS)
     case commandFileExportAsEmf:
       exportAsEmf();
@@ -278,6 +292,41 @@ public:
   }
 
 private:
+  void copyWithoutFormatControl() {
+    if (!fContent) {
+      return;
+    }
+    juce::String s;
+    for (auto const &line : fContent->lines) {
+      std::u32string l;
+      for (char32_t ch : line->result) {
+        if (0x13430 <= ch && ch <= 0x13455) {
+          continue;
+        }
+        l += ch;
+      }
+      if (s.isNotEmpty()) {
+        s += "\n";
+      }
+      s += JuceStringFromU32String(l);
+    }
+    juce::SystemClipboard::copyTextToClipboard(s);
+  }
+
+  void copyWithFormatControl() {
+    if (!fContent) {
+      return;
+    }
+    juce::String s;
+    for (auto const &line : fContent->lines) {
+      if (s.isNotEmpty()) {
+        s += "\n";
+      }
+      s += JuceStringFromU32String(line->result);
+    }
+    juce::SystemClipboard::copyTextToClipboard(s);
+  }
+
   void showExampleComponent() {
     if (fAbout || fExample) {
       return;

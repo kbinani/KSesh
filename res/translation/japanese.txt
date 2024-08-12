@@ -1,55 +1,113 @@
-language: japanese
-countries: jp
-
-"Auto" = "Auto"
-"Dark" = "Dark"
-"Midnight" = "Midnight"
-"Gray" = "Gray"
-"Light" = "Light"
-"Basic" = "基本"
-"Cartouche and Ligature" = "カルトゥーシュとリガチャ"
-"Horizontal mirroring, cartouche, and grouping" = "水平方向の反転、カルトゥーシュとグルーピング"
-"Shading" = "影付き表示"
-"New" = "新規作成"
-"Open" = "開く"
-"Save" = "保存"
-"Save As" = "名前を付けて保存"
-"1x scale" = "1x scale"
-"2x scale" = "2x scale"
-"4x scale" = "4x scale"
-"8x scale" = "8x scale"
-"Export as PDF" = "PDFにエクスポート"
-"Export as EMF" = "EMFにエクスポート"
-"Copy as EMF" = "EMFとしてコピー"
-"Exit" = "終了"
-"Copy as PDF" = "PDFとしてコピー"
-"About" = "KSeshについて"
-"Example" = "例"
-"Warning" = "警告"
-"Do you want to save the changes you made to new document?" = "変更内容を保存しますか?"
-"Don\'t Save" = "保存しない"
-"Cancel" = "キャンセル"
-"Error" = "エラー"
-"Failed to open" = "開けませんでした"
-"Failed to save" = "保存できませんでした"
-"Export as PNG" = "PNGにエクスポート"
-"Failed to export as PNG" = "PNGのエクスポートに失敗しました"
-"Failed to export as PDF" = "PDFのエクスポートに失敗しました"
-"Failed to export as EMF" = "EMFのエクスポートに失敗しました"
-"Failed to write clipboard" = "クリップボードに書き込めませんでした"
-"Unnamed" = "無題"
-"File" = "ファイル"
-"Edit" = "編集"
-"View" = "表示"
-"Help" = "ヘルプ"
-"Open Recent" = "最近使ったファイル"
-"Copy as Image" = "画像としてコピー"
-"Theme" = "テーマ"
-"Preview" = "プレビュー"
-"Cut" = "切り取り"
-"Copy" = "コピー"
-"Paste" = "貼り付け"
-"Delete" = "削除"
-"Select All" = "全て選択"
-"Undo" = "元に戻す"
+language: japanese
+
+countries: jp
+
+
+
+"Auto" = "Auto"
+
+"Dark" = "Dark"
+
+"Midnight" = "Midnight"
+
+"Gray" = "Gray"
+
+"Light" = "Light"
+
+"Basic" = "基本"
+
+"Cartouche and Ligature" = "カルトゥーシュとリガチャ"
+
+"Horizontal mirroring, cartouche, and grouping" = "水平方向の反転、カルトゥーシュとグルーピング"
+
+"Shading" = "影付き表示"
+
+"New" = "新規作成"
+
+"Open" = "開く"
+
+"Save" = "保存"
+
+"Save As" = "名前を付けて保存"
+
+"1x scale" = "1x scale"
+
+"2x scale" = "2x scale"
+
+"4x scale" = "4x scale"
+
+"8x scale" = "8x scale"
+
+"Export as PDF" = "PDFにエクスポート"
+
+"Export as EMF" = "EMFにエクスポート"
+
+"Copy as EMF" = "EMFとしてコピー"
+
+"Exit" = "終了"
+
+"Copy as PDF" = "PDFとしてコピー"
+
+"About" = "KSeshについて"
+
+"Example" = "例"
+
+"Warning" = "警告"
+
+"Do you want to save the changes you made to new document?" = "変更内容を保存しますか?"
+
+"Don\'t Save" = "保存しない"
+
+"Cancel" = "キャンセル"
+
+"Error" = "エラー"
+
+"Failed to open" = "開けませんでした"
+
+"Failed to save" = "保存できませんでした"
+
+"Export as PNG" = "PNGにエクスポート"
+
+"Failed to export as PNG" = "PNGのエクスポートに失敗しました"
+
+"Failed to export as PDF" = "PDFのエクスポートに失敗しました"
+
+"Failed to export as EMF" = "EMFのエクスポートに失敗しました"
+
+"Failed to write clipboard" = "クリップボードに書き込めませんでした"
+
+"Unnamed" = "無題"
+
+"File" = "ファイル"
+
+"Edit" = "編集"
+
+"View" = "表示"
+
+"Help" = "ヘルプ"
+
+"Open Recent" = "最近使ったファイル"
+
+"Copy as Image" = "画像としてコピー"
+
+"Theme" = "テーマ"
+
+"Preview" = "プレビュー"
+
+"Cut" = "切り取り"
+
+"Copy" = "コピー"
+
+"Paste" = "貼り付け"
+
+"Delete" = "削除"
+
+"Select All" = "全て選択"
+
+"Undo" = "元に戻す"
+
 "Redo" = "やり直し"
+
+"Copy text" = "テキストをコピー"
+
+"Copy text with format control" = "テキストをコピー(制御文字付き)"
