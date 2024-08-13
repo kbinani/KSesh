@@ -18,7 +18,7 @@ jobs:
           cache: npm
       - run: |
           npm install
-          make
+          make web
           npm run test
   deploy:
     needs: test

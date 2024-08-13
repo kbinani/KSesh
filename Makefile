@@ -1,5 +1,8 @@
 .PHONY: all
-all: public/eot.ttf public/main.js src/insertions.ts src/static-data.ts src/desktop/Insertions.hpp
+all: web src/desktop/Insertions.hpp
+
+.PHONY: web
+web: public/eot.ttf public/main.js src/insertions.ts src/static-data.ts
 
 public/eot.ttf: deps/font-tools/EgyptianOpenType/font/eot.ttf
 	cp $< $@
@@ -16,5 +19,6 @@ src/desktop/Insertions.hpp: src/insertions.ts script/insertions.hpp.ts
 src/static-data.ts: deps/font-tools/EgyptianOpenType/font/eot.ttf node_modules/harfbuzzjs/hb.wasm
 	bash script/static-data.ts.sh eot deps/font-tools/EgyptianOpenType/font/eot.ttf harfbuzz node_modules/harfbuzzjs/hb.wasm > $@
 
+.PHONY: clean
 clean:
 	rm -f public/eot.ttf public/main.js src/insertions.ts src/static-data.ts
