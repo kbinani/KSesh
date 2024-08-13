@@ -36,7 +36,6 @@ jobs:
         run: |
           version=$(echo ${{ github.ref }} | cut -d- -f2)
           echo "version=$version" >> $GITHUB_OUTPUT
-      - run: echo "version=${{ steps.get-version.outputs.version }}"
       - uses: actions/checkout@v4
         with:
           submodules: true
