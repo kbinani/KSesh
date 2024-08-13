@@ -10,7 +10,7 @@ import {
 import { EdgeInset } from "./edge-inset";
 
 const PDFDocument = require("./pdfkit.standalone.js") as PDFKit.PDFDocument;
-const blobStream = require("../node_modules/blob-stream/.js");
+const blobStream = require("../../node_modules/blob-stream/.js");
 
 export function download(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);

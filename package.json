@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "repository": "https://github.com/kbinani/KSesh.git",
   "scripts": {
-    "build": "esbuild --define:KSESH_VERSION=\\\"$KSESH_VERSION\\\" src/component/index.tsx --bundle --outfile=public/main.js --minify --sourcemap --external:fs --external:path",
-    "fmt": "prettier --write 'src/**/*.ts' 'src/**/*.tsx' 'public/**/*.css'",
+    "build": "esbuild --define:KSESH_VERSION=\\\"$KSESH_VERSION\\\" src/web/component/index.tsx --bundle --outfile=public/main.js --minify --sourcemap --external:fs --external:path",
+    "fmt": "prettier --write 'src/web/**/*.ts' 'src/web/**/*.tsx' 'public/**/*.css'",
     "test": "vitest run",
     "dev": "npm run build -- --servedir=public"
   },

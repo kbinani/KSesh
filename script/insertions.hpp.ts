@@ -1,4 +1,4 @@
-import { insertions } from "../src/insertions";
+import { insertions } from "../src/web/insertions";
 
 console.log(`#pragma once
 
