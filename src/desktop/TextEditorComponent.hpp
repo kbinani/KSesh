@@ -113,6 +113,9 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
       if (!fContent) {
         return ret;
       }
+      if (fContent->lines.empty()) {
+        return ret;
+      }
       auto p = fSetting->getPresentationSetting();
       float tx = x;
       float ty = y + p.fontSize;
@@ -269,7 +272,7 @@ private:
   }
 
   static juce::String GetTypingAtCaret(juce::String const &text, int start, int end) {
-    if (start < 1) {
+    if (start < 1 || text.isEmpty()) {
       return "";
     }
     auto leading = U32StringFromJuceString(text.substring(0, start));
