@@ -10,7 +10,7 @@ An Interactive Hieroglyphic Editor, available on Windows, macOS, and the Web.
 # Install
 
 - Windows
-  - comming soon...
+  - https://www.microsoft.com/store/apps/9PPDNN5S6Z36
 - macOS
   - https://apps.apple.com/us/app/ksesh/id6596728393
 - Web
