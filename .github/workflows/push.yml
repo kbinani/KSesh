@@ -46,7 +46,7 @@ jobs:
           KSESH_VERSION: ${{ steps.get-version.outputs.version }}
         run: |
           npm install
-          make
+          make web
       - uses: actions/upload-pages-artifact@v3
         with:
           path: './public'

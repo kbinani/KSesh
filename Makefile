@@ -1,8 +1,11 @@
 .PHONY: all
-all: web src/desktop/Insertions.hpp
+all: web desktop
 
 .PHONY: web
 web: public/eot.ttf public/main.js src/web/insertions.ts src/web/static-data.ts
+
+.PHONY: desktop
+desktop: src/desktop/Insertions.hpp
 
 public/eot.ttf: deps/font-tools/EgyptianOpenType/font/eot.ttf
 	cp $< $@
