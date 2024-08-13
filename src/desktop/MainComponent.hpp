@@ -692,18 +692,14 @@ private:
   }
 
   void textEditorComponentDidChangeCaretPosition(juce::String const &typing, int start, int end, Direction direction) override {
-    if (!fIgnoreCaretChange) {
-      fSignList->setTyping(typing);
-      fHieroglyph->setSelectedRange(start, end, direction);
-    }
+    fSignList->setTyping(typing);
+    fHieroglyph->setSelectedRange(start, end, direction);
   }
 
   void textEditorComponentDidChangeContent(std::shared_ptr<Content> content, juce::String const &typing, int start, int end, Direction direction) override {
     setContent(content);
-    if (!fIgnoreCaretChange) {
-      fSignList->setTyping(typing);
-      fHieroglyph->setSelectedRange(start, end, direction);
-    }
+    fSignList->setTyping(typing);
+    fHieroglyph->setSelectedRange(start, end, direction);
   }
 
   void setContent(std::shared_ptr<Content> content) {
@@ -718,13 +714,7 @@ private:
   }
 
   void onClickSign(Sign const &sign) {
-    fIgnoreCaretChange = true;
-    auto result = fTextEditor->insert(sign.name);
-    fTextEditor->focus();
-    auto str = U32StringFromJuceString(result);
-    setContent(std::make_shared<Content>(str, fFont));
-
-    fIgnoreCaretChange = false;
+    fTextEditor->insert(sign.name);
   }
 
 public:
@@ -738,7 +728,6 @@ private:
   std::unique_ptr<SignListComponent> fSignList;
   std::unique_ptr<BottomToolBar> fBottomToolBar;
   std::shared_ptr<hb_font_t> fFont;
-  bool fIgnoreCaretChange = false;
   std::unique_ptr<MenuBarModel> fMenuModel;
 #if !defined(JUCE_MAC)
   std::unique_ptr<juce::MenuBarComponent> fMenuComponent;

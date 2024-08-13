@@ -191,7 +191,8 @@ public:
     fEditor->applyColourToAllText(getLookAndFeel().findColour(juce::TextEditor::textColourId));
   }
 
-  juce::String insert(juce::String const &s) {
+  void insert(juce::String const &s) {
+    unbind();
     auto text = fEditor->getText();
     auto selected = getSelectedRange();
     int caret = fEditor->getCaretPosition();
@@ -215,9 +216,20 @@ public:
           next = leading + s + " " + trailing;
         }
       }
+      if (caret < nextCaret) {
+        fDirection = Direction::Forward;
+      } else if (nextCaret < caret) {
+        fDirection = Direction::Backward;
+      }
+      auto c = std::make_shared<Content>(U32StringFromJuceString(next), fFont);
       fEditor->setText(next, false);
       fEditor->setCaretPosition(nextCaret);
-      return next;
+      fEditor->setSelectedRange(juce::Range<int>(nextCaret, nextCaret), fDirection);
+      fEditor->setContent(c);
+      fEditor->grabKeyboardFocus();
+      bind();
+      auto nextTyping = GetTypingAtCaret(next, nextCaret, nextCaret);
+      fDelegate->textEditorComponentDidChangeContent(c, nextTyping, nextCaret, nextCaret, fDirection);
     } else {
       auto str = s;
       if (selected.getEnd() >= text.length()) {
@@ -226,9 +238,21 @@ public:
         str = s + " ";
       }
       auto next = text.substring(0, selected.getStart()) + str + text.substring(selected.getEnd());
+      auto nextCaret = selected.getStart() + str.length();
+      if (caret < nextCaret) {
+        fDirection = Direction::Forward;
+      } else if (nextCaret < caret) {
+        fDirection = Direction::Backward;
+      }
+      auto c = std::make_shared<Content>(U32StringFromJuceString(next), fFont);
       fEditor->setText(next, false);
-      fEditor->setCaretPosition(selected.getStart() + str.length());
-      return next;
+      fEditor->setCaretPosition(nextCaret);
+      fEditor->setSelectedRange(juce::Range<int>(nextCaret, nextCaret), fDirection);
+      fEditor->setContent(c);
+      fEditor->grabKeyboardFocus();
+      bind();
+      auto nextTyping = GetTypingAtCaret(next, nextCaret, nextCaret);
+      fDelegate->textEditorComponentDidChangeContent(c, nextTyping, nextCaret, nextCaret, fDirection);
     }
   }
 
