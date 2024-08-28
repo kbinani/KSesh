@@ -4,3 +4,6 @@
 [submodule "deps/JUCE"]
 	path = deps/JUCE
 	url = https://github.com/kbinani/JUCE.git
+[submodule "deps/doctest"]
+	path = deps/doctest
+	url = https://github.com/doctest/doctest.git
