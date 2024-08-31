@@ -144,7 +144,14 @@ target_link_libraries(ksesh
     juce::juce_recommended_lto_flags
 )
 
-source_group(TREE ${CMAKE_CURRENT_LIST_DIR} FILES ${ksesh_files})
+list(APPEND test_files
+  test/main.cpp
+  test/ContentTests.hpp
+)
+add_executable(ksesh-test test/main.cpp ${test_files})
+target_include_directories(ksesh-test PRIVATE deps/doctest/doctest)
+
+source_group(TREE ${CMAKE_CURRENT_LIST_DIR} FILES ${ksesh_files} ${test_files})
 
 if (MSVC)
   configure_file(
