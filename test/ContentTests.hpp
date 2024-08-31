@@ -342,6 +342,56 @@ TEST_CASE("Parse") {
     REQUIRE(c0c1);
     REQUIRE(c0c2);
   }
+  SUBCASE("complex") {
+    auto d = Document::Parse(U"gb&ra <i mn:n t&w&t anx>");
+    REQUIRE(d);
+    REQUIRE(d->fLines.size() == 1);
+    auto l = d->fLines[0];
+    REQUIRE(l->fItems.size() == 2);
+    auto c0 = dynamic_pointer_cast<Ligature>(l->fItems[0]);
+    auto c1 = dynamic_pointer_cast<Cartouche>(l->fItems[1]);
+    REQUIRE(c0);
+    REQUIRE(c1);
+    REQUIRE(c0->fChildren.size() == 2);
+    auto c0c0 = dynamic_pointer_cast<Simple>(c0->fChildren[0]);
+    auto c0c1 = dynamic_pointer_cast<Simple>(c0->fChildren[1]);
+    REQUIRE(c0c0);
+    REQUIRE(c0c1);
+    CHECK(c0c0->fText == U"gb");
+    CHECK(c0c1->fText == U"ra ");
+    REQUIRE(c1->fChildren.size() == 4);
+    auto c1c0 = dynamic_pointer_cast<Simple>(c1->fChildren[0]);
+    auto c1c1 = dynamic_pointer_cast<VBox>(c1->fChildren[1]);
+    auto c1c2 = dynamic_pointer_cast<Ligature>(c1->fChildren[2]);
+    auto c1c3 = dynamic_pointer_cast<Simple>(c1->fChildren[3]);
+    REQUIRE(c1c0);
+    REQUIRE(c1c1);
+    REQUIRE(c1c2);
+    REQUIRE(c1c3);
+
+    CHECK(c1c0->fText == U"i ");
+
+    REQUIRE(c1c1->fChildren.size() == 2);
+    auto c1c1c0 = dynamic_pointer_cast<Simple>(c1c1->fChildren[0]);
+    auto c1c1c1 = dynamic_pointer_cast<Simple>(c1c1->fChildren[1]);
+    REQUIRE(c1c1c0);
+    REQUIRE(c1c1c1);
+    CHECK(c1c1c0->fText == U"mn");
+    CHECK(c1c1c1->fText == U"n ");
+
+    REQUIRE(c1c2->fChildren.size() == 3);
+    auto c1c2c0 = dynamic_pointer_cast<Simple>(c1c2->fChildren[0]);
+    auto c1c2c1 = dynamic_pointer_cast<Simple>(c1c2->fChildren[1]);
+    auto c1c2c2 = dynamic_pointer_cast<Simple>(c1c2->fChildren[2]);
+    REQUIRE(c1c2c0);
+    REQUIRE(c1c2c1);
+    REQUIRE(c1c2c2);
+    CHECK(c1c2c0->fText == U"t");
+    CHECK(c1c2c1->fText == U"w");
+    CHECK(c1c2c2->fText == U"t ");
+
+    CHECK(c1c3->fText == U"anx");
+  }
 }
 
 } // namespace ksesh::test
