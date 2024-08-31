@@ -14,6 +14,11 @@ public:
   std::u32string const fText;
 };
 
+class Group : public Item {
+public:
+  std::deque<std::shared_ptr<Item>> fChildren;
+};
+
 class HBox : public Item {
 public:
 };
@@ -40,31 +45,42 @@ static size_t Whitespace(std::u32string const &str, size_t offset) {
   return i;
 }
 
-static void Group(std::u32string const &s, size_t &offset, std::deque<std::shared_ptr<Item>> &items, char32_t terminator) {
+static void ParseGroup(std::u32string const &s, size_t &offset, std::deque<std::shared_ptr<Item>> &items, char32_t terminator) {
   using namespace std;
   while (offset < s.size()) {
     auto start = Whitespace(s, offset);
     auto end = start;
-    bool rtn = false;
     for (; end < s.size(); end++) {
       char32_t ch = s[end];
-      bool brk = false;
       if (ch == U' ') {
         end = Whitespace(s, end);
+        if (start < end) {
+          auto text = s.substr(start, end - start);
+          items.push_back(make_shared<Simple>(text));
+        }
+        offset = end;
         break;
-      } else if (ch == U':' || ch == U'(' || ch == U'<' || ch == U'*') {
+      } else if (ch == U'(') {
+        if (start < end) {
+          auto text = s.substr(start, end - start);
+          items.push_back(make_shared<Simple>(text));
+        }
+        offset = end + 1;
+        auto group = make_shared<Group>();
+        ParseGroup(s, offset, group->fChildren, U')');
+        items.push_back(group);
+        break;
+      } else if (ch == U':' || ch == U'<' || ch == U'*') {
         // TODO:
         break;
       } else if (ch == terminator) {
-        rtn = true;
-        break;
+        if (start < end) {
+          auto text = s.substr(start, end - start);
+          items.push_back(make_shared<Simple>(text));
+        }
+        offset = end + 1;
+        return;
       }
-    }
-    auto text = s.substr(start, end - start);
-    items.push_back(make_shared<Simple>(text));
-    offset = end;
-    if (rtn) {
-      return;
     }
   }
 }
@@ -75,7 +91,7 @@ static std::shared_ptr<Document> Parse(std::u32string const &s) {
   size_t offset = 0;
   while (offset < s.size()) {
     auto line = make_shared<Line>();
-    Group(s, offset, line->fItems, U'\n');
+    ParseGroup(s, offset, line->fItems, U'\n');
     offset++;
     document->fLines.push_back(line);
   }
@@ -91,6 +107,31 @@ TEST_CASE("Parse") {
     CHECK(l0->fItems.size() == 2);
     auto l1 = d->fLines[1];
     CHECK(l1->fItems.size() == 1);
+  }
+  SUBCASE("group") {
+    auto d = Parse(U"A1(A2 (B1)C1)");
+    REQUIRE(d);
+    CHECK(d->fLines.size() == 1);
+    auto l = d->fLines[0];
+    CHECK(l->fItems.size() == 2);
+    auto s = dynamic_pointer_cast<Simple>(l->fItems[0]);
+    auto g = dynamic_pointer_cast<Group>(l->fItems[1]);
+    REQUIRE(s);
+    CHECK(s->fText == U"A1");
+    REQUIRE(g);
+    CHECK(g->fChildren.size() == 3);
+    auto gc0 = dynamic_pointer_cast<Simple>(g->fChildren[0]);
+    auto gc1 = dynamic_pointer_cast<Group>(g->fChildren[1]);
+    auto gc2 = dynamic_pointer_cast<Simple>(g->fChildren[2]);
+    REQUIRE(gc0);
+    CHECK(gc0->fText == U"A2 ");
+    REQUIRE(gc1);
+    CHECK(gc1->fChildren.size() == 1);
+    REQUIRE(gc2);
+    CHECK(gc2->fText == U"C1");
+    auto gc1c0 = dynamic_pointer_cast<Simple>(gc1->fChildren[0]);
+    REQUIRE(gc1c0);
+    CHECK(gc1c0->fText == U"B1");
   }
 }
 
