@@ -26,6 +26,11 @@ public:
   std::u32string fClose;
 };
 
+class HBox : public Item {
+public:
+  std::deque<std::shared_ptr<Item>> fChildren;
+};
+
 class Line {
 public:
   std::deque<std::shared_ptr<Item>> fItems;
@@ -50,6 +55,22 @@ public:
 
   static void ParseGroup(std::u32string const &s, size_t &offset, std::deque<std::shared_ptr<Item>> &items, char32_t terminator) {
     using namespace std;
+    char32_t glue = 0;
+    auto append = [&](shared_ptr<Item> item) {
+      if (items.empty()) {
+        items.push_back(item);
+        return;
+      }
+      auto back = items.back();
+      if (glue == U'*') {
+        glue = 0;
+        if (auto hbox = dynamic_pointer_cast<HBox>(back)) {
+          hbox->fChildren.push_back(item);
+          return;
+        }
+      }
+      items.push_back(item);
+    };
     while (offset < s.size()) {
       auto start = Whitespace(s, offset);
       auto end = start;
@@ -59,7 +80,7 @@ public:
           end = Whitespace(s, end);
           if (start < end) {
             auto text = s.substr(start, end - start);
-            items.push_back(make_shared<Simple>(text));
+            append(make_shared<Simple>(text));
             start = end;
           }
           offset = end;
@@ -67,7 +88,7 @@ public:
         } else if (ch == U'(') {
           if (start < end) {
             auto text = s.substr(start, end - start);
-            items.push_back(make_shared<Simple>(text));
+            append(make_shared<Simple>(text));
             start = end;
           }
           offset = end + 1;
@@ -78,7 +99,7 @@ public:
         } else if (ch == U'<') {
           if (start < end) {
             auto text = s.substr(start, end - start);
-            items.push_back(make_shared<Simple>(text));
+            append(make_shared<Simple>(text));
             start = end;
           }
           offset = end + 1;
@@ -114,15 +135,33 @@ public:
               }
             }
           }
-          items.push_back(cartouche);
+          append(cartouche);
           break;
-        } else if (ch == U':' || ch == U'*') {
+        } else if (ch == U'*') {
+          if (start < end) {
+            auto text = s.substr(start, end - start);
+            append(make_shared<Simple>(text));
+            start = end;
+          }
+          if (!items.empty()) {
+            auto back = items.back();
+            if (!dynamic_pointer_cast<HBox>(back)) {
+              items.pop_back();
+              auto hbox = make_shared<HBox>();
+              hbox->fChildren.push_back(back);
+              items.push_back(hbox);
+            }
+          }
+          glue = U'*';
+          offset = end + 1;
+          break;
+        } else if (ch == U':' || ch == U'&') {
           // TODO:
           break;
         } else if (ch == terminator) {
           if (start < end) {
             auto text = s.substr(start, end - start);
-            items.push_back(make_shared<Simple>(text));
+            append(make_shared<Simple>(text));
             start = end;
           }
           offset = end + 1;
@@ -133,7 +172,7 @@ public:
       }
       if (start < end) {
         auto text = s.substr(start, end - start);
-        items.push_back(make_shared<Simple>(text));
+        append(make_shared<Simple>(text));
       }
     }
   }
@@ -206,6 +245,34 @@ TEST_CASE("Parse") {
     CHECK(c0c1->fText == U"mn ");
     REQUIRE(c0c2);
     CHECK(c0c2->fText == U"xpr ");
+  }
+  SUBCASE("hbox") {
+    auto d = Document::Parse(U"(ib*Z1)*A1 B1");
+    REQUIRE(d);
+    CHECK(d->fLines.size() == 1);
+    auto l = d->fLines[0];
+    CHECK(l->fItems.size() == 2);
+    auto c0 = dynamic_pointer_cast<HBox>(l->fItems[0]);
+    auto c1 = dynamic_pointer_cast<Simple>(l->fItems[1]);
+    REQUIRE(c0);
+    CHECK(c0->fChildren.size() == 2);
+    auto c0c0 = dynamic_pointer_cast<Group>(c0->fChildren[0]);
+    auto c0c1 = dynamic_pointer_cast<Simple>(c0->fChildren[1]);
+    REQUIRE(c0c0);
+    CHECK(c0c0->fChildren.size() == 1);
+    auto c0c0c0 = dynamic_pointer_cast<HBox>(c0c0->fChildren[0]);
+    REQUIRE(c0c0c0);
+    CHECK(c0c0c0->fChildren.size() == 2);
+    auto c0c0c0c0 = dynamic_pointer_cast<Simple>(c0c0c0->fChildren[0]);
+    auto c0c0c0c1 = dynamic_pointer_cast<Simple>(c0c0c0->fChildren[1]);
+    REQUIRE(c0c0c0c0);
+    CHECK(c0c0c0c0->fText == U"ib");
+    REQUIRE(c0c0c0c1);
+    CHECK(c0c0c0c1->fText == U"Z1");
+    REQUIRE(c0c1);
+    CHECK(c0c1->fText == U"A1 ");
+    REQUIRE(c1);
+    CHECK(c1->fText == U"B1");
   }
 }
 
