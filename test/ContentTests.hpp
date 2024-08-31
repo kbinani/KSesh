@@ -19,6 +19,11 @@ public:
   std::deque<std::shared_ptr<Item>> fChildren;
 };
 
+class Cartouche : public Item {
+public:
+  std::deque<std::shared_ptr<Item>> fChildren;
+};
+
 class HBox : public Item {
 public:
 };
@@ -35,72 +40,96 @@ public:
 class Document {
 public:
   std::deque<std::shared_ptr<Line>> fLines;
-};
 
-static size_t Whitespace(std::u32string const &str, size_t offset) {
-  size_t i = offset;
-  while (i < str.size() && str[i] == U' ') {
-    i++;
+  static size_t Whitespace(std::u32string const &str, size_t offset) {
+    static std::set<char32_t> const sChars = {U' '};
+    return Skip(str, offset, sChars);
   }
-  return i;
-}
 
-static void ParseGroup(std::u32string const &s, size_t &offset, std::deque<std::shared_ptr<Item>> &items, char32_t terminator) {
-  using namespace std;
-  while (offset < s.size()) {
-    auto start = Whitespace(s, offset);
-    auto end = start;
-    for (; end < s.size(); end++) {
-      char32_t ch = s[end];
-      if (ch == U' ') {
-        end = Whitespace(s, end);
-        if (start < end) {
-          auto text = s.substr(start, end - start);
-          items.push_back(make_shared<Simple>(text));
+  static size_t Skip(std::u32string const &str, size_t offset, std::set<char32_t> const &characters) {
+    size_t i = offset;
+    while (i < str.size() && characters.find(str[i]) != characters.end()) {
+      i++;
+    }
+    return i;
+  }
+
+  static void ParseGroup(std::u32string const &s, size_t &offset, std::deque<std::shared_ptr<Item>> &items, char32_t terminator) {
+    using namespace std;
+    while (offset < s.size()) {
+      auto start = Whitespace(s, offset);
+      auto end = start;
+      for (; end < s.size(); end++) {
+        char32_t ch = s[end];
+        if (ch == U' ') {
+          end = Whitespace(s, end);
+          if (start < end) {
+            auto text = s.substr(start, end - start);
+            items.push_back(make_shared<Simple>(text));
+            start = end;
+          }
+          offset = end;
+          break;
+        } else if (ch == U'(') {
+          if (start < end) {
+            auto text = s.substr(start, end - start);
+            items.push_back(make_shared<Simple>(text));
+            start = end;
+          }
+          offset = end + 1;
+          auto group = make_shared<Group>();
+          ParseGroup(s, offset, group->fChildren, U')');
+          items.push_back(group);
+          break;
+        } else if (ch == U'<') {
+          if (start < end) {
+            auto text = s.substr(start, end - start);
+            items.push_back(make_shared<Simple>(text));
+            start = end;
+          }
+          offset = end + 1;
+          auto cartouche = make_shared<Cartouche>();
+          ParseGroup(s, offset, cartouche->fChildren, U'>');
+          items.push_back(cartouche);
+          break;
+        } else if (ch == U':' || ch == U'*') {
+          // TODO:
+          break;
+        } else if (ch == terminator) {
+          if (start < end) {
+            auto text = s.substr(start, end - start);
+            items.push_back(make_shared<Simple>(text));
+            start = end;
+          }
+          offset = end + 1;
+          return;
+        } else {
+          offset = end + 1;
         }
-        offset = end;
-        break;
-      } else if (ch == U'(') {
-        if (start < end) {
-          auto text = s.substr(start, end - start);
-          items.push_back(make_shared<Simple>(text));
-        }
-        offset = end + 1;
-        auto group = make_shared<Group>();
-        ParseGroup(s, offset, group->fChildren, U')');
-        items.push_back(group);
-        break;
-      } else if (ch == U':' || ch == U'<' || ch == U'*') {
-        // TODO:
-        break;
-      } else if (ch == terminator) {
-        if (start < end) {
-          auto text = s.substr(start, end - start);
-          items.push_back(make_shared<Simple>(text));
-        }
-        offset = end + 1;
-        return;
+      }
+      if (start < end) {
+        auto text = s.substr(start, end - start);
+        items.push_back(make_shared<Simple>(text));
       }
     }
   }
-}
 
-static std::shared_ptr<Document> Parse(std::u32string const &s) {
-  using namespace std;
-  auto document = make_shared<Document>();
-  size_t offset = 0;
-  while (offset < s.size()) {
-    auto line = make_shared<Line>();
-    ParseGroup(s, offset, line->fItems, U'\n');
-    offset++;
-    document->fLines.push_back(line);
+  static std::shared_ptr<Document> Parse(std::u32string const &s) {
+    using namespace std;
+    auto document = make_shared<Document>();
+    size_t offset = 0;
+    while (offset < s.size()) {
+      auto line = make_shared<Line>();
+      ParseGroup(s, offset, line->fItems, U'\n');
+      document->fLines.push_back(line);
+    }
+    return document;
   }
-  return document;
-}
+};
 
 TEST_CASE("Parse") {
   SUBCASE("simple") {
-    auto d = Parse(U"A1  B1\nC1");
+    auto d = Document::Parse(U"A1  B1\nC1");
     REQUIRE(d);
     CHECK(d->fLines.size() == 2);
     auto l0 = d->fLines[0];
@@ -109,7 +138,7 @@ TEST_CASE("Parse") {
     CHECK(l1->fItems.size() == 1);
   }
   SUBCASE("group") {
-    auto d = Parse(U"A1(A2 (B1)C1)");
+    auto d = Document::Parse(U"A1(A2 (B1)C1)");
     REQUIRE(d);
     CHECK(d->fLines.size() == 1);
     auto l = d->fLines[0];
@@ -132,6 +161,27 @@ TEST_CASE("Parse") {
     auto gc1c0 = dynamic_pointer_cast<Simple>(gc1->fChildren[0]);
     REQUIRE(gc1c0);
     CHECK(gc1c0->fText == U"B1");
+  }
+  SUBCASE("cartouche") {
+    auto d = Document::Parse(U"<1 ra mn xpr 2>");
+    REQUIRE(d);
+    CHECK(d->fLines.size() == 1);
+    auto l = d->fLines[0];
+    CHECK(l->fItems.size() == 1);
+    auto c0 = dynamic_pointer_cast<Cartouche>(l->fItems[0]);
+    REQUIRE(c0);
+    CHECK(c0->fChildren.size() == 3);
+    CHECK(c0->fOpen == U"1");
+    CHECK(c0->fClose == U"2");
+    auto c0c0 = dynamic_pointer_cast<Simple>(c0->fChildren[0]);
+    auto c0c1 = dynamic_pointer_cast<Simple>(c0->fChildren[1]);
+    auto c0c2 = dynamic_pointer_cast<Simple>(c0->fChildren[2]);
+    REQUIRE(c0c0);
+    CHECK(c0c0->fText == U"ra ");
+    REQUIRE(c0c1);
+    CHECK(c0c1->fText == U"mn ");
+    REQUIRE(c0c2);
+    CHECK(c0c2->fText == U"xpr ");
   }
 }
 
