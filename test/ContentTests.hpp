@@ -1,4 +1,5 @@
 #include <deque>
+#include <variant>
 
 namespace ksesh::test {
 
@@ -31,6 +32,19 @@ public:
   std::deque<std::shared_ptr<Item>> fChildren;
 };
 
+class VBox : public Item {
+public:
+  std::deque<std::shared_ptr<Item>> fChildren;
+};
+
+class Ligature : public Item {
+public:
+  std::deque<std::shared_ptr<Item>> fChildren;
+};
+
+class Placeholder : public Item {
+};
+
 class Line {
 public:
   std::deque<std::shared_ptr<Item>> fItems;
@@ -53,24 +67,68 @@ public:
     return i;
   }
 
-  static void ParseGroup(std::u32string const &s, size_t &offset, std::deque<std::shared_ptr<Item>> &items, char32_t terminator) {
+  struct Glue {
+    Glue() = delete;
+    struct Horizontal {};
+    struct Vertical {};
+    struct Ligature {};
+  };
+  using Entry = std::variant<std::shared_ptr<Item>, Glue::Horizontal, Glue::Vertical, Glue::Ligature>;
+
+  template <class GlueType, class ContainerItemType>
+  static void GlueEntries(std::deque<Entry> &entries) {
     using namespace std;
-    char32_t glue = 0;
-    auto append = [&](shared_ptr<Item> item) {
-      if (items.empty()) {
-        items.push_back(item);
-        return;
-      }
-      auto back = items.back();
-      if (glue == U'*') {
-        glue = 0;
-        if (auto hbox = dynamic_pointer_cast<HBox>(back)) {
-          hbox->fChildren.push_back(item);
-          return;
+    if (entries.empty()) {
+      return;
+    }
+    bool changed = true;
+    while (changed) {
+      changed = false;
+      for (size_t i = 0; i < entries.size(); i++) {
+        if (holds_alternative<GlueType>(entries[i])) {
+          changed = true;
+          auto hbox = make_shared<ContainerItemType>();
+          if (i > 0 && holds_alternative<shared_ptr<Item>>(entries[i - 1])) {
+            hbox->fChildren.push_back(get<shared_ptr<Item>>(entries[i - 1]));
+          } else {
+            hbox->fChildren.push_back(make_shared<Placeholder>());
+          }
+          size_t j = i + 1;
+          while (j < entries.size() && holds_alternative<shared_ptr<Item>>(entries[j])) {
+            auto item = get<shared_ptr<Item>>(entries[j]);
+            hbox->fChildren.push_back(item);
+            if (j + 1 >= entries.size() || !holds_alternative<GlueType>(entries[j + 1])) {
+              break;
+            }
+            j += 2;
+          }
+          size_t erase = i > 0 ? i - 1 : i;
+          for (size_t k = erase; k <= j; k++) {
+            entries.erase(entries.begin() + erase);
+          }
+          entries.insert(entries.begin() + erase, hbox);
         }
       }
-      items.push_back(item);
-    };
+    }
+  }
+
+  static void ParseGroup(std::u32string const &s, size_t &offset, std::deque<std::shared_ptr<Item>> &buffer, char32_t terminator) {
+    using namespace std;
+    deque<Entry> entries;
+    ParseGroupSequential(s, offset, entries, terminator);
+    GlueEntries<Glue::Ligature, Ligature>(entries);
+    GlueEntries<Glue::Horizontal, HBox>(entries);
+    GlueEntries<Glue::Vertical, VBox>(entries);
+    for (auto const &it : entries) {
+      if (holds_alternative<shared_ptr<Item>>(it)) {
+        buffer.push_back(get<shared_ptr<Item>>(it));
+      }
+    }
+  }
+
+  static void ParseGroupSequential(std::u32string const &s, size_t &offset, std::deque<Entry> &entries, char32_t terminator) {
+    using namespace std;
+
     while (offset < s.size()) {
       auto start = Whitespace(s, offset);
       auto end = start;
@@ -80,7 +138,7 @@ public:
           end = Whitespace(s, end);
           if (start < end) {
             auto text = s.substr(start, end - start);
-            append(make_shared<Simple>(text));
+            entries.push_back(make_shared<Simple>(text));
             start = end;
           }
           offset = end;
@@ -88,18 +146,18 @@ public:
         } else if (ch == U'(') {
           if (start < end) {
             auto text = s.substr(start, end - start);
-            append(make_shared<Simple>(text));
+            entries.push_back(make_shared<Simple>(text));
             start = end;
           }
           offset = end + 1;
           auto group = make_shared<Group>();
           ParseGroup(s, offset, group->fChildren, U')');
-          items.push_back(group);
+          entries.push_back(group);
           break;
         } else if (ch == U'<') {
           if (start < end) {
             auto text = s.substr(start, end - start);
-            append(make_shared<Simple>(text));
+            entries.push_back(make_shared<Simple>(text));
             start = end;
           }
           offset = end + 1;
@@ -135,33 +193,27 @@ public:
               }
             }
           }
-          append(cartouche);
+          entries.push_back(cartouche);
           break;
-        } else if (ch == U'*') {
+        } else if (ch == U'*' || ch == U':' || ch == U'&') {
           if (start < end) {
             auto text = s.substr(start, end - start);
-            append(make_shared<Simple>(text));
+            entries.push_back(make_shared<Simple>(text));
             start = end;
           }
-          if (!items.empty()) {
-            auto back = items.back();
-            if (!dynamic_pointer_cast<HBox>(back)) {
-              items.pop_back();
-              auto hbox = make_shared<HBox>();
-              hbox->fChildren.push_back(back);
-              items.push_back(hbox);
-            }
+          if (ch == U'*') {
+            entries.push_back(Glue::Horizontal{});
+          } else if (ch == U':') {
+            entries.push_back(Glue::Vertical{});
+          } else {
+            entries.push_back(Glue::Ligature{});
           }
-          glue = U'*';
           offset = end + 1;
-          break;
-        } else if (ch == U':' || ch == U'&') {
-          // TODO:
           break;
         } else if (ch == terminator) {
           if (start < end) {
             auto text = s.substr(start, end - start);
-            append(make_shared<Simple>(text));
+            entries.push_back(make_shared<Simple>(text));
             start = end;
           }
           offset = end + 1;
@@ -172,7 +224,7 @@ public:
       }
       if (start < end) {
         auto text = s.substr(start, end - start);
-        append(make_shared<Simple>(text));
+        entries.push_back(make_shared<Simple>(text));
       }
     }
   }
@@ -273,6 +325,22 @@ TEST_CASE("Parse") {
     CHECK(c0c1->fText == U"A1 ");
     REQUIRE(c1);
     CHECK(c1->fText == U"B1");
+  }
+  SUBCASE("vbox") {
+    auto d = Document::Parse(U"A1:B1*C1:D1");
+    REQUIRE(d);
+    CHECK(d->fLines.size() == 1);
+    auto l = d->fLines[0];
+    CHECK(l->fItems.size() == 1);
+    auto c0 = dynamic_pointer_cast<VBox>(l->fItems[0]);
+    REQUIRE(c0);
+    CHECK(c0->fChildren.size() == 3);
+    auto c0c0 = dynamic_pointer_cast<Simple>(c0->fChildren[0]);
+    auto c0c1 = dynamic_pointer_cast<HBox>(c0->fChildren[1]);
+    auto c0c2 = dynamic_pointer_cast<Simple>(c0->fChildren[2]);
+    REQUIRE(c0c0);
+    REQUIRE(c0c1);
+    REQUIRE(c0c2);
   }
 }
 
