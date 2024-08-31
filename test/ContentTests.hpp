@@ -21,15 +21,9 @@ public:
 
 class Cartouche : public Item {
 public:
+  std::u32string fOpen;
   std::deque<std::shared_ptr<Item>> fChildren;
-};
-
-class HBox : public Item {
-public:
-};
-
-class VBox : public Item {
-public:
+  std::u32string fClose;
 };
 
 class Line {
@@ -88,8 +82,38 @@ public:
             start = end;
           }
           offset = end + 1;
+          u32string open;
+          if (offset < s.size() && s[offset] == U'h') {
+            open = U"h";
+            offset++;
+            if (offset < s.size()) {
+              char32_t c = s[offset];
+              if (c == U'0' || c == U'1' || c == U'2' || c == U'3') {
+                open += c;
+                offset = Whitespace(s, offset + 1);
+              } else {
+                offset = Whitespace(s, offset);
+              }
+            }
+          } else if (offset < s.size()) {
+            char32_t c = s[offset];
+            if (c == U'0' || c == U'1' || c == U'2') {
+              open += c;
+              offset = Whitespace(s, offset + 1);
+            }
+          }
           auto cartouche = make_shared<Cartouche>();
+          cartouche->fOpen = open;
           ParseGroup(s, offset, cartouche->fChildren, U'>');
+          if (!cartouche->fChildren.empty()) {
+            if (auto last = dynamic_pointer_cast<Simple>(cartouche->fChildren.back())) {
+              auto c = last->fText;
+              if (c == U"0" || c == U"1" || c == U"2" || c == U"h0" || c == U"h1" || c == U"h2" || c == U"h3") {
+                cartouche->fClose = c;
+                cartouche->fChildren.pop_back();
+              }
+            }
+          }
           items.push_back(cartouche);
           break;
         } else if (ch == U':' || ch == U'*') {
