@@ -2,6 +2,9 @@
 #include <optional>
 #include <variant>
 
+#include "Insertions.hpp"
+#include "SignList.hpp"
+
 namespace ksesh::test {
 
 class Token {
@@ -10,28 +13,33 @@ public:
 };
 
 class Simple : public Token {
-  Simple(std::u32string const &raw, std::u32string const &text) : fRaw(raw), fText(text) {
+  Simple(std::u32string const &raw, std::u32string const &text, std::u32string const &sign) : fRaw(raw), fText(text), fSign(sign) {
   }
 
 public:
   static std::shared_ptr<Simple> Create(std::u32string const &s) {
-    auto t = s;
+    std::u32string t = s;
     while (t.starts_with(U' ')) {
       t.erase(t.begin());
     }
     while (t.ends_with(U' ')) {
       t.erase(t.begin() + t.size() - 1);
     }
+    std::u32string sign = U"";
+    if (auto found = SignList::Map(t, 0)) {
+      sign = found->second;
+    }
     class S : public Simple {
     public:
-      S(std::u32string const &raw, std::u32string const &text) : Simple(raw, text) {}
+      S(std::u32string const &raw, std::u32string const &text, std::u32string const &sign) : Simple(raw, text, sign) {}
     };
-    return std::make_shared<S>(s, t);
+    return std::make_shared<S>(s, t, sign);
   }
 
 public:
   std::u32string const fRaw;
-  std::u32string fText;
+  std::u32string const fText;
+  std::u32string const fSign;
 };
 
 class Group : public Token {
@@ -346,21 +354,21 @@ TEST_CASE("Parse") {
     auto s = dynamic_pointer_cast<Simple>(l->fTokens[0]);
     auto g = dynamic_pointer_cast<Group>(l->fTokens[1]);
     REQUIRE(s);
-    CHECK(s->fText == U"A1");
+    CHECK(s->fSign == U"𓀀");
     REQUIRE(g);
     CHECK(g->fChildren.size() == 3);
     auto gc0 = dynamic_pointer_cast<Simple>(g->fChildren[0]);
     auto gc1 = dynamic_pointer_cast<Group>(g->fChildren[1]);
     auto gc2 = dynamic_pointer_cast<Simple>(g->fChildren[2]);
     REQUIRE(gc0);
-    CHECK(gc0->fText == U"A2");
+    CHECK(gc0->fSign == U"𓀁");
     REQUIRE(gc1);
     CHECK(gc1->fChildren.size() == 1);
     REQUIRE(gc2);
-    CHECK(gc2->fText == U"C1");
+    CHECK(gc2->fSign == U"𓁚");
     auto gc1c0 = dynamic_pointer_cast<Simple>(gc1->fChildren[0]);
     REQUIRE(gc1c0);
-    CHECK(gc1c0->fText == U"B1");
+    CHECK(gc1c0->fSign == U"𓁐");
   }
   SUBCASE("cartouche") {
     auto typeface = std::make_shared<JuceTypeface>();
@@ -378,11 +386,11 @@ TEST_CASE("Parse") {
     auto c0c1 = dynamic_pointer_cast<Simple>(c0->fChildren[1]);
     auto c0c2 = dynamic_pointer_cast<Simple>(c0->fChildren[2]);
     REQUIRE(c0c0);
-    CHECK(c0c0->fText == U"ra");
+    CHECK(c0c0->fSign == U"𓇳");
     REQUIRE(c0c1);
-    CHECK(c0c1->fText == U"mn");
+    CHECK(c0c1->fSign == U"𓏠");
     REQUIRE(c0c2);
-    CHECK(c0c2->fText == U"xpr");
+    CHECK(c0c2->fSign == U"𓆣");
   }
   SUBCASE("hbox") {
     auto typeface = std::make_shared<JuceTypeface>();
@@ -405,13 +413,13 @@ TEST_CASE("Parse") {
     auto c0c0c0c0 = dynamic_pointer_cast<Simple>(c0c0c0->fChildren[0]);
     auto c0c0c0c1 = dynamic_pointer_cast<Simple>(c0c0c0->fChildren[1]);
     REQUIRE(c0c0c0c0);
-    CHECK(c0c0c0c0->fText == U"ib");
+    CHECK(c0c0c0c0->fSign == U"𓄣");
     REQUIRE(c0c0c0c1);
-    CHECK(c0c0c0c1->fText == U"Z1");
+    CHECK(c0c0c0c1->fSign == U"𓏤");
     REQUIRE(c0c1);
-    CHECK(c0c1->fText == U"A1");
+    CHECK(c0c1->fSign == U"𓀀");
     REQUIRE(c1);
-    CHECK(c1->fText == U"B1");
+    CHECK(c1->fSign == U"𓁐");
   }
   SUBCASE("vbox") {
     auto typeface = std::make_shared<JuceTypeface>();
@@ -429,6 +437,15 @@ TEST_CASE("Parse") {
     REQUIRE(c0c0);
     REQUIRE(c0c1);
     REQUIRE(c0c2);
+    CHECK(c0c0->fSign == U"𓀀");
+    CHECK(c0c1->fChildren.size() == 2);
+    auto c0c1c0 = dynamic_pointer_cast<Simple>(c0c1->fChildren[0]);
+    auto c0c1c1 = dynamic_pointer_cast<Simple>(c0c1->fChildren[1]);
+    REQUIRE(c0c1c0);
+    REQUIRE(c0c1c1);
+    CHECK(c0c1c0->fSign == U"𓁐");
+    CHECK(c0c1c1->fSign == U"𓁚");
+    CHECK(c0c2->fSign == U"𓁶");
   }
   SUBCASE("complex") {
     auto typeface = std::make_shared<JuceTypeface>();
@@ -446,8 +463,8 @@ TEST_CASE("Parse") {
     auto c0c1 = dynamic_pointer_cast<Simple>(c0->fChildren[1]);
     REQUIRE(c0c0);
     REQUIRE(c0c1);
-    CHECK(c0c0->fText == U"gb");
-    CHECK(c0c1->fText == U"ra");
+    CHECK(c0c0->fSign == U"𓅬");
+    CHECK(c0c1->fSign == U"𓇳");
     REQUIRE(c1->fChildren.size() == 4);
     auto c1c0 = dynamic_pointer_cast<Simple>(c1->fChildren[0]);
     auto c1c1 = dynamic_pointer_cast<VBox>(c1->fChildren[1]);
@@ -458,15 +475,15 @@ TEST_CASE("Parse") {
     REQUIRE(c1c2);
     REQUIRE(c1c3);
 
-    CHECK(c1c0->fText == U"i");
+    CHECK(c1c0->fSign == U"𓇋");
 
     REQUIRE(c1c1->fChildren.size() == 2);
     auto c1c1c0 = dynamic_pointer_cast<Simple>(c1c1->fChildren[0]);
     auto c1c1c1 = dynamic_pointer_cast<Simple>(c1c1->fChildren[1]);
     REQUIRE(c1c1c0);
     REQUIRE(c1c1c1);
-    CHECK(c1c1c0->fText == U"mn");
-    CHECK(c1c1c1->fText == U"n");
+    CHECK(c1c1c0->fSign == U"𓏠");
+    CHECK(c1c1c1->fSign == U"𓈖");
 
     REQUIRE(c1c2->fChildren.size() == 3);
     auto c1c2c0 = dynamic_pointer_cast<Simple>(c1c2->fChildren[0]);
@@ -475,11 +492,11 @@ TEST_CASE("Parse") {
     REQUIRE(c1c2c0);
     REQUIRE(c1c2c1);
     REQUIRE(c1c2c2);
-    CHECK(c1c2c0->fText == U"t");
-    CHECK(c1c2c1->fText == U"w");
-    CHECK(c1c2c2->fText == U"t");
+    CHECK(c1c2c0->fSign == U"𓏏");
+    CHECK(c1c2c1->fSign == U"𓅱");
+    CHECK(c1c2c2->fSign == U"𓏏");
 
-    CHECK(c1c3->fText == U"anx");
+    CHECK(c1c3->fSign == U"𓋹");
   }
 }
 

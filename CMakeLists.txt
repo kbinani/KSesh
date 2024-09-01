@@ -150,7 +150,7 @@ list(APPEND test_files
 )
 juce_add_console_app(ksesh-test)
 target_sources(ksesh-test PRIVATE test/main.cpp ${test_files})
-target_include_directories(ksesh-test PRIVATE deps/doctest/doctest)
+target_include_directories(ksesh-test PRIVATE deps/doctest/doctest src/desktop)
 target_link_libraries(ksesh-test
   PRIVATE
     juce::juce_gui_extra
