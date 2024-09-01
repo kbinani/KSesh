@@ -1,4 +1,5 @@
 #include <deque>
+#include <optional>
 #include <variant>
 
 namespace ksesh::test {
@@ -68,10 +69,26 @@ public:
   std::deque<std::shared_ptr<Item>> fItems;
 };
 
-class Document {
-public:
-  std::deque<std::shared_ptr<Line>> fLines;
+struct Rect {
+  float x;
+  float y;
+  float width;
+  float height;
+};
 
+class Typeface {
+public:
+  virtual ~Typeface() {}
+  virtual std::optional<Rect> getBounds(std::u32string const &glyph) = 0;
+};
+
+class GraphicsContext {
+public:
+  virtual ~GraphicsContext() {}
+  virtual void draw(std::u32string const &glyph, Typeface &typeface) = 0;
+};
+
+class Document {
   static size_t Whitespace(std::u32string const &str, size_t offset) {
     static std::set<char32_t> const sChars = {U' '};
     return Skip(str, offset, sChars);
