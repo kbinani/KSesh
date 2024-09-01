@@ -9,10 +9,28 @@ public:
 };
 
 class Simple : public Item {
-public:
-  explicit Simple(std::u32string const &s) : fText(s) {}
+  Simple(std::u32string const &raw, std::u32string const &text) : fRaw(raw), fText(text) {
+  }
 
-  std::u32string const fText;
+public:
+  static std::shared_ptr<Simple> Create(std::u32string const &s) {
+    auto t = s;
+    while (t.starts_with(U' ')) {
+      t.erase(t.begin());
+    }
+    while (t.ends_with(U' ')) {
+      t.erase(t.begin() + t.size() - 1);
+    }
+    class S : public Simple {
+    public:
+      S(std::u32string const &raw, std::u32string const &text) : Simple(raw, text) {}
+    };
+    return std::make_shared<S>(s, t);
+  }
+
+public:
+  std::u32string const fRaw;
+  std::u32string fText;
 };
 
 class Group : public Item {
@@ -138,7 +156,7 @@ public:
           end = Whitespace(s, end);
           if (start < end) {
             auto text = s.substr(start, end - start);
-            entries.push_back(make_shared<Simple>(text));
+            entries.push_back(Simple::Create(text));
             start = end;
           }
           offset = end;
@@ -146,7 +164,7 @@ public:
         } else if (ch == U'(') {
           if (start < end) {
             auto text = s.substr(start, end - start);
-            entries.push_back(make_shared<Simple>(text));
+            entries.push_back(Simple::Create(text));
             start = end;
           }
           offset = end + 1;
@@ -157,7 +175,7 @@ public:
         } else if (ch == U'<') {
           if (start < end) {
             auto text = s.substr(start, end - start);
-            entries.push_back(make_shared<Simple>(text));
+            entries.push_back(Simple::Create(text));
             start = end;
           }
           offset = end + 1;
@@ -198,7 +216,7 @@ public:
         } else if (ch == U'*' || ch == U':' || ch == U'&') {
           if (start < end) {
             auto text = s.substr(start, end - start);
-            entries.push_back(make_shared<Simple>(text));
+            entries.push_back(Simple::Create(text));
             start = end;
           }
           if (ch == U'*') {
@@ -213,7 +231,7 @@ public:
         } else if (ch == terminator) {
           if (start < end) {
             auto text = s.substr(start, end - start);
-            entries.push_back(make_shared<Simple>(text));
+            entries.push_back(Simple::Create(text));
             start = end;
           }
           offset = end + 1;
@@ -224,11 +242,12 @@ public:
       }
       if (start < end) {
         auto text = s.substr(start, end - start);
-        entries.push_back(make_shared<Simple>(text));
+        entries.push_back(Simple::Create(text));
       }
     }
   }
 
+public:
   static std::shared_ptr<Document> Parse(std::u32string const &s) {
     using namespace std;
     auto document = make_shared<Document>();
@@ -240,6 +259,9 @@ public:
     }
     return document;
   }
+
+public:
+  std::deque<std::shared_ptr<Line>> fLines;
 };
 
 TEST_CASE("Parse") {
@@ -268,7 +290,7 @@ TEST_CASE("Parse") {
     auto gc1 = dynamic_pointer_cast<Group>(g->fChildren[1]);
     auto gc2 = dynamic_pointer_cast<Simple>(g->fChildren[2]);
     REQUIRE(gc0);
-    CHECK(gc0->fText == U"A2 ");
+    CHECK(gc0->fText == U"A2");
     REQUIRE(gc1);
     CHECK(gc1->fChildren.size() == 1);
     REQUIRE(gc2);
@@ -292,11 +314,11 @@ TEST_CASE("Parse") {
     auto c0c1 = dynamic_pointer_cast<Simple>(c0->fChildren[1]);
     auto c0c2 = dynamic_pointer_cast<Simple>(c0->fChildren[2]);
     REQUIRE(c0c0);
-    CHECK(c0c0->fText == U"ra ");
+    CHECK(c0c0->fText == U"ra");
     REQUIRE(c0c1);
-    CHECK(c0c1->fText == U"mn ");
+    CHECK(c0c1->fText == U"mn");
     REQUIRE(c0c2);
-    CHECK(c0c2->fText == U"xpr ");
+    CHECK(c0c2->fText == U"xpr");
   }
   SUBCASE("hbox") {
     auto d = Document::Parse(U"(ib*Z1)*A1 B1");
@@ -322,7 +344,7 @@ TEST_CASE("Parse") {
     REQUIRE(c0c0c0c1);
     CHECK(c0c0c0c1->fText == U"Z1");
     REQUIRE(c0c1);
-    CHECK(c0c1->fText == U"A1 ");
+    CHECK(c0c1->fText == U"A1");
     REQUIRE(c1);
     CHECK(c1->fText == U"B1");
   }
@@ -358,7 +380,7 @@ TEST_CASE("Parse") {
     REQUIRE(c0c0);
     REQUIRE(c0c1);
     CHECK(c0c0->fText == U"gb");
-    CHECK(c0c1->fText == U"ra ");
+    CHECK(c0c1->fText == U"ra");
     REQUIRE(c1->fChildren.size() == 4);
     auto c1c0 = dynamic_pointer_cast<Simple>(c1->fChildren[0]);
     auto c1c1 = dynamic_pointer_cast<VBox>(c1->fChildren[1]);
@@ -369,7 +391,7 @@ TEST_CASE("Parse") {
     REQUIRE(c1c2);
     REQUIRE(c1c3);
 
-    CHECK(c1c0->fText == U"i ");
+    CHECK(c1c0->fText == U"i");
 
     REQUIRE(c1c1->fChildren.size() == 2);
     auto c1c1c0 = dynamic_pointer_cast<Simple>(c1c1->fChildren[0]);
@@ -377,7 +399,7 @@ TEST_CASE("Parse") {
     REQUIRE(c1c1c0);
     REQUIRE(c1c1c1);
     CHECK(c1c1c0->fText == U"mn");
-    CHECK(c1c1c1->fText == U"n ");
+    CHECK(c1c1c1->fText == U"n");
 
     REQUIRE(c1c2->fChildren.size() == 3);
     auto c1c2c0 = dynamic_pointer_cast<Simple>(c1c2->fChildren[0]);
@@ -388,7 +410,7 @@ TEST_CASE("Parse") {
     REQUIRE(c1c2c2);
     CHECK(c1c2c0->fText == U"t");
     CHECK(c1c2c1->fText == U"w");
-    CHECK(c1c2c2->fText == U"t ");
+    CHECK(c1c2c2->fText == U"t");
 
     CHECK(c1c3->fText == U"anx");
   }
