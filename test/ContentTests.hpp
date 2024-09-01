@@ -4,12 +4,12 @@
 
 namespace ksesh::test {
 
-class Item {
+class Token {
 public:
-  virtual ~Item(){};
+  virtual ~Token(){};
 };
 
-class Simple : public Item {
+class Simple : public Token {
   Simple(std::u32string const &raw, std::u32string const &text) : fRaw(raw), fText(text) {
   }
 
@@ -34,58 +34,82 @@ public:
   std::u32string fText;
 };
 
-class Group : public Item {
+class Group : public Token {
 public:
-  std::deque<std::shared_ptr<Item>> fChildren;
+  std::deque<std::shared_ptr<Token>> fChildren;
 };
 
-class Cartouche : public Item {
+class Cartouche : public Token {
 public:
   std::u32string fOpen;
-  std::deque<std::shared_ptr<Item>> fChildren;
+  std::deque<std::shared_ptr<Token>> fChildren;
   std::u32string fClose;
 };
 
-class HBox : public Item {
+class HBox : public Token {
 public:
-  std::deque<std::shared_ptr<Item>> fChildren;
+  std::deque<std::shared_ptr<Token>> fChildren;
 };
 
-class VBox : public Item {
+class VBox : public Token {
 public:
-  std::deque<std::shared_ptr<Item>> fChildren;
+  std::deque<std::shared_ptr<Token>> fChildren;
 };
 
-class Ligature : public Item {
+class Ligature : public Token {
 public:
-  std::deque<std::shared_ptr<Item>> fChildren;
+  std::deque<std::shared_ptr<Token>> fChildren;
 };
 
-class Placeholder : public Item {
+class Placeholder : public Token {
 };
 
-class Line {
-public:
-  std::deque<std::shared_ptr<Item>> fItems;
-};
-
-struct Rect {
+struct Point {
   float x;
   float y;
+};
+
+struct Size {
   float width;
   float height;
 };
 
+struct Rect {
+  Point origin;
+  Size size;
+};
+
 class Typeface {
 public:
+  using GlyphId = uint32_t;
   virtual ~Typeface() {}
-  virtual std::optional<Rect> getBounds(std::u32string const &glyph) = 0;
+  virtual std::optional<GlyphId> getGlyphId(std::u32string const &glyph) = 0;
+  virtual std::optional<Rect> getGlyphBounds(GlyphId glyphId) = 0;
 };
 
 class GraphicsContext {
 public:
   virtual ~GraphicsContext() {}
-  virtual void draw(std::u32string const &glyph, Typeface &typeface) = 0;
+  virtual void draw(Typeface::GlyphId glyphId, Typeface &typeface) = 0;
+};
+
+class Draw {
+public:
+  virtual ~Draw() {}
+};
+
+class DrawGlyph : public Draw {
+public:
+  void draw(GraphicsContext &ctx, Typeface::GlyphId glyphId, Point origin, float scale) {
+    // TODO:
+  }
+};
+
+class Line {
+public:
+  float fWidth;
+  std::deque<std::shared_ptr<Draw>> fCommands;
+  std::deque<std::shared_ptr<Token>> fTokens;
 };
 
 class Document {
@@ -108,7 +132,7 @@ class Document {
     struct Vertical {};
     struct Ligature {};
   };
-  using Entry = std::variant<std::shared_ptr<Item>, Glue::Horizontal, Glue::Vertical, Glue::Ligature>;
+  using Entry = std::variant<std::shared_ptr<Token>, Glue::Horizontal, Glue::Vertical, Glue::Ligature>;
 
   template <class GlueType, class ContainerItemType>
   static void GlueEntries(std::deque<Entry> &entries) {
@@ -123,14 +147,14 @@ class Document {
         if (holds_alternative<GlueType>(entries[i])) {
           changed = true;
           auto hbox = make_shared<ContainerItemType>();
-          if (i > 0 && holds_alternative<shared_ptr<Item>>(entries[i - 1])) {
-            hbox->fChildren.push_back(get<shared_ptr<Item>>(entries[i - 1]));
+          if (i > 0 && holds_alternative<shared_ptr<Token>>(entries[i - 1])) {
+            hbox->fChildren.push_back(get<shared_ptr<Token>>(entries[i - 1]));
           } else {
             hbox->fChildren.push_back(make_shared<Placeholder>());
           }
           size_t j = i + 1;
-          while (j < entries.size() && holds_alternative<shared_ptr<Item>>(entries[j])) {
-            auto item = get<shared_ptr<Item>>(entries[j]);
+          while (j < entries.size() && holds_alternative<shared_ptr<Token>>(entries[j])) {
+            auto item = get<shared_ptr<Token>>(entries[j]);
             hbox->fChildren.push_back(item);
             if (j + 1 >= entries.size() || !holds_alternative<GlueType>(entries[j + 1])) {
               break;
@@ -147,7 +171,7 @@ class Document {
     }
   }
 
-  static void ParseGroup(std::u32string const &s, size_t &offset, std::deque<std::shared_ptr<Item>> &buffer, char32_t terminator) {
+  static void ParseGroup(std::u32string const &s, size_t &offset, std::deque<std::shared_ptr<Token>> &buffer, char32_t terminator) {
     using namespace std;
     deque<Entry> entries;
     ParseGroupSequential(s, offset, entries, terminator);
@@ -155,8 +179,8 @@ class Document {
     GlueEntries<Glue::Horizontal, HBox>(entries);
     GlueEntries<Glue::Vertical, VBox>(entries);
     for (auto const &it : entries) {
-      if (holds_alternative<shared_ptr<Item>>(it)) {
-        buffer.push_back(get<shared_ptr<Item>>(it));
+      if (holds_alternative<shared_ptr<Token>>(it)) {
+        buffer.push_back(get<shared_ptr<Token>>(it));
       }
     }
   }
@@ -264,14 +288,23 @@ class Document {
     }
   }
 
+  static std::shared_ptr<Line> ParseLine(std::u32string const &s, size_t &offset) {
+    using namespace std;
+    auto line = make_shared<Line>();
+    ParseGroup(s, offset, line->fTokens, U'\n');
+    return line;
+  }
+
 public:
   static std::shared_ptr<Document> Parse(std::u32string const &s) {
     using namespace std;
     auto document = make_shared<Document>();
     size_t offset = 0;
     while (offset < s.size()) {
-      auto line = make_shared<Line>();
-      ParseGroup(s, offset, line->fItems, U'\n');
+      auto line = ParseLine(s, offset);
+      if (!line) {
+        return nullptr;
+      }
       document->fLines.push_back(line);
     }
     return document;
@@ -287,18 +320,18 @@ TEST_CASE("Parse") {
     REQUIRE(d);
     CHECK(d->fLines.size() == 2);
     auto l0 = d->fLines[0];
-    CHECK(l0->fItems.size() == 2);
+    CHECK(l0->fTokens.size() == 2);
     auto l1 = d->fLines[1];
-    CHECK(l1->fItems.size() == 1);
+    CHECK(l1->fTokens.size() == 1);
   }
   SUBCASE("group") {
     auto d = Document::Parse(U"A1(A2 (B1)C1)");
     REQUIRE(d);
     CHECK(d->fLines.size() == 1);
     auto l = d->fLines[0];
-    CHECK(l->fItems.size() == 2);
-    auto s = dynamic_pointer_cast<Simple>(l->fItems[0]);
-    auto g = dynamic_pointer_cast<Group>(l->fItems[1]);
+    CHECK(l->fTokens.size() == 2);
+    auto s = dynamic_pointer_cast<Simple>(l->fTokens[0]);
+    auto g = dynamic_pointer_cast<Group>(l->fTokens[1]);
     REQUIRE(s);
     CHECK(s->fText == U"A1");
     REQUIRE(g);
@@ -321,8 +354,8 @@ TEST_CASE("Parse") {
     REQUIRE(d);
     CHECK(d->fLines.size() == 1);
     auto l = d->fLines[0];
-    CHECK(l->fItems.size() == 1);
-    auto c0 = dynamic_pointer_cast<Cartouche>(l->fItems[0]);
+    CHECK(l->fTokens.size() == 1);
+    auto c0 = dynamic_pointer_cast<Cartouche>(l->fTokens[0]);
     REQUIRE(c0);
     CHECK(c0->fChildren.size() == 3);
     CHECK(c0->fOpen == U"1");
@@ -342,9 +375,9 @@ TEST_CASE("Parse") {
     REQUIRE(d);
     CHECK(d->fLines.size() == 1);
     auto l = d->fLines[0];
-    CHECK(l->fItems.size() == 2);
-    auto c0 = dynamic_pointer_cast<HBox>(l->fItems[0]);
-    auto c1 = dynamic_pointer_cast<Simple>(l->fItems[1]);
+    CHECK(l->fTokens.size() == 2);
+    auto c0 = dynamic_pointer_cast<HBox>(l->fTokens[0]);
+    auto c1 = dynamic_pointer_cast<Simple>(l->fTokens[1]);
     REQUIRE(c0);
     CHECK(c0->fChildren.size() == 2);
     auto c0c0 = dynamic_pointer_cast<Group>(c0->fChildren[0]);
@@ -370,8 +403,8 @@ TEST_CASE("Parse") {
     REQUIRE(d);
     CHECK(d->fLines.size() == 1);
     auto l = d->fLines[0];
-    CHECK(l->fItems.size() == 1);
-    auto c0 = dynamic_pointer_cast<VBox>(l->fItems[0]);
+    CHECK(l->fTokens.size() == 1);
+    auto c0 = dynamic_pointer_cast<VBox>(l->fTokens[0]);
     REQUIRE(c0);
     CHECK(c0->fChildren.size() == 3);
     auto c0c0 = dynamic_pointer_cast<Simple>(c0->fChildren[0]);
@@ -386,9 +419,9 @@ TEST_CASE("Parse") {
     REQUIRE(d);
     REQUIRE(d->fLines.size() == 1);
     auto l = d->fLines[0];
-    REQUIRE(l->fItems.size() == 2);
-    auto c0 = dynamic_pointer_cast<Ligature>(l->fItems[0]);
-    auto c1 = dynamic_pointer_cast<Cartouche>(l->fItems[1]);
+    REQUIRE(l->fTokens.size() == 2);
+    auto c0 = dynamic_pointer_cast<Ligature>(l->fTokens[0]);
+    auto c1 = dynamic_pointer_cast<Cartouche>(l->fTokens[1]);
     REQUIRE(c0);
     REQUIRE(c1);
     REQUIRE(c0->fChildren.size() == 2);
