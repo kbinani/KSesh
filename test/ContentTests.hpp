@@ -288,7 +288,7 @@ class Document {
     }
   }
 
-  static std::shared_ptr<Line> ParseLine(std::u32string const &s, size_t &offset) {
+  static std::shared_ptr<Line> ParseLine(std::u32string const &s, size_t &offset, Typeface &typeface) {
     using namespace std;
     auto line = make_shared<Line>();
     ParseGroup(s, offset, line->fTokens, U'\n');
@@ -296,12 +296,12 @@ class Document {
   }
 
 public:
-  static std::shared_ptr<Document> Parse(std::u32string const &s) {
+  static std::shared_ptr<Document> Parse(std::u32string const &s, Typeface &typeface) {
     using namespace std;
     auto document = make_shared<Document>();
     size_t offset = 0;
     while (offset < s.size()) {
-      auto line = ParseLine(s, offset);
+      auto line = ParseLine(s, offset, typeface);
       if (!line) {
         return nullptr;
       }
@@ -314,9 +314,21 @@ public:
   std::deque<std::shared_ptr<Line>> fLines;
 };
 
+class JuceTypeface : public Typeface {
+public:
+  std::optional<GlyphId> getGlyphId(std::u32string const &glyph) override {
+    return std::nullopt;
+  }
+
+  std::optional<Rect> getGlyphBounds(GlyphId glyphId) override {
+    return std::nullopt;
+  }
+};
+
 TEST_CASE("Parse") {
   SUBCASE("simple") {
-    auto d = Document::Parse(U"A1  B1\nC1");
+    auto typeface = std::make_shared<JuceTypeface>();
+    auto d = Document::Parse(U"A1  B1\nC1", *typeface);
     REQUIRE(d);
     CHECK(d->fLines.size() == 2);
     auto l0 = d->fLines[0];
@@ -325,7 +337,8 @@ TEST_CASE("Parse") {
     CHECK(l1->fTokens.size() == 1);
   }
   SUBCASE("group") {
-    auto d = Document::Parse(U"A1(A2 (B1)C1)");
+    auto typeface = std::make_shared<JuceTypeface>();
+    auto d = Document::Parse(U"A1(A2 (B1)C1)", *typeface);
     REQUIRE(d);
     CHECK(d->fLines.size() == 1);
     auto l = d->fLines[0];
@@ -350,7 +363,8 @@ TEST_CASE("Parse") {
     CHECK(gc1c0->fText == U"B1");
   }
   SUBCASE("cartouche") {
-    auto d = Document::Parse(U"<1 ra mn xpr 2>");
+    auto typeface = std::make_shared<JuceTypeface>();
+    auto d = Document::Parse(U"<1 ra mn xpr 2>", *typeface);
     REQUIRE(d);
     CHECK(d->fLines.size() == 1);
     auto l = d->fLines[0];
@@ -371,7 +385,8 @@ TEST_CASE("Parse") {
     CHECK(c0c2->fText == U"xpr");
   }
   SUBCASE("hbox") {
-    auto d = Document::Parse(U"(ib*Z1)*A1 B1");
+    auto typeface = std::make_shared<JuceTypeface>();
+    auto d = Document::Parse(U"(ib*Z1)*A1 B1", *typeface);
     REQUIRE(d);
     CHECK(d->fLines.size() == 1);
     auto l = d->fLines[0];
@@ -399,7 +414,8 @@ TEST_CASE("Parse") {
     CHECK(c1->fText == U"B1");
   }
   SUBCASE("vbox") {
-    auto d = Document::Parse(U"A1:B1*C1:D1");
+    auto typeface = std::make_shared<JuceTypeface>();
+    auto d = Document::Parse(U"A1:B1*C1:D1", *typeface);
     REQUIRE(d);
     CHECK(d->fLines.size() == 1);
     auto l = d->fLines[0];
@@ -415,7 +431,8 @@ TEST_CASE("Parse") {
     REQUIRE(c0c2);
   }
   SUBCASE("complex") {
-    auto d = Document::Parse(U"gb&ra <i mn:n t&w&t anx>");
+    auto typeface = std::make_shared<JuceTypeface>();
+    auto d = Document::Parse(U"gb&ra <i mn:n t&w&t anx>", *typeface);
     REQUIRE(d);
     REQUIRE(d->fLines.size() == 1);
     auto l = d->fLines[0];

@@ -148,8 +148,16 @@ list(APPEND test_files
   test/main.cpp
   test/ContentTests.hpp
 )
-add_executable(ksesh-test test/main.cpp ${test_files})
+juce_add_console_app(ksesh-test)
+target_sources(ksesh-test PRIVATE test/main.cpp ${test_files})
 target_include_directories(ksesh-test PRIVATE deps/doctest/doctest)
+target_link_libraries(ksesh-test
+  PRIVATE
+    juce::juce_gui_extra
+  PUBLIC
+    juce::juce_recommended_config_flags
+    juce::juce_recommended_lto_flags
+)
 
 source_group(TREE ${CMAKE_CURRENT_LIST_DIR} FILES ${ksesh_files} ${test_files})
 
