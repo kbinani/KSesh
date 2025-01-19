@@ -32,6 +32,9 @@ public:
     fSignList->onClickSign = [this](Sign const &sign) {
       onClickSign(sign);
     };
+    fSignList->onClickCategory = [this]() {
+      fTextEditor->focus();
+    };
 
     fHorizontalSplitter = std::make_unique<SplitterComponent>(fVerticalSplitter.get(), fSignList.get(), false);
     fHorizontalSplitter->setBounds(0, height / 2 + resizerSize / 2, width, resizerSize);

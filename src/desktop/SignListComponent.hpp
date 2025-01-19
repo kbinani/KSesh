@@ -192,6 +192,9 @@ public:
       auto tb = fTabButtons[fMouseDownCategory];
       if (juce::Rectangle<float>(tb.x, tb.y, tb.width, tb.height).contains(e.getPosition().toFloat())) {
         setActiveCategory(fMouseDownCategory);
+        if (onClickCategory) {
+          onClickCategory();
+        }
       }
     }
     fMouseDownCategory = -1;
@@ -289,6 +292,7 @@ private:
 
 public:
   std::function<void(Sign const &)> onClickSign;
+  std::function<void()> onClickCategory;
 
 private:
   std::unique_ptr<juce::Viewport> fViewport;
