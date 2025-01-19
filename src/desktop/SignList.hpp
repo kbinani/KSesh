@@ -194,7 +194,7 @@ class SignList {
     I(U"D50H"s, U"𓂵"s);
     I(U"D50I"s, U"𓂶"s);
     I(U"D51"s, U"𓂷"s);
-    I(U"D52"s, U"𓂸|"s);
+    I(U"D52"s, U"𓂸"s);
     I(U"D52A"s, U"𓂹"s);
     I(U"D53"s, U"𓂺"s);
     I(U"D54"s, U"𓂻"s);
