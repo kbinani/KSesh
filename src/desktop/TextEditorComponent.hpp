@@ -171,6 +171,7 @@ public:
     virtual void textEditorComponentDidChangeContent(std::shared_ptr<Content> content, juce::String const &typing, int start, int end, Direction) = 0;
     virtual void textEditorComponentDidChangeCaretPosition(juce::String const &typing, int start, int end, Direction) = 0;
     virtual void textEditorComponentDidGainFocus() = 0;
+    virtual void textEditorComponentDidLostFocus() = 0;
   };
 
   explicit TextEditorComponent(std::shared_ptr<hb_font_t> const &font, std::shared_ptr<AppSetting> const &setting) : fFont(font), fSetting(setting) {
@@ -340,6 +341,11 @@ private:
         this->fDelegate->textEditorComponentDidGainFocus();
       }
     };
+    fEditor->onFocusLost = [this]() {
+      if (this->fDelegate) {
+        this->fDelegate->textEditorComponentDidLostFocus();
+      }
+    };
   }
 
   void unbind() {
@@ -347,6 +353,7 @@ private:
     fEditor->onCaretPositionChange = nullptr;
     fEditor->onSelectionChange = nullptr;
     fEditor->fOnFocusGained = nullptr;
+    fEditor->onFocusLost = nullptr;
   }
 
   juce::Range<int> getSelectedRange() const {

@@ -919,12 +919,20 @@ private:
 
   void textEditorComponentDidChangeContent(std::shared_ptr<Content> content, juce::String const &typing, int start, int end, Direction direction) override {
     setContent(content);
-    fSignList->setTyping(typing);
+    if (fFocusOwner == FocusOwner::textEditor) {
+      fSignList->setTyping(typing);
+    }
     fHieroglyph->setSelectedRange(start, end, direction);
   }
 
   void textEditorComponentDidGainFocus() override {
     setFocusOwner(FocusOwner::textEditor);
+  }
+
+  void textEditorComponentDidLostFocus() override {
+    if (fFocusOwner == FocusOwner::textEditor) {
+      fTextEditor->focus();
+    }
   }
 
   void setContent(std::shared_ptr<Content> content) {
