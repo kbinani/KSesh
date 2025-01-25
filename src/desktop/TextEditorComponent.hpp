@@ -164,7 +164,7 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
 
 public:
   struct Delegate {
-    virtual ~Delegate(){};
+    virtual ~Delegate() {};
     virtual void textEditorComponentDidChangeContent(std::shared_ptr<Content> content, juce::String const &typing, int start, int end, Direction) = 0;
     virtual void textEditorComponentDidChangeCaretPosition(juce::String const &typing, int start, int end, Direction) = 0;
   };

@@ -9,7 +9,7 @@ namespace ksesh::test {
 
 class Token {
 public:
-  virtual ~Token(){};
+  virtual ~Token() {};
 };
 
 class Simple : public Token {
