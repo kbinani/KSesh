@@ -88,6 +88,12 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
       }
     }
 
+    void focusGained(FocusChangeType) override {
+      if (fOnFocusGained) {
+        fOnFocusGained();
+      }
+    }
+
     void setSelectedRange(juce::Range<int> range, Direction direction) {
       fSelectedRange = range;
       fDirection = direction;
@@ -149,6 +155,9 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
       return setting;
     }
 
+  public:
+    std::function<void()> fOnFocusGained;
+
   private:
     std::shared_ptr<AppSetting> fSetting;
     std::shared_ptr<Content> fContent;
@@ -161,6 +170,7 @@ public:
     virtual ~Delegate() {};
     virtual void textEditorComponentDidChangeContent(std::shared_ptr<Content> content, juce::String const &typing, int start, int end, Direction) = 0;
     virtual void textEditorComponentDidChangeCaretPosition(juce::String const &typing, int start, int end, Direction) = 0;
+    virtual void textEditorComponentDidGainFocus() = 0;
   };
 
   explicit TextEditorComponent(std::shared_ptr<hb_font_t> const &font, std::shared_ptr<AppSetting> const &setting) : fFont(font), fSetting(setting) {
@@ -220,7 +230,6 @@ public:
       fEditor->setCaretPosition(nextCaret);
       fEditor->setSelectedRange(juce::Range<int>(nextCaret, nextCaret), fDirection);
       fEditor->setContent(c);
-      fEditor->grabKeyboardFocus();
       bind();
       auto nextTyping = GetTypingAtCaret(next, nextCaret, nextCaret);
       fDelegate->textEditorComponentDidChangeContent(c, nextTyping, nextCaret, nextCaret, fDirection);
@@ -243,7 +252,6 @@ public:
       fEditor->setCaretPosition(nextCaret);
       fEditor->setSelectedRange(juce::Range<int>(nextCaret, nextCaret), fDirection);
       fEditor->setContent(c);
-      fEditor->grabKeyboardFocus();
       bind();
       auto nextTyping = GetTypingAtCaret(next, nextCaret, nextCaret);
       fDelegate->textEditorComponentDidChangeContent(c, nextTyping, nextCaret, nextCaret, fDirection);
@@ -327,12 +335,18 @@ private:
     fEditor->onSelectionChange = [this]() {
       this->_onCaretPositionChange();
     };
+    fEditor->fOnFocusGained = [this]() {
+      if (this->fDelegate) {
+        this->fDelegate->textEditorComponentDidGainFocus();
+      }
+    };
   }
 
   void unbind() {
     fEditor->onTextChange = nullptr;
     fEditor->onCaretPositionChange = nullptr;
     fEditor->onSelectionChange = nullptr;
+    fEditor->fOnFocusGained = nullptr;
   }
 
   juce::Range<int> getSelectedRange() const {

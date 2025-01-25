@@ -368,7 +368,7 @@ private:
       fTextEditor->focus();
       break;
     case FocusOwner::signList:
-      fTextEditor->focus();
+      fTextEditor->blur();
       fSignList->grabKeyboardFocus();
       break;
     }
@@ -799,6 +799,10 @@ private:
     setContent(content);
     fSignList->setTyping(typing);
     fHieroglyph->setSelectedRange(start, end, direction);
+  }
+
+  void textEditorComponentDidGainFocus() override {
+    setFocusOwner(FocusOwner::textEditor);
   }
 
   void setContent(std::shared_ptr<Content> content) {
