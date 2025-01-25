@@ -258,6 +258,10 @@ public:
     setActiveCategory(next);
   }
 
+  void useSelectedSign() {
+    fContainer->useSelectedSign();
+  }
+
 private:
   void updateButtonHit(juce::Point<int> const &p) {
     int hitTabButton = -1;

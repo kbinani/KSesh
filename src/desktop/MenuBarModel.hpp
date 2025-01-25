@@ -66,6 +66,7 @@ public:
       menu.addSubMenu(TRANS("Copy as Image"), png, true);
       menu.addSeparator();
       menu.addCommandItem(fManager, commandEditSwitchFocus);
+      menu.addCommandItem(fManager, commandEditSignListUseSign);
       juce::PopupMenu tab;
       tab.addCommandItem(fManager, commandEditSignListCategoryNext);
       tab.addCommandItem(fManager, commandEditSignListCategoryPrev);

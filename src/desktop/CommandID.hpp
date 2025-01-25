@@ -20,6 +20,7 @@ enum CommandID : juce::CommandID {
 
   commandEditSwitchFocus,
 
+  commandEditSignListUseSign,
   commandEditSignListMoveLeft,
   commandEditSignListMoveUp,
   commandEditSignListMoveRight,

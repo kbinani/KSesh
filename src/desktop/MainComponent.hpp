@@ -189,6 +189,11 @@ public:
       }
       info.addDefaultKeypress('\t', 0);
       break;
+    case commandEditSignListUseSign:
+      info.setInfo(TRANS("Use selected sign"), {}, {}, 0);
+      info.addDefaultKeypress(juce::KeyPress::returnKey, 0);
+      info.setActive(fFocusOwner == FocusOwner::signList);
+      break;
     case commandEditSignListMoveLeft:
       info.setInfo("Select left sign", {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress(juce::KeyPress::leftKey, 0);
@@ -381,6 +386,9 @@ public:
         setFocusOwner(FocusOwner::textEditor);
         break;
       }
+      return true;
+    case commandEditSignListUseSign:
+      fSignList->useSelectedSign();
       return true;
     case commandEditSignListMoveLeft:
       fSignList->moveSignSelection(-1, 0);

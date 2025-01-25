@@ -336,6 +336,17 @@ public:
     repaint();
   }
 
+  void useSelectedSign() {
+    int index = fSelectedSign;
+    if (index < 0 || fSignButtons.size() < index) {
+      return;
+    }
+    auto const &sign = fSigns[index];
+    if (onClickSign) {
+      onClickSign(*sign);
+    }
+  }
+
 private:
   std::shared_ptr<Sign> makeSign(std::u32string const &name, std::u32string const &sign) {
     auto s = std::make_shared<Sign>();
