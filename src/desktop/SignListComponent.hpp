@@ -228,6 +228,20 @@ public:
     repaint();
   }
 
+  void setActiveCategory(int index) {
+    if (fActiveCategory != index || index == 0) {
+      fActiveCategory = index;
+      if (index != 0) {
+        fTyping.clear();
+      }
+      if (0 <= index && index < (int)fCategories.size()) {
+        fContainer->updateFilter(fCategories[index].name, fTyping);
+      }
+      layout();
+      repaint();
+    }
+  }
+
 private:
   void updateButtonHit(juce::Point<int> const &p) {
     int hitTabButton = -1;
@@ -287,20 +301,6 @@ private:
       x += tabButtonWidth + 1;
     }
     fContainer->layout(width);
-  }
-
-  void setActiveCategory(int index) {
-    if (fActiveCategory != index || index == 0) {
-      fActiveCategory = index;
-      if (index != 0) {
-        fTyping.clear();
-      }
-      if (0 <= index && index < (int)fCategories.size()) {
-        fContainer->updateFilter(fCategories[index].name, fTyping);
-      }
-      layout();
-      repaint();
-    }
   }
 
 public:

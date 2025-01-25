@@ -209,6 +209,67 @@ public:
       info.addDefaultKeypress(juce::KeyPress::downKey, 0);
       info.setActive(fFocusOwner == FocusOwner::signList);
       break;
+    case commandEditSignListCategoryA:
+    case commandEditSignListCategoryB:
+    case commandEditSignListCategoryC:
+    case commandEditSignListCategoryD:
+    case commandEditSignListCategoryE:
+    case commandEditSignListCategoryF:
+    case commandEditSignListCategoryG:
+    case commandEditSignListCategoryH:
+    case commandEditSignListCategoryI: {
+      char ch = 'A' + (commandID - commandEditSignListCategoryA);
+      std::string v;
+      v += ch;
+      info.setInfo(juce::String::formatted(TRANS("Select %s category"), juce::String(v)), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.addDefaultKeypress('a' + (commandID - commandEditSignListCategoryA), 0);
+      info.setActive(fFocusOwner == FocusOwner::signList);
+      break;
+    }
+    case commandEditSignListCategoryK:
+    case commandEditSignListCategoryL:
+    case commandEditSignListCategoryM:
+    case commandEditSignListCategoryN:
+    case commandEditSignListCategoryO:
+    case commandEditSignListCategoryP:
+    case commandEditSignListCategoryQ:
+    case commandEditSignListCategoryR:
+    case commandEditSignListCategoryS:
+    case commandEditSignListCategoryT:
+    case commandEditSignListCategoryU:
+    case commandEditSignListCategoryV:
+    case commandEditSignListCategoryW:
+    case commandEditSignListCategoryX:
+    case commandEditSignListCategoryY:
+    case commandEditSignListCategoryZ: {
+      char ch = 'K' + (commandID - commandEditSignListCategoryK);
+      std::string v;
+      v += ch;
+      info.setInfo(juce::String::formatted(TRANS("Select %s category"), juce::String(v)), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.addDefaultKeypress('k' + (commandID - commandEditSignListCategoryK), 0);
+      info.setActive(fFocusOwner == FocusOwner::signList);
+      break;
+    }
+    case commandEditSignListCategoryAa:
+      info.setInfo(juce::String::formatted(TRANS("Select %s category"), "Aa"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.addDefaultKeypress('a', juce::ModifierKeys::shiftModifier);
+      info.setActive(fFocusOwner == FocusOwner::signList);
+      break;
+    case commandEditSignListCategoryTall:
+      info.setInfo(juce::String::formatted(TRANS("Select %s category"), "tall"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.addDefaultKeypress('t', juce::ModifierKeys::shiftModifier);
+      info.setActive(fFocusOwner == FocusOwner::signList);
+      break;
+    case commandEditSignListCategoryWide:
+      info.setInfo(juce::String::formatted(TRANS("Select %s category"), "wide"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.addDefaultKeypress('w', juce::ModifierKeys::shiftModifier);
+      info.setActive(fFocusOwner == FocusOwner::signList);
+      break;
+    case commandEditSignListCategorySmall:
+      info.setInfo(juce::String::formatted(TRANS("Select %s category"), "small"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.addDefaultKeypress('s', juce::ModifierKeys::shiftModifier);
+      info.setActive(fFocusOwner == FocusOwner::signList);
+      break;
     case commandEditCopyAsImage1x:
       info.setInfo(TRANS("1x scale"), {}, {}, 0);
       info.setActive((bool)fContent);
@@ -319,6 +380,39 @@ public:
       return true;
     case commandEditSignListMoveDown:
       return true;
+    case commandEditSignListCategoryA:
+    case commandEditSignListCategoryB:
+    case commandEditSignListCategoryC:
+    case commandEditSignListCategoryD:
+    case commandEditSignListCategoryE:
+    case commandEditSignListCategoryF:
+    case commandEditSignListCategoryG:
+    case commandEditSignListCategoryH:
+    case commandEditSignListCategoryI:
+    case commandEditSignListCategoryK:
+    case commandEditSignListCategoryL:
+    case commandEditSignListCategoryM:
+    case commandEditSignListCategoryN:
+    case commandEditSignListCategoryO:
+    case commandEditSignListCategoryP:
+    case commandEditSignListCategoryQ:
+    case commandEditSignListCategoryR:
+    case commandEditSignListCategoryS:
+    case commandEditSignListCategoryT:
+    case commandEditSignListCategoryU:
+    case commandEditSignListCategoryV:
+    case commandEditSignListCategoryW:
+    case commandEditSignListCategoryX:
+    case commandEditSignListCategoryY:
+    case commandEditSignListCategoryZ:
+    case commandEditSignListCategoryAa:
+    case commandEditSignListCategoryTall:
+    case commandEditSignListCategoryWide:
+    case commandEditSignListCategorySmall: {
+      int index = info.commandID - commandEditSignListCategoryA + 1;
+      fSignList->setActiveCategory(index);
+      return true;
+    }
     case commandEditCopyAsImage1x:
     case commandEditCopyAsImage2x:
     case commandEditCopyAsImage4x:
@@ -377,7 +471,7 @@ private:
 
   void updateOverlayColors() {
     auto textColor = getLookAndFeel().findColour(juce::TextEditor::textColourId);
-    auto color = textColor.withAlpha(0.05f);
+    auto color = textColor.withAlpha(0.03f);
     switch (fFocusOwner) {
     case FocusOwner::textEditor:
       fVerticalSplitter->setOverlayColor(juce::Colours::transparentBlack);

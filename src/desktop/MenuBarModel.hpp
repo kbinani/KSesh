@@ -51,6 +51,37 @@ public:
     } else if (topLevelMenuIndex == 1) {
       // Edit
       menu.addCommandItem(fManager, commandEditSwitchFocus);
+      juce::PopupMenu tab;
+      tab.addCommandItem(fManager, commandEditSignListCategoryA);
+      tab.addCommandItem(fManager, commandEditSignListCategoryB);
+      tab.addCommandItem(fManager, commandEditSignListCategoryC);
+      tab.addCommandItem(fManager, commandEditSignListCategoryD);
+      tab.addCommandItem(fManager, commandEditSignListCategoryE);
+      tab.addCommandItem(fManager, commandEditSignListCategoryF);
+      tab.addCommandItem(fManager, commandEditSignListCategoryG);
+      tab.addCommandItem(fManager, commandEditSignListCategoryH);
+      tab.addCommandItem(fManager, commandEditSignListCategoryI);
+      tab.addCommandItem(fManager, commandEditSignListCategoryK);
+      tab.addCommandItem(fManager, commandEditSignListCategoryL);
+      tab.addCommandItem(fManager, commandEditSignListCategoryM);
+      tab.addCommandItem(fManager, commandEditSignListCategoryN);
+      tab.addCommandItem(fManager, commandEditSignListCategoryO);
+      tab.addCommandItem(fManager, commandEditSignListCategoryP);
+      tab.addCommandItem(fManager, commandEditSignListCategoryQ);
+      tab.addCommandItem(fManager, commandEditSignListCategoryR);
+      tab.addCommandItem(fManager, commandEditSignListCategoryS);
+      tab.addCommandItem(fManager, commandEditSignListCategoryT);
+      tab.addCommandItem(fManager, commandEditSignListCategoryU);
+      tab.addCommandItem(fManager, commandEditSignListCategoryV);
+      tab.addCommandItem(fManager, commandEditSignListCategoryW);
+      tab.addCommandItem(fManager, commandEditSignListCategoryX);
+      tab.addCommandItem(fManager, commandEditSignListCategoryY);
+      tab.addCommandItem(fManager, commandEditSignListCategoryZ);
+      tab.addCommandItem(fManager, commandEditSignListCategoryAa);
+      tab.addCommandItem(fManager, commandEditSignListCategoryTall);
+      tab.addCommandItem(fManager, commandEditSignListCategoryWide);
+      tab.addCommandItem(fManager, commandEditSignListCategorySmall);
+      menu.addSubMenu(TRANS("Switch sign list category"), tab, true);
       menu.addSeparator();
       menu.addCommandItem(fManager, commandEditCopyAsUnicodeWithoutFormatControl);
       menu.addCommandItem(fManager, commandEditCopyAsUnicodeWithFormatControl);
