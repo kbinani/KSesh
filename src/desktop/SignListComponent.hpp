@@ -238,8 +238,13 @@ public:
         fContainer->updateFilter(fCategories[index].name, fTyping);
       }
       layout();
+      fContainer->resetSignSelection();
       repaint();
     }
+  }
+
+  void moveSignSelection(int dx, int dy) {
+    fContainer->moveSignSelection(dx, dy);
   }
 
 private:

@@ -61,6 +61,9 @@ public:
       } else {
         g.setColour(textColor);
       }
+      if (i == fSelectedSign) {
+        g.drawRect(sb.x, sb.y, sb.width, sb.height);
+      }
       g.drawText(sb.name, juce::Rectangle<float>(sb.x, sb.y, sb.width, signButtonHeaderHeight).reduced(1), juce::Justification::centred);
       if (fShowMdC && sb.mdcFirst.isNotEmpty()) {
         g.setColour(textColor);
@@ -134,16 +137,21 @@ public:
     if (fShowMdC) {
       rowHeight += signButtonMdCHeight;
     }
+    int maxNumColumns = 1;
+    int columns = 0;
     for (auto const &it : fSigns) {
       auto bounds = it->path->getBoundsTransformed(juce::AffineTransform::scale(scale, scale));
       int buttonWidth = signButtonWidth;
       if (bounds.getWidth() + signButtonMinMargin * 2 > signButtonWidth) {
         buttonWidth = (int)ceil(bounds.getWidth() + signButtonMinMargin * 2);
       }
+      columns += 1;
       if (x + buttonWidth > width) {
         x = 0;
         y += rowHeight + 1;
+        columns = 1;
       }
+      maxNumColumns = std::max(maxNumColumns, columns);
       SignButton sb;
       sb.x = x;
       sb.y = y;
@@ -157,6 +165,7 @@ public:
       x += buttonWidth + 1;
       maxY = y + rowHeight;
     }
+    fNumColumns = maxNumColumns;
     setBounds(0, 0, width, maxY);
     return maxY;
   }
@@ -262,6 +271,71 @@ public:
     layout(getWidth());
   }
 
+  void moveSignSelection(int dx, int dy) {
+    if (fSelectedSign < 0) {
+      fSelectedSign = 0;
+      repaint();
+      return;
+    }
+    int const num = (int)fSignButtons.size();
+    if (fSelectedSign == 0 && dx == -1 && dy == 0) {
+      fSelectedSign = num - 1;
+      repaint();
+      return;
+    }
+    int const numRows = (int)ceil(num / (float)fNumColumns);
+    int const y = fSelectedSign / fNumColumns;
+    int const x = fSelectedSign - y * fNumColumns;
+    int nx = x + dx;
+    int ny = y + dy;
+    if (x + dx >= fNumColumns) {
+      nx = 0;
+      ny = y + 1;
+    } else if (x + dx < 0) {
+      nx = fNumColumns - 1;
+      ny = y - 1;
+    } else if (y + dy < 0) {
+      ny = numRows - 1;
+      nx = x - 1;
+    } else if (y + dy >= numRows) {
+      ny = 0;
+      nx = x + 1;
+    }
+    int n = ny * fNumColumns + nx;
+    if (n == num && dx == 1 && dy == 0) {
+      n = 0;
+    } else if (n >= num && y < numRows && dy != 0) {
+      if (dy > 0 && x + 1 >= fNumColumns) {
+        ny = 0;
+        nx = 0;
+      } else if (dy < 0) {
+        ny = numRows - 2;
+        nx = x - 1;
+      } else {
+        ny = 0;
+        nx = x + 1;
+      }
+      n = ny * fNumColumns + nx;
+    }
+    int next = n;
+    if (n == num) {
+      next = 0;
+    } else if (n < 0) {
+      next = num - 1;
+      return;
+    } else if (n >= num) {
+      next = 0;
+      return;
+    }
+    fSelectedSign = next;
+    repaint();
+  }
+
+  void resetSignSelection() {
+    fSelectedSign = -1;
+    repaint();
+  }
+
 private:
   std::shared_ptr<Sign> makeSign(std::u32string const &name, std::u32string const &sign) {
     auto s = std::make_shared<Sign>();
@@ -329,6 +403,8 @@ private:
   std::vector<SignButton> fSignButtons;
   int fHitSignButton = -1;
   int fMouseDownSign = -1;
+  int fSelectedSign = -1;
+  int fNumColumns = 1;
   bool fShowMdC = false;
   std::unordered_map<juce::String, std::shared_ptr<Sign>> fAllSigns;
 };

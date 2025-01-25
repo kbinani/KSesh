@@ -373,12 +373,16 @@ public:
       }
       return true;
     case commandEditSignListMoveLeft:
+      fSignList->moveSignSelection(-1, 0);
       return true;
     case commandEditSignListMoveUp:
+      fSignList->moveSignSelection(0, -1);
       return true;
     case commandEditSignListMoveRight:
+      fSignList->moveSignSelection(1, 0);
       return true;
     case commandEditSignListMoveDown:
+      fSignList->moveSignSelection(0, 1);
       return true;
     case commandEditSignListCategoryA:
     case commandEditSignListCategoryB:
