@@ -33,7 +33,7 @@ class SignListComponent : public juce::Component {
   };
 
 public:
-  explicit SignListComponent(std::shared_ptr<hb_font_t> const &font) : fFont(font) {
+  explicit SignListComponent(std::shared_ptr<hb_font_t> const &font) : fFont(font), fOverlayColor(juce::Colours::transparentBlack) {
     using namespace std::literals::string_literals;
     fCategories.push_back(Category("typing"));
     fCategories.push_back(makeCategory("A", U"𓀀"s));
@@ -146,6 +146,13 @@ public:
     }
   }
 
+  void paintOverChildren(juce::Graphics &g) override {
+    if (fOverlayColor.isTransparent()) {
+      return;
+    }
+    g.fillAll(fOverlayColor);
+  }
+
   void resized() override {
     int width = getWidth();
     int height = getHeight();
@@ -214,6 +221,11 @@ public:
 
   bool isShowMdC() const {
     return fContainer->isShowMdC();
+  }
+
+  void setOverlayColor(juce::Colour color) {
+    fOverlayColor = color;
+    repaint();
   }
 
 private:
@@ -307,6 +319,7 @@ private:
   int fHitTabButton = -1;
   int fMouseDownCategory = -1;
   juce::String fTyping;
+  juce::Colour fOverlayColor;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SignListComponent)
 };

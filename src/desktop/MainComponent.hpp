@@ -75,6 +75,7 @@ public:
 
     setSize(width, height);
     startTimerHz(1);
+    updateOverlayColors();
   }
 
   ~MainComponent() {
@@ -351,6 +352,11 @@ public:
     return false;
   }
 
+  void lookAndFeelChanged() override {
+    updateOverlayColors();
+  }
+
+private:
   void setFocusOwner(FocusOwner next) {
     if (next == fFocusOwner) {
       return;
@@ -366,9 +372,25 @@ public:
       fSignList->grabKeyboardFocus();
       break;
     }
+    updateOverlayColors();
   }
 
-private:
+  void updateOverlayColors() {
+    auto textColor = getLookAndFeel().findColour(juce::TextEditor::textColourId);
+    auto color = textColor.withAlpha(0.05f);
+    switch (fFocusOwner) {
+    case FocusOwner::textEditor:
+      fVerticalSplitter->setOverlayColor(juce::Colours::transparentBlack);
+      fSignList->setOverlayColor(color);
+      break;
+    case FocusOwner::signList:
+      fVerticalSplitter->setOverlayColor(color);
+      fSignList->setOverlayColor(juce::Colours::transparentBlack);
+      break;
+    }
+    repaint();
+  }
+
   void copyWithoutFormatControl() {
     if (!fContent) {
       return;

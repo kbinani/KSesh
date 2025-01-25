@@ -28,7 +28,7 @@ class SplitterComponent : public juce::Component, public juce::ComponentListener
   };
 
 public:
-  explicit SplitterComponent(juce::Component *leading, juce::Component *trailing, bool vertical) : fLeading(leading), fTrailing(trailing), fVertical(vertical) {
+  explicit SplitterComponent(juce::Component *leading, juce::Component *trailing, bool vertical) : fLeading(leading), fTrailing(trailing), fVertical(vertical), fOverlayColor(juce::Colours::transparentBlack) {
     fResizer = std::make_unique<Resizer>(vertical);
     addAndMakeVisible(fResizer.get());
     addAndMakeVisible(leading);
@@ -116,12 +116,25 @@ public:
     resized();
   }
 
+  void paintOverChildren(juce::Graphics &g) override {
+    if (fOverlayColor.isTransparent()) {
+      return;
+    }
+    g.fillAll(fOverlayColor);
+  }
+
+  void setOverlayColor(juce::Colour color) {
+    fOverlayColor = color;
+    repaint();
+  }
+
 private:
   juce::Component *const fLeading;
   juce::Component *const fTrailing;
   bool const fVertical;
   std::unique_ptr<Resizer> fResizer;
   float fRatio = 0.5;
+  juce::Colour fOverlayColor;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SplitterComponent)
 };
