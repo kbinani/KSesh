@@ -209,6 +209,16 @@ public:
       info.addDefaultKeypress(juce::KeyPress::downKey, 0);
       info.setActive(fFocusOwner == FocusOwner::signList);
       break;
+    case commandEditSignListCategoryNext:
+      info.setInfo("Select next category", {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.addDefaultKeypress('\t', juce::ModifierKeys::ctrlModifier);
+      info.setActive(fFocusOwner == FocusOwner::signList);
+      break;
+    case commandEditSignListCategoryPrev:
+      info.setInfo("Select previous category", {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.addDefaultKeypress('\t', juce::ModifierKeys::ctrlModifier | juce::ModifierKeys::shiftModifier);
+      info.setActive(fFocusOwner == FocusOwner::signList);
+      break;
     case commandEditSignListCategoryA:
     case commandEditSignListCategoryB:
     case commandEditSignListCategoryC:
@@ -221,7 +231,7 @@ public:
       char ch = 'A' + (commandID - commandEditSignListCategoryA);
       std::string v;
       v += ch;
-      info.setInfo(juce::String::formatted(TRANS("Select %s category"), juce::String(v)), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.setInfo(juce::String::formatted(TRANS("Select %s category"), v.c_str()), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress('a' + (commandID - commandEditSignListCategoryA), 0);
       info.setActive(fFocusOwner == FocusOwner::signList);
       break;
@@ -245,28 +255,28 @@ public:
       char ch = 'K' + (commandID - commandEditSignListCategoryK);
       std::string v;
       v += ch;
-      info.setInfo(juce::String::formatted(TRANS("Select %s category"), juce::String(v)), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.setInfo(juce::String::formatted(TRANS("Select %s category"), v.c_str()), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress('k' + (commandID - commandEditSignListCategoryK), 0);
       info.setActive(fFocusOwner == FocusOwner::signList);
       break;
     }
     case commandEditSignListCategoryAa:
-      info.setInfo(juce::String::formatted(TRANS("Select %s category"), "Aa"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.setInfo(TRANS("Select Aa category"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress('a', juce::ModifierKeys::shiftModifier);
       info.setActive(fFocusOwner == FocusOwner::signList);
       break;
     case commandEditSignListCategoryTall:
-      info.setInfo(juce::String::formatted(TRANS("Select %s category"), "tall"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.setInfo(TRANS("Select tall category"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress('t', juce::ModifierKeys::shiftModifier);
       info.setActive(fFocusOwner == FocusOwner::signList);
       break;
     case commandEditSignListCategoryWide:
-      info.setInfo(juce::String::formatted(TRANS("Select %s category"), "wide"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.setInfo(TRANS("Select wide category"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress('w', juce::ModifierKeys::shiftModifier);
       info.setActive(fFocusOwner == FocusOwner::signList);
       break;
     case commandEditSignListCategorySmall:
-      info.setInfo(juce::String::formatted(TRANS("Select %s category"), "small"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.setInfo(TRANS("Select small category"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress('s', juce::ModifierKeys::shiftModifier);
       info.setActive(fFocusOwner == FocusOwner::signList);
       break;
@@ -383,6 +393,12 @@ public:
       return true;
     case commandEditSignListMoveDown:
       fSignList->moveSignSelection(0, 1);
+      return true;
+    case commandEditSignListCategoryNext:
+      fSignList->moveCategory(1);
+      return true;
+    case commandEditSignListCategoryPrev:
+      fSignList->moveCategory(-1);
       return true;
     case commandEditSignListCategoryA:
     case commandEditSignListCategoryB:

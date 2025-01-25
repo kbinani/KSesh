@@ -50,8 +50,26 @@ public:
 #endif
     } else if (topLevelMenuIndex == 1) {
       // Edit
+      menu.addCommandItem(fManager, commandEditCopyAsUnicodeWithoutFormatControl);
+      menu.addCommandItem(fManager, commandEditCopyAsUnicodeWithFormatControl);
+#if defined(JUCE_WINDOWS)
+      menu.addCommandItem(fManager, commandEditCopyAsEmf);
+#endif
+#if defined(JUCE_MAC)
+      menu.addCommandItem(fManager, commandEditCopyAsPdf);
+#endif
+      juce::PopupMenu png;
+      png.addCommandItem(fManager, commandEditCopyAsImage1x);
+      png.addCommandItem(fManager, commandEditCopyAsImage2x);
+      png.addCommandItem(fManager, commandEditCopyAsImage4x);
+      png.addCommandItem(fManager, commandEditCopyAsImage8x);
+      menu.addSubMenu(TRANS("Copy as Image"), png, true);
+      menu.addSeparator();
       menu.addCommandItem(fManager, commandEditSwitchFocus);
       juce::PopupMenu tab;
+      tab.addCommandItem(fManager, commandEditSignListCategoryNext);
+      tab.addCommandItem(fManager, commandEditSignListCategoryPrev);
+      tab.addSeparator();
       tab.addCommandItem(fManager, commandEditSignListCategoryA);
       tab.addCommandItem(fManager, commandEditSignListCategoryB);
       tab.addCommandItem(fManager, commandEditSignListCategoryC);
@@ -82,21 +100,6 @@ public:
       tab.addCommandItem(fManager, commandEditSignListCategoryWide);
       tab.addCommandItem(fManager, commandEditSignListCategorySmall);
       menu.addSubMenu(TRANS("Switch sign list category"), tab, true);
-      menu.addSeparator();
-      menu.addCommandItem(fManager, commandEditCopyAsUnicodeWithoutFormatControl);
-      menu.addCommandItem(fManager, commandEditCopyAsUnicodeWithFormatControl);
-#if defined(JUCE_WINDOWS)
-      menu.addCommandItem(fManager, commandEditCopyAsEmf);
-#endif
-#if defined(JUCE_MAC)
-      menu.addCommandItem(fManager, commandEditCopyAsPdf);
-#endif
-      juce::PopupMenu png;
-      png.addCommandItem(fManager, commandEditCopyAsImage1x);
-      png.addCommandItem(fManager, commandEditCopyAsImage2x);
-      png.addCommandItem(fManager, commandEditCopyAsImage4x);
-      png.addCommandItem(fManager, commandEditCopyAsImage8x);
-      menu.addSubMenu(TRANS("Copy as Image"), png, true);
     } else if (topLevelMenuIndex == 2) {
       // View
       menu.addCommandItem(fManager, commandViewTogglePreviewVisibility);

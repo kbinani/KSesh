@@ -247,6 +247,17 @@ public:
     fContainer->moveSignSelection(dx, dy);
   }
 
+  void moveCategory(int delta) {
+    int next = fActiveCategory + delta;
+    int max = (int)fCategories.size() - 1;
+    if (next <= 0) {
+      next = max;
+    } else if (max < next) {
+      next = 1;
+    }
+    setActiveCategory(next);
+  }
+
 private:
   void updateButtonHit(juce::Point<int> const &p) {
     int hitTabButton = -1;

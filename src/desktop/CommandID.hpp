@@ -25,6 +25,9 @@ enum CommandID : juce::CommandID {
   commandEditSignListMoveRight,
   commandEditSignListMoveDown,
 
+  commandEditSignListCategoryNext,
+  commandEditSignListCategoryPrev,
+
   commandEditSignListCategoryA,
   commandEditSignListCategoryB,
   commandEditSignListCategoryC,
