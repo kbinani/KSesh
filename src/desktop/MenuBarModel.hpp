@@ -100,7 +100,7 @@ public:
       tab.addCommandItem(fManager, commandEditSignListCategoryTall);
       tab.addCommandItem(fManager, commandEditSignListCategoryWide);
       tab.addCommandItem(fManager, commandEditSignListCategorySmall);
-      menu.addSubMenu(TRANS("Switch sign list category"), tab, true);
+      menu.addSubMenu(TRANS("Sign list category"), tab, true);
     } else if (topLevelMenuIndex == 2) {
       // View
       menu.addCommandItem(fManager, commandViewTogglePreviewVisibility);

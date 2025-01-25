@@ -111,3 +111,19 @@ countries: jp
 "Copy text" = "テキストをコピー"
 
 "Copy text with format control" = "テキストをコピー(制御文字付き)"
+
+"Focus sign list" = "サインリストをフォーカス"
+
+"Focus text editor" = "テキストエディタをフォーカス"
+
+"Use selected sign" = "選択した文字を使う"
+
+"Select " = "カテゴリ "
+
+" category" = " を選択"
+
+"Sign list category" = "サインリストのカテゴリ"
+
+"Select next category" = "次のカテゴリを選択"
+
+"Select previous category" = "前のカテゴリを選択"

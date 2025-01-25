@@ -215,12 +215,12 @@ public:
       info.setActive(fFocusOwner == FocusOwner::signList);
       break;
     case commandEditSignListCategoryNext:
-      info.setInfo("Select next category", {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.setInfo(TRANS("Select next category"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress('\t', juce::ModifierKeys::ctrlModifier);
       info.setActive(fFocusOwner == FocusOwner::signList);
       break;
     case commandEditSignListCategoryPrev:
-      info.setInfo("Select previous category", {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.setInfo(TRANS("Select previous category"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress('\t', juce::ModifierKeys::ctrlModifier | juce::ModifierKeys::shiftModifier);
       info.setActive(fFocusOwner == FocusOwner::signList);
       break;
@@ -233,10 +233,10 @@ public:
     case commandEditSignListCategoryG:
     case commandEditSignListCategoryH:
     case commandEditSignListCategoryI: {
-      char ch = 'A' + (commandID - commandEditSignListCategoryA);
-      std::string v;
+      char8_t ch = u8'A' + (commandID - commandEditSignListCategoryA);
+      std::u8string v;
       v += ch;
-      info.setInfo(juce::String::formatted(TRANS("Select %s category"), v.c_str()), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.setInfo(TRANS("Select ") + JuceStringFromU8String(v) + TRANS(" category"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress('a' + (commandID - commandEditSignListCategoryA), 0);
       info.setActive(fFocusOwner == FocusOwner::signList);
       break;
@@ -257,31 +257,31 @@ public:
     case commandEditSignListCategoryX:
     case commandEditSignListCategoryY:
     case commandEditSignListCategoryZ: {
-      char ch = 'K' + (commandID - commandEditSignListCategoryK);
-      std::string v;
+      char8_t ch = u8'K' + (commandID - commandEditSignListCategoryK);
+      std::u8string v;
       v += ch;
-      info.setInfo(juce::String::formatted(TRANS("Select %s category"), v.c_str()), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.setInfo(TRANS("Select ") + JuceStringFromU8String(v) + TRANS(" category"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress('k' + (commandID - commandEditSignListCategoryK), 0);
       info.setActive(fFocusOwner == FocusOwner::signList);
       break;
     }
     case commandEditSignListCategoryAa:
-      info.setInfo(TRANS("Select Aa category"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.setInfo(TRANS("Select ") + juce::String("Aa") + TRANS(" category"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress('a', juce::ModifierKeys::shiftModifier);
       info.setActive(fFocusOwner == FocusOwner::signList);
       break;
     case commandEditSignListCategoryTall:
-      info.setInfo(TRANS("Select tall category"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.setInfo(TRANS("Select ") + juce::String("tall") + TRANS(" category"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress('t', juce::ModifierKeys::shiftModifier);
       info.setActive(fFocusOwner == FocusOwner::signList);
       break;
     case commandEditSignListCategoryWide:
-      info.setInfo(TRANS("Select wide category"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.setInfo(TRANS("Select ") + juce::String("wide") + TRANS(" category"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress('w', juce::ModifierKeys::shiftModifier);
       info.setActive(fFocusOwner == FocusOwner::signList);
       break;
     case commandEditSignListCategorySmall:
-      info.setInfo(TRANS("Select small category"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.setInfo(TRANS("Select ") + juce::String("small") + TRANS(" category"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress('s', juce::ModifierKeys::shiftModifier);
       info.setActive(fFocusOwner == FocusOwner::signList);
       break;
