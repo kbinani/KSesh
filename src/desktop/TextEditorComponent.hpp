@@ -27,12 +27,6 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
       fSetting->removeChangeListener(this);
     }
 
-    void focusLost(juce::Component::FocusChangeType reason) override {
-      if (reason == juce::Component::focusChangedByTabKey) {
-        grabKeyboardFocus();
-      }
-    }
-
     void paintOverChildren(juce::Graphics &g) override {
       PresentationSetting setting = getRenderSetting();
       auto borderColor = getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId);

@@ -8,6 +8,11 @@ class MainComponent : public juce::Component, public juce::Timer, public juce::A
     bottomBarHeight = 24,
   };
 
+  enum class FocusOwner {
+    textEditor,
+    signList,
+  };
+
 public:
   MainComponent(std::shared_ptr<hb_font_t> const &font, std::unique_ptr<juce::ApplicationCommandManager> const &commandManager, std::shared_ptr<AppSetting> appSetting) : fFont(font), fAppSetting(appSetting) {
     int const width = 1280;
@@ -33,7 +38,9 @@ public:
       onClickSign(sign);
     };
     fSignList->onClickCategory = [this]() {
-      fTextEditor->focus();
+      if (fFocusOwner == FocusOwner::textEditor) {
+        fTextEditor->focus();
+      }
     };
 
     fHorizontalSplitter = std::make_unique<SplitterComponent>(fVerticalSplitter.get(), fSignList.get(), false);
@@ -170,6 +177,37 @@ public:
     case commandFileExit:
       info.setInfo(TRANS("Exit"), {}, {}, 0);
       return;
+    case commandEditSwitchFocus:
+      switch (fFocusOwner) {
+      case FocusOwner::textEditor:
+        info.setInfo(TRANS("Focus sign list"), {}, {}, 0);
+        break;
+      case FocusOwner::signList:
+        info.setInfo(TRANS("Focus text editor"), {}, {}, 0);
+        break;
+      }
+      info.addDefaultKeypress('\t', 0);
+      break;
+    case commandEditSignListMoveLeft:
+      info.setInfo("Select left sign", {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.addDefaultKeypress(juce::KeyPress::leftKey, 0);
+      info.setActive(fFocusOwner == FocusOwner::signList);
+      break;
+    case commandEditSignListMoveUp:
+      info.setInfo("Select up sign", {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.addDefaultKeypress(juce::KeyPress::upKey, 0);
+      info.setActive(fFocusOwner == FocusOwner::signList);
+      break;
+    case commandEditSignListMoveRight:
+      info.setInfo("Select right sign", {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.addDefaultKeypress(juce::KeyPress::rightKey, 0);
+      info.setActive(fFocusOwner == FocusOwner::signList);
+      break;
+    case commandEditSignListMoveDown:
+      info.setInfo("Select down sign", {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.addDefaultKeypress(juce::KeyPress::downKey, 0);
+      info.setActive(fFocusOwner == FocusOwner::signList);
+      break;
     case commandEditCopyAsImage1x:
       info.setInfo(TRANS("1x scale"), {}, {}, 0);
       info.setActive((bool)fContent);
@@ -262,6 +300,24 @@ public:
         juce::JUCEApplication::getInstance()->quit();
       });
       return true;
+    case commandEditSwitchFocus:
+      switch (fFocusOwner) {
+      case FocusOwner::textEditor:
+        setFocusOwner(FocusOwner::signList);
+        break;
+      case FocusOwner::signList:
+        setFocusOwner(FocusOwner::textEditor);
+        break;
+      }
+      return true;
+    case commandEditSignListMoveLeft:
+      return true;
+    case commandEditSignListMoveUp:
+      return true;
+    case commandEditSignListMoveRight:
+      return true;
+    case commandEditSignListMoveDown:
+      return true;
     case commandEditCopyAsImage1x:
     case commandEditCopyAsImage2x:
     case commandEditCopyAsImage4x:
@@ -288,10 +344,28 @@ public:
       bool visible = !fHieroglyph->isVisible();
       fHieroglyph->setVisible(visible);
       fAppSetting->setPreviewEnabled(visible);
+      updateMenuModel();
       return true;
     }
     }
     return false;
+  }
+
+  void setFocusOwner(FocusOwner next) {
+    if (next == fFocusOwner) {
+      return;
+    }
+    fFocusOwner = next;
+    switch (fFocusOwner) {
+    case FocusOwner::textEditor:
+      fSignList->giveAwayKeyboardFocus();
+      fTextEditor->focus();
+      break;
+    case FocusOwner::signList:
+      fTextEditor->focus();
+      fSignList->grabKeyboardFocus();
+      break;
+    }
   }
 
 private:
@@ -746,6 +820,7 @@ private:
   std::shared_ptr<AppSetting> fAppSetting;
   std::unique_ptr<AboutComponent> fAbout;
   std::unique_ptr<ExampleComponent> fExample;
+  FocusOwner fFocusOwner = FocusOwner::textEditor;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };

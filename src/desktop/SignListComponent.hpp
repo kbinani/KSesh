@@ -82,6 +82,7 @@ public:
 
     setActiveCategory(1);
     layout();
+    setFocusContainerType(juce::Component::FocusContainerType::keyboardFocusContainer);
   }
 
   void paint(juce::Graphics &g) override {

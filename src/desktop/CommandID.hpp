@@ -18,6 +18,11 @@ enum CommandID : juce::CommandID {
 #endif
   commandFileExit,
 
+  commandEditSwitchFocus,
+  commandEditSignListMoveLeft,
+  commandEditSignListMoveUp,
+  commandEditSignListMoveRight,
+  commandEditSignListMoveDown,
   commandEditCopyAsUnicodeWithoutFormatControl,
   commandEditCopyAsUnicodeWithFormatControl,
 #if defined(JUCE_WINDOWS)
