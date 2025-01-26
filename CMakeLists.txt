@@ -91,6 +91,7 @@ list(APPEND ksesh_files
   src/desktop/BottomToolBar.hpp
   src/desktop/AboutComponent.hpp
   src/desktop/ExampleComponent.hpp
+  src/desktop/defer.hpp
 )
 if (APPLE)
   list(APPEND ksesh_files src/desktop/Application.mm)

@@ -336,6 +336,9 @@ public:
   }
 
   bool perform(juce::ApplicationCommandTarget::InvocationInfo const &info) override {
+    defer {
+      updateMenuModel();
+    };
     switch (info.commandID) {
     case commandFileNew:
       warnDirtyThen([this]() {
@@ -465,7 +468,6 @@ public:
       return true;
 #endif
     case commandUpdateMenuModel:
-      updateMenuModel();
       return true;
     case commandHelpAbout:
       showAboutComponent();
@@ -477,7 +479,6 @@ public:
       bool visible = !fHieroglyph->isVisible();
       fHieroglyph->setVisible(visible);
       fAppSetting->setPreviewEnabled(visible);
-      updateMenuModel();
       return true;
     }
     }

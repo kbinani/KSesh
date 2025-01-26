@@ -1,12 +1,11 @@
+// clang-format off
 #include <juce_gui_extra/juce_gui_extra.h>
-
 #include "PDFGen.hpp"
-
 #include <iostream>
+#include "defer.hpp"
 
 #pragma GCC diagnostic ignored "-Wunused-variable"
 
-// clang-format off
 #include "String.hpp"
 #include "Harfbuzz.hpp"
 #include "BinaryData.hpp"
