@@ -1698,11 +1698,13 @@ private:
     auto s = new unordered_map<u32string, uint8_t>();
     for (auto const &[key, sign] : Signs()) {
       auto type = Insertions::InsertionType(key);
-      if (type == 0) {
-        continue;
-      }
       if (sign == U"𓅱") {
         type = (type & (~Insertions::Type::BottomEnd)) | Insertions::Type::TopEnd;
+      } else if (sign == U"𓅡") {
+        type = type | Insertions::Type::BottomStart;
+      }
+      if (type == 0) {
+        continue;
       }
       (*s)[sign] = type;
     }
