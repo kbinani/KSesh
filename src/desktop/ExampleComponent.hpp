@@ -22,8 +22,9 @@ public:
 
     fExamples = {
         {TRANS("Basic"), "i w Y3 Y1v A1 r:1 n km m t:niwt"},
-        {TRANS("Cartouche and Ligature"), "< i mn:n t&w&t anx >"},
-        {TRANS("Horizontal mirroring, cartouche, and grouping"), "< C12\\ C2 N36:ms*s*s >"},
+        {TRANS("Cartouche, ligature, and grouping"), R"(< i mn:n t&w&t anx >
+(d:d)&D&t m Hm 1:n stp:V16 pr anx DA s)"},
+        {TRANS("Horizontal mirroring and cartouche"), "< C12\\ C2 N36:ms*s*s >"},
         {TRANS("Shading"), R"(A#1 A#2 A#3 A#4
 A#12 A#34
 A#1234 A#4132)"},

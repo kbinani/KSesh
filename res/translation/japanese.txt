@@ -16,9 +16,9 @@ countries: jp
 
 "Basic" = "基本"
 
-"Cartouche and Ligature" = "カルトゥーシュとリガチャ"
+"Cartouche, ligature, and grouping" = "カルトゥーシュ、リガチャとグルーピング"
 
-"Horizontal mirroring, cartouche, and grouping" = "水平方向の反転、カルトゥーシュとグルーピング"
+"Horizontal mirroring and cartouche" = "水平方向の反転、カルトゥーシュ"
 
 "Shading" = "影付き表示"
 
