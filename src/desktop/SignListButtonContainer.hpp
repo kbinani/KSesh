@@ -338,7 +338,7 @@ public:
 
   void useSelectedSign() {
     int index = fSelectedSign;
-    if (index < 0 || fSignButtons.size() < index) {
+    if (index < 0 || (int)fSignButtons.size() < index) {
       return;
     }
     auto const &sign = fSigns[index];
