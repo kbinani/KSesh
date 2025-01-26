@@ -496,12 +496,14 @@ private:
     fFocusOwner = next;
     switch (fFocusOwner) {
     case FocusOwner::textEditor:
+      fSignList->resetSignSelection();
       fSignList->giveAwayKeyboardFocus();
       fTextEditor->focus();
       break;
     case FocusOwner::signList:
       fTextEditor->blur();
       fSignList->grabKeyboardFocus();
+      fSignList->moveSignSelection(0, 0);
       break;
     }
     updateOverlayColors();

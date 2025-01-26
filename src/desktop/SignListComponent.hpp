@@ -247,6 +247,10 @@ public:
     fContainer->moveSignSelection(dx, dy);
   }
 
+  void resetSignSelection() {
+    fContainer->resetSignSelection();
+  }
+
   void moveCategory(int delta) {
     int next = fActiveCategory + delta;
     int max = (int)fCategories.size() - 1;
