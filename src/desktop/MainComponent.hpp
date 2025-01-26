@@ -197,22 +197,22 @@ public:
       info.setActive(fFocusOwner == FocusOwner::signList);
       break;
     case commandEditSignListMoveLeft:
-      info.setInfo("Select left sign", {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.setInfo(TRANS("Select the left sign"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress(juce::KeyPress::leftKey, 0);
       info.setActive(fFocusOwner == FocusOwner::signList);
       break;
     case commandEditSignListMoveUp:
-      info.setInfo("Select up sign", {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.setInfo(TRANS("Select the sign above"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress(juce::KeyPress::upKey, 0);
       info.setActive(fFocusOwner == FocusOwner::signList);
       break;
     case commandEditSignListMoveRight:
-      info.setInfo("Select right sign", {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.setInfo(TRANS("Select the right sign"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress(juce::KeyPress::rightKey, 0);
       info.setActive(fFocusOwner == FocusOwner::signList);
       break;
     case commandEditSignListMoveDown:
-      info.setInfo("Select down sign", {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      info.setInfo(TRANS("Select the sign below"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress(juce::KeyPress::downKey, 0);
       info.setActive(fFocusOwner == FocusOwner::signList);
       break;

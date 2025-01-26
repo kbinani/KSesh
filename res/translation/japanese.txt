@@ -127,3 +127,13 @@ countries: jp
 "Select next category" = "次のカテゴリを選択"
 
 "Select previous category" = "前のカテゴリを選択"
+
+"Sign" = "サイン"
+
+"Select the sign above" = "上のサインを選択"
+
+"Select the sign below" = "下のサインを選択"
+
+"Select the right sign" = "右のサインを選択"
+
+"Select the left sign" = "左のサインを選択"
