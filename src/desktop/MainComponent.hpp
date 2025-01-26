@@ -218,12 +218,20 @@ public:
       break;
     case commandEditSignListCategoryNext:
       info.setInfo(TRANS("Select next category"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+#if defined(JUCE_WINDOWS)
       info.addDefaultKeypress('\t', juce::ModifierKeys::ctrlModifier);
+#else
+      info.addDefaultKeypress('}', juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier);
+#endif
       info.setActive(fFocusOwner == FocusOwner::signList);
       break;
     case commandEditSignListCategoryPrev:
       info.setInfo(TRANS("Select previous category"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+#if defined(JUCE_WINDOWS)
       info.addDefaultKeypress('\t', juce::ModifierKeys::ctrlModifier | juce::ModifierKeys::shiftModifier);
+#else
+      info.addDefaultKeypress('{', juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier);
+#endif
       info.setActive(fFocusOwner == FocusOwner::signList);
       break;
     case commandEditSignListCategoryA:
