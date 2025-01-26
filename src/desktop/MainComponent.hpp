@@ -82,6 +82,8 @@ public:
 #if defined(JUCE_MAC)
     juce::MenuBarModel::setMacMainMenu(nullptr);
 #endif
+    removeAllChildren();
+    fHorizontalSplitter.reset();
   }
 
   void resized() override {
