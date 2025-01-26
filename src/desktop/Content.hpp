@@ -85,36 +85,119 @@ public:
       }
     }
     for (size_t i = 1; i + 1 < chars.size(); i++) {
-      if (!chars[i - 1].sign || chars[i].ch != U"&" || !chars[i + 1].sign) {
+      auto center = chars[i];
+      if (center.ch != U"&") {
         continue;
       }
       auto left = chars[i - 1];
-      auto center = chars[i];
       auto right = chars[i + 1];
-      auto type = SignList::InsertionType(left.ch, right.ch);
-      if (type == Insertions::Type::TopStart) {
-        chars[i - 1] = CharBase(right.ch, left.raw, left.rawOffset, left.resultOffset, left.ctrl, left.sign, left.ch);
-        chars[i] = CharBase(SignList::topStartInsertion, center.raw, center.rawOffset, center.resultOffset, center.ctrl, center.sign, U"");
-        chars[i + 1] = CharBase(left.ch, right.raw, right.rawOffset, right.resultOffset, right.ctrl, right.sign, right.ch);
-      } else if (type == Insertions::Type::BottomStart) {
-        chars[i - 1] = CharBase(right.ch, left.raw, left.rawOffset, left.resultOffset, left.ctrl, left.sign, left.ch);
-        chars[i] = CharBase(SignList::bottomStartInsertion, center.raw, center.rawOffset, center.resultOffset, center.ctrl, center.sign, U"");
-        chars[i + 1] = CharBase(left.ch, right.raw, right.rawOffset, right.resultOffset, right.ctrl, right.sign, right.ch);
-      } else if (type == Insertions::Type::TopEnd) {
-        chars[i] = CharBase(SignList::topEndInsertion, center.raw, center.rawOffset, center.resultOffset, center.ctrl, center.sign, U"");
-      } else if (type == Insertions::Type::BottomEnd) {
-        chars[i] = CharBase(SignList::bottomEndInsertion, center.raw, center.rawOffset, center.resultOffset, center.ctrl, center.sign, U"");
-      }
-      if (type == Insertions::Type::TopStart || type == Insertions::Type::BottomStart) {
-        if (i + 3 < chars.size() && chars[i + 2].ch == U"&" && chars[i + 3].sign) {
-          auto o = chars[i + 2];
-          auto t = SignList::InsertionType(right.ch, chars[i + 3].ch);
-          if (t == Insertions::Type::TopEnd) {
-            chars[i + 2] = CharBase(SignList::topEndInsertion, o.raw, o.rawOffset, o.resultOffset, o.ctrl, o.sign, U"");
-          } else if (t == Insertions::Type::BottomEnd) {
-            chars[i + 2] = CharBase(SignList::bottomEndInsertion, o.raw, o.rawOffset, o.resultOffset, o.ctrl, o.sign, U"");
+      CharBase leftCh = left;
+      optional<u32string> glue;
+      if (left.raw == U")") {
+        int count = 1;
+        for (int j = (int)i - 2; j >= 2; j--) {
+          auto raw = chars[j].raw;
+          if (raw == U")") {
+            count++;
+          } else if (raw == U"(") {
+            count--;
+            if (count == 0) {
+              if (chars[j - 1].raw == U"&" && chars[j - 2].sign) {
+                glue = chars[j - 1].ch;
+                leftCh = chars[j - 2];
+              }
+              break;
+            }
           }
-          i += 3;
+        }
+      }
+      if (left.sign && right.sign) {
+        auto type = SignList::InsertionType(left.ch, right.ch);
+        if (type == Insertions::Type::TopStart) {
+          chars[i - 1] = CharBase(right.ch, left.raw, left.rawOffset, left.resultOffset, left.ctrl, left.sign, left.ch);
+          chars[i] = CharBase(SignList::topStartInsertion, center.raw, center.rawOffset, center.resultOffset, center.ctrl, center.sign, U"");
+          chars[i + 1] = CharBase(left.ch, right.raw, right.rawOffset, right.resultOffset, right.ctrl, right.sign, right.ch);
+        } else if (type == Insertions::Type::BottomStart) {
+          chars[i - 1] = CharBase(right.ch, left.raw, left.rawOffset, left.resultOffset, left.ctrl, left.sign, left.ch);
+          chars[i] = CharBase(SignList::bottomStartInsertion, center.raw, center.rawOffset, center.resultOffset, center.ctrl, center.sign, U"");
+          chars[i + 1] = CharBase(left.ch, right.raw, right.rawOffset, right.resultOffset, right.ctrl, right.sign, right.ch);
+        } else if (type == Insertions::Type::TopEnd) {
+          chars[i] = CharBase(SignList::topEndInsertion, center.raw, center.rawOffset, center.resultOffset, center.ctrl, center.sign, U"");
+        } else if (type == Insertions::Type::BottomEnd) {
+          chars[i] = CharBase(SignList::bottomEndInsertion, center.raw, center.rawOffset, center.resultOffset, center.ctrl, center.sign, U"");
+        }
+        if (type == Insertions::Type::TopStart || type == Insertions::Type::BottomStart) {
+          if (i + 3 < chars.size() && chars[i + 2].ch == U"&" && chars[i + 3].sign) {
+            auto o = chars[i + 2];
+            auto t = SignList::InsertionType(right.ch, chars[i + 3].ch);
+            if (t == Insertions::Type::TopEnd) {
+              chars[i + 2] = CharBase(SignList::topEndInsertion, o.raw, o.rawOffset, o.resultOffset, o.ctrl, o.sign, U"");
+            } else if (t == Insertions::Type::BottomEnd) {
+              chars[i + 2] = CharBase(SignList::bottomEndInsertion, o.raw, o.rawOffset, o.resultOffset, o.ctrl, o.sign, U"");
+            }
+            i += 3;
+          }
+        }
+      } else if (leftCh.sign && glue) {
+        // (d:d)&D&(t)
+        if (glue == SignList::topStartInsertion || glue == SignList::bottomStartInsertion) {
+          if (SignList::HasInsertion(leftCh.ch, Insertions::Type::TopEnd)) {
+            chars[i] = CharBase(SignList::topEndInsertion, center.raw, center.rawOffset, center.resultOffset, true, false, U"");
+          } else if (SignList::HasInsertion(leftCh.ch, Insertions::Type::BottomEnd)) {
+            chars[i] = CharBase(SignList::bottomEndInsertion, center.raw, center.rawOffset, center.resultOffset, true, false, U"");
+          }
+        }
+      } else if (left.sign && right.raw == U"(") {
+        int count = 1;
+        optional<size_t> term;
+        for (size_t j = i + 2; j < chars.size(); j++) {
+          auto raw = chars[j].raw;
+          if (raw == U"(") {
+            count++;
+          } else if (raw == U")") {
+            count--;
+            if (count == 0) {
+              term = j;
+              break;
+            }
+          }
+        }
+        if (term) {
+          if (SignList::HasInsertion(left.ch, Insertions::Type::BottomEnd)) {
+            chars[i] = CharBase(SignList::bottomEndInsertion, center.raw, center.rawOffset, center.resultOffset, true, false, U"");
+          } else if (SignList::HasInsertion(left.ch, Insertions::Type::TopEnd)) {
+            chars[i] = CharBase(SignList::topEndInsertion, center.raw, center.rawOffset, center.resultOffset, true, false, U"");
+          }
+        }
+      } else if (left.raw == U")" && right.sign) {
+        int count = 1;
+        optional<int> term;
+        for (int j = (int)i - 2; j >= 0; j--) {
+          auto raw = chars[j].raw;
+          if (raw == U")") {
+            count++;
+          } else if (raw == U"(") {
+            count--;
+            if (count == 0) {
+              term = j;
+              break;
+            }
+          }
+        }
+        if (term) {
+          optional<u32string> insertion;
+          if (SignList::HasInsertion(right.ch, Insertions::Type::BottomStart)) {
+            insertion = SignList::bottomStartInsertion;
+          } else if (SignList::HasInsertion(right.ch, Insertions::Type::TopStart)) {
+            insertion = SignList::topStartInsertion;
+          }
+          if (insertion) {
+            for (int j = i + 1; j >= *term + 2; j--) {
+              chars[j] = chars[j - 2];
+            }
+            chars[*term] = right;
+            chars[*term + 1] = CharBase(*insertion, center.raw, center.rawOffset, center.resultOffset, true, false, U"");
+          }
         }
       }
     }

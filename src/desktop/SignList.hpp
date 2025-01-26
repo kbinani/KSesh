@@ -1709,12 +1709,17 @@ private:
     return s;
   }
 
+  static std::unordered_map<std::u32string, uint8_t> const &Insertions() {
+    using namespace std;
+    static unique_ptr<unordered_map<u32string, uint8_t> const> const sTable(CreateInsertions());
+    return *sTable;
+  }
+
 public:
   static std::optional<Insertions::Type> InsertionType(std::u32string const &left, std::u32string const &right) {
-    using namespace std;
-    static unique_ptr<unordered_map<u32string, uint8_t> const> const table(CreateInsertions());
-    auto l = table->find(left);
-    if (l != table->end()) {
+    auto const &table = Insertions();
+    auto l = table.find(left);
+    if (l != table.end()) {
       if ((l->second & Insertions::Type::BottomEnd) == Insertions::Type::BottomEnd) {
         return Insertions::Type::BottomEnd;
       }
@@ -1722,8 +1727,8 @@ public:
         return Insertions::Type::TopEnd;
       }
     }
-    auto r = table->find(right);
-    if (r != table->end()) {
+    auto r = table.find(right);
+    if (r != table.end()) {
       if ((r->second & Insertions::Type::BottomStart) == Insertions::Type::BottomStart) {
         return Insertions::Type::BottomStart;
       }
@@ -1731,7 +1736,32 @@ public:
         return Insertions::Type::TopStart;
       }
     }
-    return nullopt;
+    return std::nullopt;
+  }
+
+  static bool HasInsertion(std::u32string const &center, Insertions::Type type) {
+    auto const &table = Insertions();
+    switch (type) {
+    case Insertions::Type::BottomStart:
+    case Insertions::Type::TopStart: {
+      auto r = table.find(center);
+      if (r == table.end()) {
+        return false;
+      } else {
+        return (r->second & type) == type;
+      }
+    }
+    case Insertions::Type::BottomEnd:
+    case Insertions::Type::TopEnd: {
+      auto l = table.find(center);
+      if (l == table.end()) {
+        return false;
+      } else {
+        return (l->second & type) == type;
+      }
+    }
+    }
+    return false;
   }
 };
 
