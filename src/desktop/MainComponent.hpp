@@ -105,6 +105,7 @@ public:
   void timerCallback() override {
     if (auto root = getTopLevelComponent(); root && root->isOnDesktop()) {
       fTextEditor->focus();
+      updateMenuModel();
       stopTimer();
     }
   }
@@ -158,15 +159,15 @@ public:
     case commandFileExportAsPdf:
       info.setInfo(TRANS("Export as PDF"), {}, {}, 0);
       info.setActive((bool)fContent);
-      break;
+      return;
     case commandEditCopyAsUnicodeWithoutFormatControl:
       info.setInfo(TRANS("Copy text"), {}, {}, 0);
       info.setActive((bool)fContent);
-      break;
+      return;
     case commandEditCopyAsUnicodeWithFormatControl:
       info.setInfo(TRANS("Copy text with format control"), {}, {}, 0);
       info.setActive((bool)fContent);
-      break;
+      return;
 #if defined(JUCE_WINDOWS)
     case commandFileExportAsEmf:
       info.setInfo(TRANS("Export as EMF"), {}, {}, 0);
@@ -190,32 +191,32 @@ public:
         break;
       }
       info.addDefaultKeypress('\t', 0);
-      break;
+      return;
     case commandEditSignListUseSign:
       info.setInfo(TRANS("Use selected sign"), {}, {}, 0);
       info.addDefaultKeypress(juce::KeyPress::returnKey, 0);
       info.setActive(fFocusOwner == FocusOwner::signList);
-      break;
+      return;
     case commandEditSignListMoveLeft:
       info.setInfo(TRANS("Select the left sign"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress(juce::KeyPress::leftKey, 0);
       info.setActive(fFocusOwner == FocusOwner::signList);
-      break;
+      return;
     case commandEditSignListMoveUp:
       info.setInfo(TRANS("Select the sign above"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress(juce::KeyPress::upKey, 0);
       info.setActive(fFocusOwner == FocusOwner::signList);
-      break;
+      return;
     case commandEditSignListMoveRight:
       info.setInfo(TRANS("Select the right sign"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress(juce::KeyPress::rightKey, 0);
       info.setActive(fFocusOwner == FocusOwner::signList);
-      break;
+      return;
     case commandEditSignListMoveDown:
       info.setInfo(TRANS("Select the sign below"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress(juce::KeyPress::downKey, 0);
       info.setActive(fFocusOwner == FocusOwner::signList);
-      break;
+      return;
     case commandEditSignListCategoryNext:
       info.setInfo(TRANS("Select next category"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
 #if defined(JUCE_WINDOWS)
@@ -224,7 +225,7 @@ public:
       info.addDefaultKeypress('}', juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier);
 #endif
       info.setActive(fFocusOwner == FocusOwner::signList);
-      break;
+      return;
     case commandEditSignListCategoryPrev:
       info.setInfo(TRANS("Select previous category"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
 #if defined(JUCE_WINDOWS)
@@ -233,7 +234,7 @@ public:
       info.addDefaultKeypress('{', juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier);
 #endif
       info.setActive(fFocusOwner == FocusOwner::signList);
-      break;
+      return;
     case commandEditSignListCategoryA:
     case commandEditSignListCategoryB:
     case commandEditSignListCategoryC:
@@ -249,7 +250,7 @@ public:
       info.setInfo(TRANS("Select ") + JuceStringFromU8String(v) + TRANS(" category"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress('a' + (commandID - commandEditSignListCategoryA), 0);
       info.setActive(fFocusOwner == FocusOwner::signList);
-      break;
+      return;
     }
     case commandEditSignListCategoryK:
     case commandEditSignListCategoryL:
@@ -273,28 +274,28 @@ public:
       info.setInfo(TRANS("Select ") + JuceStringFromU8String(v) + TRANS(" category"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress('k' + (commandID - commandEditSignListCategoryK), 0);
       info.setActive(fFocusOwner == FocusOwner::signList);
-      break;
+      return;
     }
     case commandEditSignListCategoryAa:
       info.setInfo(TRANS("Select ") + juce::String("Aa") + TRANS(" category"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress('a', juce::ModifierKeys::shiftModifier);
       info.setActive(fFocusOwner == FocusOwner::signList);
-      break;
+      return;
     case commandEditSignListCategoryTall:
       info.setInfo(TRANS("Select ") + juce::String("tall") + TRANS(" category"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress('t', juce::ModifierKeys::shiftModifier);
       info.setActive(fFocusOwner == FocusOwner::signList);
-      break;
+      return;
     case commandEditSignListCategoryWide:
       info.setInfo(TRANS("Select ") + juce::String("wide") + TRANS(" category"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress('w', juce::ModifierKeys::shiftModifier);
       info.setActive(fFocusOwner == FocusOwner::signList);
-      break;
+      return;
     case commandEditSignListCategorySmall:
       info.setInfo(TRANS("Select ") + juce::String("small") + TRANS(" category"), {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       info.addDefaultKeypress('s', juce::ModifierKeys::shiftModifier);
       info.setActive(fFocusOwner == FocusOwner::signList);
-      break;
+      return;
     case commandEditCopyAsImage1x:
       info.setInfo(TRANS("1x scale"), {}, {}, 0);
       info.setActive((bool)fContent);
@@ -331,7 +332,7 @@ public:
       info.setInfo(TRANS("Example"), {}, {}, 0);
       return;
     default:
-      break;
+      return;
     }
   }
 
