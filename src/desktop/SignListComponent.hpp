@@ -215,14 +215,6 @@ public:
     setActiveCategory(0);
   }
 
-  void setShowMdC(bool show) {
-    fContainer->setShowMdC(show);
-  }
-
-  bool isShowMdC() const {
-    return fContainer->isShowMdC();
-  }
-
   void setOverlayColor(juce::Colour color) {
     fOverlayColor = color;
     repaint();

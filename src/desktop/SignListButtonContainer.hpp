@@ -65,7 +65,7 @@ public:
         g.drawRect(sb.x, sb.y, sb.width, sb.height);
       }
       g.drawText(sb.name, juce::Rectangle<float>(sb.x, sb.y, sb.width, signButtonHeaderHeight).reduced(1), juce::Justification::centred);
-      if (fShowMdC && sb.mdcFirst.isNotEmpty()) {
+      if (sb.mdcFirst.isNotEmpty()) {
         g.setColour(textColor);
         g.setFont(signButtonMdCFontSize);
         auto base = juce::Rectangle<float>(sb.x, sb.y + signButtonHeaderHeight + signButtonSignHeight, sb.width, signButtonMdCHeight).reduced(1);
@@ -133,10 +133,7 @@ public:
     int maxY = 0;
     float scale = signButtonSignSize / (float)Harfbuzz::UnitsPerEm(fFont);
     fSignButtons.clear();
-    float rowHeight = signButtonHeaderHeight + signButtonSignHeight;
-    if (fShowMdC) {
-      rowHeight += signButtonMdCHeight;
-    }
+    float rowHeight = signButtonHeaderHeight + signButtonSignHeight + signButtonMdCHeight;
     int maxNumColumns = 1;
     int columns = 0;
     for (auto const &it : fSigns) {
@@ -168,18 +165,6 @@ public:
     fNumColumns = maxNumColumns;
     setBounds(0, 0, width, maxY);
     return maxY;
-  }
-
-  void setShowMdC(bool show) {
-    if (show == fShowMdC) {
-      return;
-    }
-    fShowMdC = show;
-    layout(getWidth());
-  }
-
-  bool isShowMdC() const {
-    return fShowMdC;
   }
 
   void updateFilter(juce::String const &activeCategory, juce::String const &typing) {
@@ -416,7 +401,6 @@ private:
   int fMouseDownSign = -1;
   int fSelectedSign = -1;
   int fNumColumns = 1;
-  bool fShowMdC = false;
   std::unordered_map<juce::String, std::shared_ptr<Sign>> fAllSigns;
 };
 

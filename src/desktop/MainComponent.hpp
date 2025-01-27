@@ -48,10 +48,6 @@ public:
     addAndMakeVisible(*fHorizontalSplitter);
 
     fBottomToolBar = std::make_unique<BottomToolBar>();
-    fBottomToolBar->initShowMdC(fSignList->isShowMdC());
-    fBottomToolBar->onChangeShowMdC = [this](bool show) {
-      fSignList->setShowMdC(show);
-    };
     addAndMakeVisible(*fBottomToolBar);
 
     commandManager->registerAllCommandsForTarget(this);
