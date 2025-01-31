@@ -1151,6 +1151,9 @@ private:
     I(U"("s, U"\U00013437"s); // EGYPTIAN HIEROGLYPH BEGIN SEGMENT
     I(U")"s, U"\U00013438"s); // EGYPTIAN HIEROGLYPH END SEGMENT
     I(U"##"s, U"\U00013436"s); // EGYPTIAN HIEROGLYPH OVERLAY MIDDLE
+    I(U"\\r1", U"\U0000FE02"); // VARIATION SELECTOR-3 (means rotating 270 degrees)
+    I(U"\\r2", U"\U0000FE01"); // VARIATION SELECTOR-2 (means rotating 180 degrees)
+    I(U"\\r3", U"\U0000FE00"); // VARIATION SELECTOR-1 (means rotating 90 degrees)
     I(U" "s, U""s);
     I(U"-"s, U""s);
     I(U"A"s, U"𓄿"s); // G1
