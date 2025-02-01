@@ -13,8 +13,19 @@ class MainComponent : public juce::Component, public juce::Timer, public juce::A
     signList,
   };
 
+  struct ModalFinishDetector : public juce::ModalComponentManager::Callback {
+    explicit ModalFinishDetector(std::shared_ptr<int> counter) : fCounter(counter) {
+    }
+
+    void modalStateFinished(int returnValue) override {
+      *fCounter = *fCounter - 1;
+    }
+
+    std::shared_ptr<int> const fCounter;
+  };
+
 public:
-  MainComponent(std::shared_ptr<hb_font_t> const &font, std::unique_ptr<juce::ApplicationCommandManager> const &commandManager, std::shared_ptr<AppSetting> appSetting) : fFont(font), fAppSetting(appSetting) {
+  MainComponent(std::shared_ptr<hb_font_t> const &font, std::unique_ptr<juce::ApplicationCommandManager> const &commandManager, std::shared_ptr<AppSetting> appSetting) : fFont(font), fAppSetting(appSetting), fNumModalComponents(std::make_shared<int>(0)), fNativeMessageBoxCoroner(fNumModalComponents) {
     int const width = 1280;
     int const height = 720;
 
@@ -586,12 +597,16 @@ private:
     if (fAbout || fExample) {
       return;
     }
+    auto prevFocus = fFocusOwner;
     fTextEditor->blur();
     fExample = std::make_unique<ExampleComponent>(fFont, fAppSetting);
     fExample->setBounds(getLocalBounds());
-    fExample->onClickClose = [this]() {
+    fExample->onClickClose = [prevFocus, this]() {
       hideExampleComponent();
+      *fNumModalComponents -= 1;
+      setFocusOwner(prevFocus);
     };
+    *fNumModalComponents += 1;
     addAndMakeVisible(*fExample);
   }
 
@@ -635,7 +650,7 @@ private:
                        .withButton(TRANS("Save"))       // yes
                        .withButton(TRANS("Don't Save")) // no
                        .withButton(TRANS("Cancel"));    // cancel
-    juce::NativeMessageBox::showAsync(options, [this, then](int result) {
+    showAsync(options, [this, then](int result) {
       switch (result) {
       case 0:
         // save
@@ -668,7 +683,7 @@ private:
     if (!fOpenFileChooser) {
       fOpenFileChooser = std::make_unique<juce::FileChooser>(TRANS("Open"), juce::File(), "*.txt");
     }
-    fOpenFileChooser->launchAsync(juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles, [this](juce::FileChooser const &chooser) {
+    launchFileChooser(*fOpenFileChooser, juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles, [this](juce::FileChooser const &chooser) {
       auto file = chooser.getResult();
       if (file == juce::File()) {
         return;
@@ -687,10 +702,31 @@ private:
     fMenuModel->menuItemsChanged();
   }
 
+  void showMessageBoxAsync(juce::MessageBoxIconType iconType, juce::String const &title, juce::String const &message, juce::Component *associatedComponent = nullptr) {
+    *fNumModalComponents += 1;
+    juce::NativeMessageBox::showMessageBoxAsync(iconType, title, message, associatedComponent, &fNativeMessageBoxCoroner);
+  }
+
+  void showAsync(juce::MessageBoxOptions const &options, std::function<void(int)> callback) {
+    *fNumModalComponents += 1;
+    juce::NativeMessageBox::showAsync(options, [this, callback](int result) {
+      callback(result);
+      *fNumModalComponents -= 1;
+    });
+  }
+
+  void launchFileChooser(juce::FileChooser &chooser, int flags, std::function<void(juce::FileChooser const &)> callback) {
+    *fNumModalComponents += 1;
+    chooser.launchAsync(flags, [this, callback](juce::FileChooser const &ch) {
+      callback(ch);
+      *fNumModalComponents -= 1;
+    });
+  }
+
   void open(juce::File const &file) {
     auto stream = file.createInputStream();
     if (!stream || stream->failedToOpen()) {
-      juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, TRANS("Error"), TRANS("Failed to open"));
+      showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, TRANS("Error"), TRANS("Failed to open"));
       return;
     }
     auto str = stream->readString();
@@ -712,7 +748,7 @@ private:
     if (!fSaveFileChooser) {
       fSaveFileChooser = std::make_unique<juce::FileChooser>(TRANS("Save"), juce::File(), "*.txt");
     }
-    fSaveFileChooser->launchAsync(juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::warnAboutOverwriting, [this, then](juce::FileChooser const &chooser) {
+    launchFileChooser(*fSaveFileChooser, juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::warnAboutOverwriting, [this, then](juce::FileChooser const &chooser) {
       auto file = chooser.getResult();
       if (file == juce::File() || !fContent) {
         return;
@@ -728,7 +764,7 @@ private:
           waitModalThen(then);
         }
       } else {
-        juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, TRANS("Error"), TRANS("Failed to save"));
+        showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, TRANS("Error"), TRANS("Failed to save"));
       }
     });
   }
@@ -756,7 +792,7 @@ private:
           waitModalThen(then);
         }
       } else {
-        juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, TRANS("Error"), TRANS("Failed to save"));
+        showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, TRANS("Error"), TRANS("Failed to save"));
       }
     } else {
       saveDocumentWithNewName(then);
@@ -802,7 +838,7 @@ private:
     if (!fExportPngFileChooser) {
       fExportPngFileChooser = std::make_unique<juce::FileChooser>(TRANS("Export as PNG"), juce::File(), "*.png");
     }
-    fExportPngFileChooser->launchAsync(juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::warnAboutOverwriting, [this, scale](juce::FileChooser const &chooser) {
+    launchFileChooser(*fExportPngFileChooser, juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::warnAboutOverwriting, [this, scale](juce::FileChooser const &chooser) {
       auto file = chooser.getResult();
       if (file == juce::File() || !fContent) {
         return;
@@ -818,20 +854,20 @@ private:
       auto title = TRANS("Error");
       auto message = TRANS("Failed to export as PNG");
       if (!stream || stream->failedToOpen()) {
-        juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
+        showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
         return;
       }
       if (!stream->setPosition(0)) {
-        juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
+        showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
         return;
       }
       if (stream->truncate().failed()) {
-        juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
+        showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
         return;
       }
       juce::PNGImageFormat format;
       if (!format.writeImageToStream(img, *stream)) {
-        juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
+        showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
         return;
       }
     });
@@ -841,7 +877,7 @@ private:
     if (!fExportPdfFileChooser) {
       fExportPdfFileChooser = std::make_unique<juce::FileChooser>(TRANS("Export as PDF"), juce::File(), "*.pdf");
     }
-    fExportPdfFileChooser->launchAsync(juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::warnAboutOverwriting, [this](juce::FileChooser const &chooser) {
+    launchFileChooser(*fExportPdfFileChooser, juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::warnAboutOverwriting, [this](juce::FileChooser const &chooser) {
       auto file = chooser.getResult();
       if (file == juce::File() || !fContent) {
         return;
@@ -851,19 +887,19 @@ private:
       auto title = TRANS("Error");
       auto message = TRANS("Failed to export as PDF");
       if (str.empty() || !stream || stream->failedToOpen()) {
-        juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
+        showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
         return;
       }
       if (!stream->setPosition(0)) {
-        juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
+        showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
         return;
       }
       if (stream->truncate().failed()) {
-        juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
+        showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
         return;
       }
       if (!stream->write(str.c_str(), str.size())) {
-        juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
+        showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
         return;
       }
     });
@@ -883,7 +919,7 @@ private:
     if (!fExportEmfFileChooser) {
       fExportEmfFileChooser = std::make_unique<juce::FileChooser>(TRANS("Export as EMF"), juce::File(), "*.emf");
     }
-    fExportEmfFileChooser->launchAsync(juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::warnAboutOverwriting, [this](juce::FileChooser const &chooser) {
+    launchFileChooser(*fExportEmfFileChooser, juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::warnAboutOverwriting, [this](juce::FileChooser const &chooser) {
       auto file = chooser.getResult();
       if (file == juce::File() || !fContent) {
         return;
@@ -893,19 +929,19 @@ private:
       auto title = TRANS("Error");
       auto message = TRANS("Failed to export as EMF");
       if (str.empty() || !stream || stream->failedToOpen()) {
-        juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
+        showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
         return;
       }
       if (!stream->setPosition(0)) {
-        juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
+        showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
         return;
       }
       if (stream->truncate().failed()) {
-        juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
+        showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
         return;
       }
       if (!stream->write(str.c_str(), str.size())) {
-        juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
+        showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
         return;
       }
     });
@@ -943,7 +979,7 @@ private:
     if (!Clipboard::Store(data, type)) {
       auto title = TRANS("Error");
       auto message = TRANS("Failed to write clipboard");
-      juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
+      showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
     }
   }
 
@@ -970,7 +1006,9 @@ private:
 
   void textEditorComponentDidLostFocus() override {
     if (fFocusOwner == FocusOwner::textEditor) {
-      fTextEditor->focus();
+      if (*fNumModalComponents == 0) {
+        fTextEditor->focus();
+      }
     }
   }
 
@@ -1016,6 +1054,8 @@ private:
   std::unique_ptr<AboutComponent> fAbout;
   std::unique_ptr<ExampleComponent> fExample;
   FocusOwner fFocusOwner = FocusOwner::textEditor;
+  std::shared_ptr<int> fNumModalComponents;
+  ModalFinishDetector fNativeMessageBoxCoroner;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };
