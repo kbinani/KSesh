@@ -18,6 +18,11 @@ class ExampleComponent : public juce::Component {
 public:
   ExampleComponent(std::shared_ptr<hb_font_t> const &font, std::shared_ptr<AppSetting> const &setting) : fFont(font) {
     fEditor = std::make_unique<TextEditorComponent>(font, setting);
+    fEditor->fOnEscapeKey = [this]() {
+      if (onClickClose) {
+        onClickClose();
+      }
+    };
     addAndMakeVisible(*fEditor);
 
     fExamples = {

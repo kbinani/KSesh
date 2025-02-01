@@ -157,6 +157,7 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
 
   public:
     std::function<void()> fOnFocusGained;
+    std::function<void()> fOnEscape;
 
   private:
     std::shared_ptr<AppSetting> fSetting;
@@ -344,6 +345,11 @@ private:
         this->fDelegate->textEditorComponentDidLostFocus();
       }
     };
+    fEditor->onEscapeKey = [this]() {
+      if (this->fOnEscapeKey) {
+        this->fOnEscapeKey();
+      }
+    };
   }
 
   void unbind() {
@@ -394,6 +400,7 @@ private:
 
 public:
   Delegate *fDelegate = nullptr;
+  std::function<void()> fOnEscapeKey;
 
 private:
   std::unique_ptr<TextEditor> fEditor;
