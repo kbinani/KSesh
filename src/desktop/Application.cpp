@@ -101,6 +101,12 @@ public:
       info.setInfo(TRANS("Light"), {}, {}, 0);
       info.setTicked(fSetting->getColorScheme() == AppSetting::ColorScheme::Light);
       return;
+    case commandHelpAboutClose:
+      info.setInfo("Close About dialog", {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      return;
+    case commandHelpExampleClose:
+      info.setInfo("Close Example dialog", {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
+      return;
     default:
       break;
     }
@@ -122,6 +128,12 @@ public:
       return true;
     case commandViewThemeLight:
       setColorScheme(AppSetting::ColorScheme::Light);
+      return true;
+    case commandHelpAboutClose:
+      fMainWindow->closeAbout();
+      return true;
+    case commandHelpExampleClose:
+      fMainWindow->closeExample();
       return true;
     }
     return false;

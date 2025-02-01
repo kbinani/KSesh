@@ -40,6 +40,14 @@ public:
     setBackgroundColour(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
   }
 
+  void closeExample() {
+    fMain->closeExample();
+  }
+
+  void closeAbout() {
+    fMain->closeAbout();
+  }
+
 private:
   std::unique_ptr<MainComponent> fMain;
 

@@ -18,10 +18,8 @@ class ExampleComponent : public juce::Component {
 public:
   ExampleComponent(std::shared_ptr<hb_font_t> const &font, std::shared_ptr<AppSetting> const &setting) : fFont(font) {
     fEditor = std::make_unique<TextEditorComponent>(font, setting);
-    fEditor->fOnEscapeKey = [this]() {
-      if (onClickClose) {
-        onClickClose();
-      }
+    fEditor->fOnEscapeKey = []() {
+      juce::JUCEApplication::getInstance()->invoke(CommandID::commandHelpExampleClose, true);
     };
     addAndMakeVisible(*fEditor);
 
@@ -58,10 +56,8 @@ mAa\r3 xrw)"}};
     path.lineTo(5, 15);
     fClose->setShape(path, false, true, false);
     fClose->setOutline(getLookAndFeel().findColour(juce::TextEditor::textColourId), 5);
-    fClose->onClick = [this]() {
-      if (onClickClose) {
-        onClickClose();
-      }
+    fClose->onClick = []() {
+      juce::JUCEApplication::getInstance()->invoke(CommandID::commandHelpExampleClose, true);
     };
     addAndMakeVisible(*fClose);
   }
@@ -99,8 +95,7 @@ private:
     }
   }
 
-public:
-  std::function<void()> onClickClose;
+private:
   std::unique_ptr<TextEditorComponent> fEditor;
   std::unique_ptr<juce::ShapeButton> fClose;
   std::shared_ptr<hb_font_t> fFont;

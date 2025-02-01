@@ -84,6 +84,8 @@ enum CommandID : juce::CommandID {
   commandViewThemeMidnight,
   commandViewThemeGray,
   commandViewThemeLight,
+  commandHelpAboutClose,
+  commandHelpExampleClose,
   applicationCommandIDEnd,
 };
 

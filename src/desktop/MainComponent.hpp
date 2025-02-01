@@ -521,9 +521,23 @@ public:
     updateOverlayColors();
   }
 
+  void closeExample() {
+    removeChildComponent(fExample.get());
+    fExample.reset();
+    *fNumModalComponents -= 1;
+    setFocusOwner(fFocusOwner, true);
+  }
+
+  void closeAbout() {
+    removeChildComponent(fAbout.get());
+    fAbout.reset();
+    *fNumModalComponents -= 1;
+    setFocusOwner(fFocusOwner, true);
+  }
+
 private:
-  void setFocusOwner(FocusOwner next) {
-    if (next == fFocusOwner) {
+  void setFocusOwner(FocusOwner next, bool force = false) {
+    if (next == fFocusOwner && !force) {
       return;
     }
     fFocusOwner = next;
@@ -601,19 +615,9 @@ private:
     fTextEditor->blur();
     fExample = std::make_unique<ExampleComponent>(fFont, fAppSetting);
     fExample->setBounds(getLocalBounds());
-    fExample->onClickClose = [prevFocus, this]() {
-      hideExampleComponent();
-      *fNumModalComponents -= 1;
-      setFocusOwner(prevFocus);
-    };
     *fNumModalComponents += 1;
     addAndMakeVisible(*fExample);
-  }
-
-  void hideExampleComponent() {
-    removeChildComponent(fExample.get());
-    fExample.reset();
-    fTextEditor->focus();
+    fExample->grabKeyboardFocus();
   }
 
   void showAboutComponent() {
@@ -623,16 +627,9 @@ private:
     fTextEditor->blur();
     fAbout = std::make_unique<AboutComponent>();
     fAbout->setBounds(getLocalBounds());
-    fAbout->onClickClose = [this]() {
-      hideAboutComponent();
-    };
+    *fNumModalComponents += 1;
     addAndMakeVisible(*fAbout);
-  }
-
-  void hideAboutComponent() {
-    removeChildComponent(fAbout.get());
-    fAbout.reset();
-    fTextEditor->focus();
+    fAbout->grabKeyboardFocus();
   }
 
   void warnDirtyThen(std::function<void()> then) {

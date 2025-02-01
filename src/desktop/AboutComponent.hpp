@@ -56,10 +56,8 @@ public:
     path.lineTo(5, 15);
     fCloseButton->setShape(path, false, true, false);
     fCloseButton->setOutline(getLookAndFeel().findColour(juce::TextEditor::textColourId), 5);
-    fCloseButton->onClick = [this]() {
-      if (onClickClose) {
-        onClickClose();
-      }
+    fCloseButton->onClick = []() {
+      juce::JUCEApplication::getInstance()->invoke(CommandID::commandHelpAboutClose, true);
     };
     addAndMakeVisible(*fCloseButton);
 
@@ -98,8 +96,13 @@ public:
     fCloseButton->setBounds(juce::Rectangle<int>(bounds.removeFromTop(20).removeFromRight(20)).translated(-10, 10));
   }
 
-public:
-  std::function<void()> onClickClose;
+  bool keyPressed(juce::KeyPress const &ev) override {
+    if (ev.getModifiers() == juce::ModifierKeys::noModifiers && ev.getKeyCode() == juce::KeyPress::escapeKey) {
+      juce::JUCEApplication::getInstance()->invoke(CommandID::commandHelpAboutClose, true);
+      return true;
+    }
+    return false;
+  }
 
 private:
   std::unique_ptr<juce::Viewport> fContainer;
