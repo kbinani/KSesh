@@ -196,9 +196,11 @@ public:
   }
 
   void mouseUp(juce::MouseEvent const &e) override {
+    bool hit = false;
     if (0 <= fMouseDownCategory && fMouseDownCategory < (int)fTabButtons.size()) {
       auto tb = fTabButtons[fMouseDownCategory];
       if (juce::Rectangle<float>(tb.x, tb.y, tb.width, tb.height).contains(e.getPosition().toFloat())) {
+        hit = true;
         setActiveCategory(fMouseDownCategory);
         if (onClickCategory) {
           onClickCategory();
@@ -208,6 +210,9 @@ public:
     fMouseDownCategory = -1;
     updateCursor();
     repaint();
+    if (!hit && e.mouseWasClicked() && onClickBackground) {
+      onClickBackground();
+    }
   }
 
   void setTyping(juce::String const &typing) {
@@ -322,6 +327,7 @@ private:
 public:
   std::function<void(Sign const &)> onClickSign;
   std::function<void()> onClickCategory;
+  std::function<void()> onClickBackground;
 
 private:
   std::unique_ptr<juce::Viewport> fViewport;

@@ -42,6 +42,9 @@ public:
         fTextEditor->focus();
       }
     };
+    fSignList->onClickBackground = [this]() {
+      setFocusOwner(FocusOwner::signList);
+    };
 
     fHorizontalSplitter = std::make_unique<SplitterComponent>(fVerticalSplitter.get(), fSignList.get(), false);
     fHorizontalSplitter->setBounds(0, height / 2 + resizerSize / 2, width, resizerSize);
