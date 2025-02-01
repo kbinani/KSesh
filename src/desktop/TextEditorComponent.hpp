@@ -168,7 +168,7 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
 public:
   struct Delegate {
     virtual ~Delegate() {};
-    virtual void textEditorComponentDidChangeContent(std::shared_ptr<Content> content, juce::String const &typing, int start, int end, Direction) = 0;
+    virtual void textEditorComponentDidChangeContent(std::shared_ptr<Content> content, std::optional<juce::String> typing, int start, int end, Direction) = 0;
     virtual void textEditorComponentDidChangeCaretPosition(juce::String const &typing, int start, int end, Direction) = 0;
     virtual void textEditorComponentDidGainFocus() = 0;
     virtual void textEditorComponentDidLostFocus() = 0;
@@ -196,7 +196,7 @@ public:
     fEditor->applyColourToAllText(getLookAndFeel().findColour(juce::TextEditor::textColourId));
   }
 
-  void insert(juce::String const &s) {
+  void onClickSign(juce::String const &s) {
     unbind();
     auto text = fEditor->getText();
     auto selected = getSelectedRange();
@@ -232,8 +232,7 @@ public:
       fEditor->setSelectedRange(juce::Range<int>(nextCaret, nextCaret), fDirection);
       fEditor->setContent(c);
       bind();
-      auto nextTyping = GetTypingAtCaret(next, nextCaret, nextCaret);
-      fDelegate->textEditorComponentDidChangeContent(c, nextTyping, nextCaret, nextCaret, fDirection);
+      fDelegate->textEditorComponentDidChangeContent(c, std::nullopt, nextCaret, nextCaret, fDirection);
     } else {
       auto str = s;
       if (selected.getEnd() >= text.length()) {
@@ -254,8 +253,7 @@ public:
       fEditor->setSelectedRange(juce::Range<int>(nextCaret, nextCaret), fDirection);
       fEditor->setContent(c);
       bind();
-      auto nextTyping = GetTypingAtCaret(next, nextCaret, nextCaret);
-      fDelegate->textEditorComponentDidChangeContent(c, nextTyping, nextCaret, nextCaret, fDirection);
+      fDelegate->textEditorComponentDidChangeContent(c, std::nullopt, nextCaret, nextCaret, fDirection);
     }
   }
 

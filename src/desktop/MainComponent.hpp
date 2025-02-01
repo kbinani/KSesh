@@ -930,10 +930,13 @@ private:
     fHieroglyph->setSelectedRange(start, end, direction);
   }
 
-  void textEditorComponentDidChangeContent(std::shared_ptr<Content> content, juce::String const &typing, int start, int end, Direction direction) override {
+  void textEditorComponentDidChangeContent(std::shared_ptr<Content> content, std::optional<juce::String> typing, int start, int end, Direction direction) override {
     setContent(content);
-    if (fFocusOwner == FocusOwner::textEditor) {
-      fSignList->setTyping(typing);
+    if (typing && fFocusOwner == FocusOwner::textEditor) {
+      static int a = 0;
+      a++;
+      (void)a;
+      fSignList->setTyping(*typing);
     }
     fHieroglyph->setSelectedRange(start, end, direction);
   }
@@ -960,7 +963,7 @@ private:
   }
 
   void onClickSign(Sign const &sign) {
-    fTextEditor->insert(sign.name);
+    fTextEditor->onClickSign(sign.name);
   }
 
 public:
