@@ -61,6 +61,7 @@ public:
     };
     addAndMakeVisible(*fCloseButton);
 
+    addParagraph("KSesh version " JUCE_APPLICATION_VERSION_STRING, std::nullopt, "", fContent->fString);
     addParagraph("About KSesh",
                  "https://github.com/kbinani/KSesh",
                  juce::String::fromUTF8(BinaryData::KSesh_txt, BinaryData::KSesh_txtSize),
