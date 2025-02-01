@@ -140,20 +140,16 @@ public:
       info.addDefaultKeypress('s', juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier);
       return;
     case commandFileExportAsPng1x:
-      info.setInfo(TRANS("1x scale"), {}, {}, 0);
-      info.setActive((bool)fContent);
+      attachScaledMenuInfo(1, info);
       return;
     case commandFileExportAsPng2x:
-      info.setInfo(TRANS("2x scale"), {}, {}, 0);
-      info.setActive((bool)fContent);
+      attachScaledMenuInfo(2, info);
       return;
     case commandFileExportAsPng4x:
-      info.setInfo(TRANS("4x scale"), {}, {}, 0);
-      info.setActive((bool)fContent);
+      attachScaledMenuInfo(4, info);
       return;
     case commandFileExportAsPng8x:
-      info.setInfo(TRANS("8x scale"), {}, {}, 0);
-      info.setActive((bool)fContent);
+      attachScaledMenuInfo(8, info);
       return;
     case commandFileExportAsPdf:
       info.setInfo(TRANS("Export as PDF"), {}, {}, 0);
@@ -296,20 +292,16 @@ public:
       info.setActive(fFocusOwner == FocusOwner::signList);
       return;
     case commandEditCopyAsImage1x:
-      info.setInfo(TRANS("1x scale"), {}, {}, 0);
-      info.setActive((bool)fContent);
+      attachScaledMenuInfo(1, info);
       return;
     case commandEditCopyAsImage2x:
-      info.setInfo(TRANS("2x scale"), {}, {}, 0);
-      info.setActive((bool)fContent);
+      attachScaledMenuInfo(2, info);
       return;
     case commandEditCopyAsImage4x:
-      info.setInfo(TRANS("4x scale"), {}, {}, 0);
-      info.setActive((bool)fContent);
+      attachScaledMenuInfo(4, info);
       return;
     case commandEditCopyAsImage8x:
-      info.setInfo(TRANS("8x scale"), {}, {}, 0);
-      info.setActive((bool)fContent);
+      attachScaledMenuInfo(8, info);
       return;
 #if defined(JUCE_MAC)
     case commandEditCopyAsPdf:
@@ -332,6 +324,35 @@ public:
       return;
     default:
       return;
+    }
+  }
+
+  void attachScaledMenuInfo(int scale, juce::ApplicationCommandInfo &info) {
+    juce::String leading;
+    switch (scale) {
+    case 1:
+      leading = TRANS("1x scale");
+      break;
+    case 2:
+      leading = TRANS("2x scale");
+      break;
+    case 4:
+      leading = TRANS("4x scale");
+      break;
+    case 8:
+      leading = TRANS("8x scale");
+      break;
+    default:
+      assert(false);
+      return;
+    }
+    if (fContent) {
+      auto [w, h] = getPngSize(scale);
+      info.setInfo(leading + juce::String(" (") + juce::String(w) + juce::String(" x ") + juce::String(h) + juce::String(")"), {}, {}, 0);
+      info.setActive(true);
+    } else {
+      info.setInfo(leading, {}, {}, 0);
+      info.setActive(false);
     }
   }
 
@@ -770,6 +791,13 @@ private:
     return stream->write(u8.c_str(), u8.size());
   }
 
+  std::pair<int, int> getPngSize(float scale) {
+    auto [widthf, heightf] = fContent->getSize(fAppSetting->getPresentationSetting());
+    int width = (int)ceil(widthf * scale);
+    int height = (int)ceil(heightf * scale);
+    return std::make_pair(width, height);
+  }
+
   void exportAsPng(float scale) {
     if (!fExportPngFileChooser) {
       fExportPngFileChooser = std::make_unique<juce::FileChooser>(TRANS("Export as PNG"), juce::File(), "*.png");
@@ -779,9 +807,7 @@ private:
       if (file == juce::File() || !fContent) {
         return;
       }
-      auto [widthf, heightf] = fContent->getSize(fAppSetting->getPresentationSetting());
-      int width = (int)ceil(widthf * scale);
-      int height = (int)ceil(heightf * scale);
+      auto [width, height] = getPngSize(scale);
       juce::Image img(juce::Image::PixelFormat::ARGB, width, height, true);
       {
         juce::Graphics g(img);
@@ -933,9 +959,6 @@ private:
   void textEditorComponentDidChangeContent(std::shared_ptr<Content> content, std::optional<juce::String> typing, int start, int end, Direction direction) override {
     setContent(content);
     if (typing && fFocusOwner == FocusOwner::textEditor) {
-      static int a = 0;
-      a++;
-      (void)a;
       fSignList->setTyping(*typing);
     }
     fHieroglyph->setSelectedRange(start, end, direction);
