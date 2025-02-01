@@ -22,6 +22,8 @@ countries: jp
 
 "Shading" = "影付き表示"
 
+"Rotating glyph" = "グリフの回転"
+
 "New" = "新規作成"
 
 "Open" = "開く"

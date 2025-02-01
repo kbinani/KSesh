@@ -33,7 +33,10 @@ public:
         {TRANS("Shading"), R"(A#1 A#2 A#3 A#4
 A#12 A#34
 A#1234 A#4132)"},
-    };
+        {TRANS("Rotating glyph"), R"(mAa xrw
+mAa\r1 xrw
+mAa\r2 xrw
+mAa\r3 xrw)"}};
     fSelector = std::make_unique<juce::ComboBox>();
     for (int i = 0; i < (int)fExamples.size(); i++) {
       fSelector->addItem(fExamples[i].description, i + 1);
