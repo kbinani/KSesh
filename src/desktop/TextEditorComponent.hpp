@@ -381,16 +381,15 @@ private:
   }
 
   void _onTextChange() {
-    if (!fDelegate) {
-      return;
-    }
     auto text = fEditor->getText();
     auto range = getSelectedRange();
     auto c = std::make_shared<Content>(U32StringFromJuceString(text), fFont);
     auto typing = GetTypingAtCaret(text, range.getStart(), range.getEnd());
     fEditor->setContent(c);
     fEditor->setSelectedRange(range, fDirection);
-    fDelegate->textEditorComponentDidChangeContent(c, typing, range.getStart(), range.getEnd(), fDirection);
+    if (fDelegate) {
+      fDelegate->textEditorComponentDidChangeContent(c, typing, range.getStart(), range.getEnd(), fDirection);
+    }
   }
 
 public:
