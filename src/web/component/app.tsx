@@ -16,6 +16,7 @@ import { SignList } from "../sign-list";
 import { About } from "./about";
 import { init } from "../init";
 import { EdgeInset } from "../edge-inset";
+import { Advertisement } from "./advertisement";
 
 //@ts-ignore
 export const kAppVersion: string = KSESH_VERSION;
@@ -52,6 +53,7 @@ export const App: FC = ({}) => {
   const textarea = useRef<HTMLTextAreaElement>(null);
   const seshA = useRef<HTMLDivElement>(null);
   const seshB = useRef<HTMLDivElement>(null);
+  const [isAdvertisementVisible, setAdvertisementVisible] = useState(true);
   const edgeInset: EdgeInset = {
     top: padding,
     left: padding,
@@ -539,6 +541,9 @@ export const App: FC = ({}) => {
         </div>
       </div>
       {isAboutVisible && <About onClose={() => setAboutVisible(false)} />}
+      {isAdvertisementVisible && (
+        <Advertisement onClose={() => setAdvertisementVisible(false)} />
+      )}
     </div>
   );
 };
