@@ -1,3 +1,8 @@
+Version 1.1.0
+・Enhanced editing functionality with keyboard shortcuts.
+・Fixed an issue where the D52 glyph had extra parts.
+・Added support for grouping with parentheses and glyph rotation using \r1, \r2, and \r3.
+
 Version 1.0.1
 ・Fixed a crash while editing
 
