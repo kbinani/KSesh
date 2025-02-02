@@ -22,12 +22,12 @@ export const About: FC<{ onClose: () => void }> = ({ onClose }) => {
       <div className="aboutContent">
         <div className="aboutContainer">
           <div className="aboutHeader">About KSesh</div>
-          <div className="aboutSpacer" />
-          <Pre
-            text={`
-KSesh: An Online and Interactive Hieroglyphic Editor
+          <Package
+            name={"KSesh"}
+            url={"https://github.com/kbinani/KSesh"}
+            license={`An Online and Interactive Hieroglyphic Editor
 
-Copyright (C) 2024 kbinani
+Copyright (C) 2024-2025 kbinani
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
