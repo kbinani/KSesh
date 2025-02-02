@@ -47,7 +47,7 @@ export const Advertisement: FC<{ onClose: () => void }> = ({ onClose }) => {
               margin: 30,
             }}
           >
-            <div>Microsoft Store: </div>
+            <div style={{ marginRight: 10 }}>Microsoft Store: </div>
             <div>
               <a
                 href="https://apps.microsoft.com/detail/9ppdnn5s6z36?mode=direct"
@@ -63,7 +63,7 @@ export const Advertisement: FC<{ onClose: () => void }> = ({ onClose }) => {
                 />
               </a>
             </div>
-            <div> Apple App Store:</div>
+            <div style={{ marginRight: 10 }}> Apple App Store:</div>
             <div>
               <a
                 href="https://apps.apple.com/us/app/ksesh/id6596728393?mt=12&itscg=30200&itsct=apps_box_badge&mttnsubad=6596728393"
