@@ -9,6 +9,8 @@ public:
   virtual uint32_t u32() = 0;
   virtual uint16_t u16() = 0;
   virtual uint8_t u8() = 0;
+  virtual bool read(void *buffer, size_t size) = 0;
+  virtual bool seek(int64_t loc) = 0;
 
   Offset32 o32() {
     return u32();
@@ -16,11 +18,11 @@ public:
 };
 
 struct Tag {
-  uint8_t values[4];
+  std::array<uint8_t, 4> values;
 
   static std::optional<Tag> Read(InputStream &in) {
     Tag t;
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < t.values.size(); i++) {
       t.values[i] = in.u8();
     }
     if (in.ok()) {
@@ -87,6 +89,7 @@ struct TableDirectory {
 class FontFile {
 public:
   TableDirectory tableDirectory;
+  std::map<std::array<uint8_t, 4>, std::string> tables;
 
   static std::shared_ptr<FontFile> Read(InputStream &in) {
     using namespace std;
@@ -95,6 +98,16 @@ public:
       ff->tableDirectory = *td;
     } else {
       return nullptr;
+    }
+    for (uint32_t i = 0; i < ff->tableDirectory.numTables; i++) {
+      TableRecord tr = ff->tableDirectory.tableRecords[i];
+      uint32_t size = tr.length + (tr.length % 4);
+      string buffer;
+      buffer.resize(size);
+      if (!in.read(buffer.data(), tr.length)) {
+        return nullptr;
+      }
+      ff->tables[tr.tag.values].swap(buffer);
     }
     return ff;
   }
@@ -130,6 +143,17 @@ public:
 
   bool ok() override {
     return s.openedOk() && !s.isExhausted();
+  }
+
+  bool read(void *buffer, size_t size) override {
+    if (size == 0) {
+      return true;
+    }
+    return s.read(buffer, size) == size;
+  }
+
+  bool seek(int64_t loc) override {
+    return s.setPosition(loc);
   }
 
 private:
