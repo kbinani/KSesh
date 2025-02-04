@@ -154,11 +154,19 @@ target_sources(ksesh-test PRIVATE test/main.cpp ${test_files})
 target_include_directories(ksesh-test PRIVATE deps/doctest/doctest src/desktop)
 target_link_libraries(ksesh-test
   PRIVATE
+    ksesh-binary-data
     juce::juce_gui_extra
   PUBLIC
     juce::juce_recommended_config_flags
     juce::juce_recommended_lto_flags
 )
+if (MSVC)
+  target_compile_definitions(ksesh-test
+    PRIVATE
+      NOMINMAX
+      WIN32_LEAN_AND_MEAN
+  )
+endif()
 
 source_group(TREE ${CMAKE_CURRENT_LIST_DIR} FILES ${ksesh_files} ${test_files})
 
