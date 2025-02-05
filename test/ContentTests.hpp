@@ -100,12 +100,50 @@ struct TableDirectory {
   }
 };
 
+class Table {
+public:
+  virtual ~Table() {}
+  virtual std::string encode() = 0;
+  virtual uint32_t length() = 0;
+
+  static std::optional<uint32_t> Checksum(std::string const &table) {
+    if (table.size() % 4 != 0) {
+      return std::nullopt;
+    }
+    uint32_t const *ptr = (uint32_t const *)table.data();
+    uint32_t sum = 0;
+    uint32_t const *const end = ptr + table.size() / 4;
+    while (ptr < end) {
+      sum += *ptr++;
+    }
+    return sum;
+  }
+};
+
+class ReadonlyTable : public Table {
+public:
+  explicit ReadonlyTable(std::string const &content, uint32_t length) : content(content), len(length) {}
+
+  std::string encode() override {
+    return content;
+  }
+
+  uint32_t length() override {
+    return len;
+  }
+
+public:
+  std::string const content;
+  uint32_t const len;
+};
+
 class FontFile {
 public:
   TableDirectory tableDirectory;
-  std::map<std::array<uint8_t, 4>, std::string> tables;
+  std::map<std::array<uint8_t, 4>, std::shared_ptr<Table>> tables;
 
   bool write(OutputStream &out) {
+    using namespace std;
     if (!out.u32(tableDirectory.sfntVersion)) {
       return false;
     }
@@ -123,21 +161,26 @@ public:
     }
     Offset32 const start = 12 + 16 * tableDirectory.numTables;
     Offset32 offset = start;
+    vector<string> tableContents;
     for (TableRecord const &tr : tableDirectory.tableRecords) {
       if (!out.write((void *)tr.tag.values.data(), tr.tag.values.size())) {
         return false;
       }
-      auto table = tables.find(tr.tag.values);
-      if (table == tables.end()) {
+      auto item = tables.find(tr.tag.values);
+      if (item == tables.end()) {
         return false;
       }
-      if (table->second.size() < tr.length) {
+      auto table = item->second;
+      auto data = table->encode();
+      auto length = table->length();
+      tableContents.push_back(data);
+      if (data.size() < length) {
         return false;
       }
-      if (table->second.size() % 4 != 0) {
+      if (data.size() % 4 != 0) {
         return false;
       }
-      auto checksum = Checksum(table->second);
+      auto checksum = Table::Checksum(data);
       if (!checksum) {
         return false;
       }
@@ -147,45 +190,20 @@ public:
       if (!out.o32(offset)) {
         return false;
       }
-      offset += table->second.size();
-      if (!out.u32(tr.length)) {
+      offset += data.size();
+      if (!out.u32(length)) {
         return false;
       }
     }
-    offset = start;
-    for (TableRecord const &tr : tableDirectory.tableRecords) {
-      auto table = tables.find(tr.tag.values);
-      if (table == tables.end()) {
+    if (!out.seek(start)) {
+      return false;
+    }
+    for (auto const &data : tableContents) {
+      if (!out.write((void *)data.c_str(), data.size())) {
         return false;
       }
-      if (table->second.size() < tr.length) {
-        return false;
-      }
-      if (table->second.size() % 4 != 0) {
-        return false;
-      }
-      if (!out.seek(offset)) {
-        return false;
-      }
-      if (!out.write(table->second.data(), table->second.size())) {
-        return false;
-      }
-      offset += table->second.size();
     }
     return true;
-  }
-
-  static std::optional<uint32_t> Checksum(std::string const &table) {
-    if (table.size() % 4 != 0) {
-      return std::nullopt;
-    }
-    uint32_t const *ptr = (uint32_t const *)table.data();
-    uint32_t sum = 0;
-    uint32_t const *const end = ptr + table.size() / 4;
-    while (ptr < end) {
-      sum += *ptr++;
-    }
-    return sum;
   }
 
   static std::shared_ptr<FontFile> Read(InputStream &in) {
@@ -210,7 +228,7 @@ public:
       if (!in.read(buffer.data(), tr.length)) {
         return nullptr;
       }
-      ff->tables[tr.tag.values].swap(buffer);
+      ff->tables[tr.tag.values] = make_shared<ReadonlyTable>(buffer, tr.length);
     }
     return ff;
   }
