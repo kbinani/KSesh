@@ -17,6 +17,20 @@ public:
   }
 };
 
+class OutputStream {
+public:
+  virtual ~OutputStream() {}
+  virtual bool u32(uint32_t v) = 0;
+  virtual bool u16(uint16_t v) = 0;
+  virtual bool u8(uint8_t v) = 0;
+  virtual bool write(void *buffer, size_t size) = 0;
+  virtual bool seek(int64_t loc) = 0;
+
+  bool o32(Offset32 v) {
+    return u32(v);
+  }
+};
+
 struct Tag {
   std::array<uint8_t, 4> values;
 
@@ -91,6 +105,89 @@ public:
   TableDirectory tableDirectory;
   std::map<std::array<uint8_t, 4>, std::string> tables;
 
+  bool write(OutputStream &out) {
+    if (!out.u32(tableDirectory.sfntVersion)) {
+      return false;
+    }
+    if (!out.u16(tableDirectory.numTables)) {
+      return false;
+    }
+    if (!out.u16(tableDirectory.searchRange)) {
+      return false;
+    }
+    if (!out.u16(tableDirectory.entrySelector)) {
+      return false;
+    }
+    if (!out.u16(tableDirectory.rangeShift)) {
+      return false;
+    }
+    Offset32 const start = 12 + 16 * tableDirectory.numTables;
+    Offset32 offset = start;
+    for (TableRecord const &tr : tableDirectory.tableRecords) {
+      if (!out.write((void *)tr.tag.values.data(), tr.tag.values.size())) {
+        return false;
+      }
+      auto table = tables.find(tr.tag.values);
+      if (table == tables.end()) {
+        return false;
+      }
+      if (table->second.size() < tr.length) {
+        return false;
+      }
+      if (table->second.size() % 4 != 0) {
+        return false;
+      }
+      auto checksum = Checksum(table->second);
+      if (!checksum) {
+        return false;
+      }
+      if (!out.u32(*checksum)) {
+        return false;
+      }
+      if (!out.o32(offset)) {
+        return false;
+      }
+      offset += table->second.size();
+      if (!out.u32(tr.length)) {
+        return false;
+      }
+    }
+    offset = start;
+    for (TableRecord const &tr : tableDirectory.tableRecords) {
+      auto table = tables.find(tr.tag.values);
+      if (table == tables.end()) {
+        return false;
+      }
+      if (table->second.size() < tr.length) {
+        return false;
+      }
+      if (table->second.size() % 4 != 0) {
+        return false;
+      }
+      if (!out.seek(offset)) {
+        return false;
+      }
+      if (!out.write(table->second.data(), table->second.size())) {
+        return false;
+      }
+      offset += table->second.size();
+    }
+    return true;
+  }
+
+  static std::optional<uint32_t> Checksum(std::string const &table) {
+    if (table.size() % 4 != 0) {
+      return std::nullopt;
+    }
+    uint32_t const *ptr = (uint32_t const *)table.data();
+    uint32_t sum = 0;
+    uint32_t const *const end = ptr + table.size() / 4;
+    while (ptr < end) {
+      sum += *ptr++;
+    }
+    return sum;
+  }
+
   static std::shared_ptr<FontFile> Read(InputStream &in) {
     using namespace std;
     auto ff = make_shared<FontFile>();
@@ -101,9 +198,15 @@ public:
     }
     for (uint32_t i = 0; i < ff->tableDirectory.numTables; i++) {
       TableRecord tr = ff->tableDirectory.tableRecords[i];
-      uint32_t size = tr.length + (tr.length % 4);
+      uint32_t size = tr.length;
+      if (size % 4 != 0) {
+        size += 4 - (tr.length % 4);
+      }
       string buffer;
       buffer.resize(size);
+      if (!in.seek(tr.offset)) {
+        return nullptr;
+      }
       if (!in.read(buffer.data(), tr.length)) {
         return nullptr;
       }
@@ -160,10 +263,60 @@ private:
   juce::FileInputStream s;
 };
 
+class FileOutputStream : public OutputStream {
+public:
+  explicit FileOutputStream(juce::File file) : s(file) {
+    if (!s.setPosition(0)) {
+      return;
+    }
+    s.truncate();
+  }
+
+  bool u32(uint32_t v) override {
+    if (s.failedToOpen()) {
+      return false;
+    }
+    return s.writeIntBigEndian(*(int32_t *)&v);
+  }
+
+  bool u16(uint16_t v) override {
+    if (s.failedToOpen()) {
+      return false;
+    }
+    return s.writeShortBigEndian(*(int16_t *)&v);
+  }
+
+  bool u8(uint8_t v) override {
+    if (s.failedToOpen()) {
+      return false;
+    }
+    return s.writeByte(*(char *)&v);
+  }
+
+  bool write(void *buffer, size_t size) override {
+    if (s.failedToOpen()) {
+      return false;
+    }
+    return s.write(buffer, size);
+  }
+
+  bool seek(int64_t loc) override {
+    if (s.failedToOpen()) {
+      return false;
+    }
+    return s.setPosition(loc);
+  }
+
+private:
+  juce::FileOutputStream s;
+};
+
 TEST_CASE("research") {
   FileInputStream fis(juce::File::getCurrentWorkingDirectory().getChildFile("egyptiantext-COLR.ttf"));
   auto ff = FontFile::Read(fis);
   CHECK(ff);
+  FileOutputStream fos(juce::File::getCurrentWorkingDirectory().getChildFile("egyptiantext-COLR-out.ttf"));
+  CHECK(ff->write(fos));
 }
 
 } // namespace ksesh::test
