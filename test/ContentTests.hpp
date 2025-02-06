@@ -2,11 +2,19 @@ namespace ksesh::test {
 
 using Offset32 = uint32_t;
 
+struct Fixed {
+  uint32_t value;
+};
+
+using LONGDATETIME = int64_t;
+
 class InputStream {
 public:
   virtual ~InputStream() {}
   virtual bool ok() = 0;
+  virtual int64_t i64() = 0;
   virtual uint32_t u32() = 0;
+  virtual int16_t i16() = 0;
   virtual uint16_t u16() = 0;
   virtual uint8_t u8() = 0;
   virtual bool read(void *buffer, size_t size) = 0;
@@ -20,7 +28,9 @@ public:
 class OutputStream {
 public:
   virtual ~OutputStream() {}
+  virtual bool i64(int64_t v) = 0;
   virtual bool u32(uint32_t v) = 0;
+  virtual bool i16(int16_t) = 0;
   virtual bool u16(uint16_t v) = 0;
   virtual bool u8(uint8_t v) = 0;
   virtual bool write(void *buffer, size_t size) = 0;
@@ -29,6 +39,175 @@ public:
   bool o32(Offset32 v) {
     return u32(v);
   }
+};
+
+class ByteInputStream : public InputStream {
+public:
+  explicit ByteInputStream(std::string const &buffer) : buffer(buffer) {
+  }
+
+  int64_t i64() override {
+    if (pos + 8 <= buffer.size()) {
+      uint64_t v = juce::ByteOrder::bigEndianInt64(buffer.c_str() + pos);
+      pos += 8;
+      return *(int64_t*)&v;
+    } else {
+      pos = buffer.size();
+      return 0;
+    }
+  }
+
+  uint32_t u32() override {
+    if (pos + 4 <= buffer.size()) {
+      uint32_t v = juce::ByteOrder::bigEndianInt(buffer.c_str() + pos);
+      pos += 4;
+      return v;
+    } else {
+      pos = buffer.size();
+      return 0;
+    }
+  }
+
+  int16_t i16() override {
+    if (pos + 2 <= buffer.size()) {
+      uint16_t v = juce::ByteOrder::bigEndianShort(buffer.c_str() + pos);
+      pos += 2;
+      return *(int16_t*)&v;
+    } else {
+      pos = buffer.size();
+      return 0;
+    }
+  }
+
+  uint16_t u16() override {
+    if (pos + 2 <= buffer.size()) {
+      uint16_t v = juce::ByteOrder::bigEndianShort(buffer.c_str() + pos);
+      pos += 2;
+      return v;
+    } else {
+      pos = buffer.size();
+      return 0;
+    }
+  }
+
+  uint8_t u8() override {
+    if (pos + 1 <= buffer.size()) {
+      char v = buffer[pos];
+      pos += 1;
+      return *(uint8_t *)&v;
+    } else {
+      pos = buffer.size();
+      return 0;
+    }
+  }
+
+  bool read(void* buf, size_t size) override {
+    if (pos + size <= buffer.size()) {
+      pos += size;
+      std::copy_n(buffer.c_str() + pos, size, (char *)buf);
+      return true;
+    } else {
+      pos = buffer.size();
+      return false;
+    }
+  }
+
+  bool seek(int64_t loc) override {
+    if (0 <= pos + loc && pos + loc <= buffer.size()) {
+      pos = loc;
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  bool ok() override {
+    return pos < buffer.size();
+  }
+
+private:
+  size_t pos = 0;
+  std::string buffer;
+};
+
+class ByteOutputStream : public OutputStream {
+public:
+  bool i64(int64_t v) override {
+    uint64_t t = juce::ByteOrder::bigEndianInt64(&v);
+    if (loc + 8 > buffer.size()) {
+      buffer.resize(loc + 8);
+    }
+    std::copy_n((char const *)&t, 8, buffer.data() + loc);
+    loc += 8;
+    return true;
+  }
+
+  bool u32(uint32_t v) override {
+    uint32_t t = juce::ByteOrder::bigEndianInt(&v);
+    if (loc + 4 > buffer.size()) {
+      buffer.resize(loc + 4);
+    }
+    std::copy_n((char const *)&t, 4, buffer.data() + loc);
+    loc += 4;
+    return true;
+  }
+
+  bool i16(int16_t v) override {
+    uint16_t t = juce::ByteOrder::bigEndianShort(&v);
+    if (loc + 2 > buffer.size()) {
+      buffer.resize(loc + 2);
+    }
+    std::copy_n((char const *)&t, 2, buffer.data() + loc);
+    loc += 2;
+    return true;
+  }
+
+  bool u16(uint16_t v) override {
+    uint16_t t = juce::ByteOrder::bigEndianShort(&v);
+    if (loc + 2 > buffer.size()) {
+      buffer.resize(loc + 2);
+    }
+    std::copy_n((char const *)&t, 2, buffer.data() + loc);
+    loc += 2;
+    return true;
+  }
+
+  bool u8(uint8_t v) override {
+    if (loc + 1 > buffer.size()) {
+      buffer.resize(loc + 1);
+    }
+    buffer[loc] = *(char*)&v;
+    loc += 1;
+    return true;
+  }
+
+  bool write(void* buf, size_t size) override {
+    if (loc + size > buffer.size()) {
+      buffer.resize(loc + size);
+    }
+    std::copy_n((char const *)buf, size, buffer.data() + loc);
+    loc += size;
+    return true;
+  }
+
+  bool seek(int64_t l) override {
+    if (l >= 0) {
+      loc = l;
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  std::string data() {
+    std::string s;
+    s.assign((char const*)buffer.data(), buffer.size());
+    return s;
+  }
+
+private:
+  std::vector<uint8_t> buffer;
+  size_t loc = 0;
 };
 
 struct Tag {
@@ -44,6 +223,15 @@ struct Tag {
     } else {
       return std::nullopt;
     }
+  }
+
+  static constexpr std::array<uint8_t, 4> FCC(char a, char b, char c, char d) {
+    std::array<uint8_t, 4> v;
+    v[0] = *(uint8_t *)&a;
+    v[1] = *(uint8_t *)&b;
+    v[2] = *(uint8_t *)&c;
+    v[3] = *(uint8_t *)&d;
+    return v;
   }
 };
 
@@ -103,8 +291,11 @@ struct TableDirectory {
 class Table {
 public:
   virtual ~Table() {}
-  virtual std::string encode() = 0;
-  virtual uint32_t length() = 0;
+  struct EncodeResult {
+    std::string data;
+    uint32_t length;
+  };
+  virtual std::optional<EncodeResult> encode() = 0;
 
   static std::optional<uint32_t> Checksum(std::string const &table) {
     if (table.size() % 4 != 0) {
@@ -124,17 +315,135 @@ class ReadonlyTable : public Table {
 public:
   explicit ReadonlyTable(std::string const &content, uint32_t length) : content(content), len(length) {}
 
-  std::string encode() override {
-    return content;
-  }
-
-  uint32_t length() override {
-    return len;
+  std::optional<EncodeResult> encode() override {
+    EncodeResult er;
+    er.data = content;
+    er.length = len;
+    return er;
   }
 
 public:
   std::string const content;
   uint32_t const len;
+};
+
+// 'head'
+class FontHeaderTable : public Table {
+public:
+  static std::shared_ptr<FontHeaderTable> Read(InputStream &in) {
+    using namespace std;
+    auto r = make_shared<FontHeaderTable>();
+    r->majorVersion = in.u16();
+    r->minorVersion = in.u16();
+    r->fontRevision.value = in.u32();
+    r->checksumAdjustment = in.u32();
+    r->magicNumber = in.u32();
+    r->flags = in.u16();
+    r->unitsPerEm = in.u16();
+    r->created = in.i64();
+    r->modified = in.i64();
+    r->xMin = in.i16();
+    r->yMin = in.i16();
+    r->xMax = in.i16();
+    r->yMax = in.i16();
+    r->macStyle = in.u16();
+    r->lowestRecPPEM = in.u16();
+    r->fontDirectionHint = in.i16();
+    r->indexToLocFormat = in.i16();
+    r->glyphDataFormat = in.i16();
+    if (in.ok()) {
+      return r;
+    } else {
+      return nullptr;
+    }
+  }
+
+  std::optional<EncodeResult> encode() override {
+    using namespace std;
+    ByteOutputStream out;
+    if (!out.u16(majorVersion)) {
+      return nullopt;
+    }
+    if (!out.u16(minorVersion)) {
+      return nullopt;
+    }
+    if (!out.u32(fontRevision.value)) {
+      return nullopt;
+    }
+    if (!out.u32(checksumAdjustment)) {
+      return nullopt;
+    }
+    if (!out.u32(magicNumber)) {
+      return nullopt;
+    }
+    if (!out.u16(flags)) {
+      return nullopt;
+    }
+    if (!out.u16(unitsPerEm)) {
+      return nullopt;
+    }
+    if (!out.i64(created)) {
+      return nullopt;
+    }
+    if (!out.i64(modified)) {
+      return nullopt;
+    }
+    if (!out.i16(xMin)) {
+      return nullopt;
+    }
+    if (!out.i16(yMin)) {
+      return nullopt;
+    }
+    if (!out.i16(xMax)) {
+      return nullopt;
+    }
+    if (!out.i16(yMax)) {
+      return nullopt;
+    }
+    if (!out.u16(macStyle)) {
+      return nullopt;
+    }
+    if (!out.u16(lowestRecPPEM)) {
+      return nullopt;
+    }
+    if (!out.i16(fontDirectionHint)) {
+      return nullopt;
+    }
+    if (!out.i16(indexToLocFormat)) {
+      return nullopt;
+    }
+    if (!out.i16(glyphDataFormat)) {
+      return nullopt;
+    }
+    auto data = out.data();
+    EncodeResult er;
+    er.length = data.size();
+    if (er.length % 4 != 0) {
+      data.resize(er.length + (4 - (er.length % 4)));
+    }
+    er.data = data;
+    return er;
+  }
+
+public:
+  uint16_t majorVersion;
+  uint16_t minorVersion;
+  Fixed fontRevision;
+  uint32_t checksumAdjustment;
+  uint32_t magicNumber;
+  uint16_t flags;
+  uint16_t unitsPerEm;
+  LONGDATETIME created;
+  LONGDATETIME modified;
+  int16_t xMin;
+  int16_t yMin;
+  int16_t xMax;
+  int16_t yMax;
+  uint16_t macStyle;
+  uint16_t lowestRecPPEM;
+  int16_t fontDirectionHint;
+  int16_t indexToLocFormat;
+  int16_t glyphDataFormat;
 };
 
 class FontFile {
@@ -171,16 +480,19 @@ public:
         return false;
       }
       auto table = item->second;
-      auto data = table->encode();
-      auto length = table->length();
-      tableContents.push_back(data);
-      if (data.size() < length) {
+      auto encoded = table->encode();
+      if (!encoded) {
         return false;
       }
-      if (data.size() % 4 != 0) {
+      uint32_t length = encoded->length;
+      tableContents.push_back(encoded->data);
+      if (encoded->data.size() < length) {
         return false;
       }
-      auto checksum = Table::Checksum(data);
+      if (encoded->data.size() % 4 != 0) {
+        return false;
+      }
+      auto checksum = Table::Checksum(encoded->data);
       if (!checksum) {
         return false;
       }
@@ -190,7 +502,7 @@ public:
       if (!out.o32(offset)) {
         return false;
       }
-      offset += data.size();
+      offset += encoded->data.size();
       if (!out.u32(length)) {
         return false;
       }
@@ -228,7 +540,16 @@ public:
       if (!in.read(buffer.data(), tr.length)) {
         return nullptr;
       }
-      ff->tables[tr.tag.values] = make_shared<ReadonlyTable>(buffer, tr.length);
+      if (tr.tag.values == Tag::FCC('h', 'e', 'a', 'd')) {
+        ByteInputStream slice(buffer);
+        auto head = FontHeaderTable::Read(slice);
+        if (!head) {
+          return nullptr;
+        }
+        ff->tables[tr.tag.values] = head;
+      } else {
+        ff->tables[tr.tag.values] = make_shared<ReadonlyTable>(buffer, tr.length);
+      }
     }
     return ff;
   }
@@ -238,12 +559,26 @@ class FileInputStream : public InputStream {
 public:
   explicit FileInputStream(juce::File file) : s(file) {}
 
+  int64_t i64() override {
+    if (!ok()) {
+      return 0;
+    }
+    return s.readInt64BigEndian();
+  }
+
   uint32_t u32() override {
     if (!ok()) {
       return 0;
     }
     int32_t v = s.readIntBigEndian();
     return *(uint32_t *)&v;
+  }
+
+  int16_t i16() override {
+    if (!ok()) {
+      return 0;
+    }
+    return s.readShortBigEndian();
   }
 
   uint16_t u16() override {
@@ -290,12 +625,26 @@ public:
     s.truncate();
   }
 
+  bool i64(int64_t v) override {
+    if (s.failedToOpen()) {
+      return false;
+    }
+    return s.writeInt64BigEndian(v);
+  }
+
   bool u32(uint32_t v) override {
     if (s.failedToOpen()) {
       return false;
     }
     return s.writeIntBigEndian(*(int32_t *)&v);
   }
+
+  bool i16(int16_t v) override {
+    if (s.failedToOpen()) {
+      return false;
+    }
+    return s.writeShortBigEndian(v);
+  } 
 
   bool u16(uint16_t v) override {
     if (s.failedToOpen()) {
@@ -330,7 +679,7 @@ private:
 };
 
 TEST_CASE("research") {
-  FileInputStream fis(juce::File::getCurrentWorkingDirectory().getChildFile("egyptiantext-COLR.ttf"));
+  FileInputStream fis(juce::File::getCurrentWorkingDirectory().getChildFile("egyptiantext-COLR-reordered.ttf"));
   auto ff = FontFile::Read(fis);
   CHECK(ff);
   FileOutputStream fos(juce::File::getCurrentWorkingDirectory().getChildFile("egyptiantext-COLR-out.ttf"));
