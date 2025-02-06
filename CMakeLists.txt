@@ -92,6 +92,20 @@ list(APPEND ksesh_files
   src/desktop/AboutComponent.hpp
   src/desktop/ExampleComponent.hpp
   src/desktop/defer.hpp
+  src/desktop/otf/Type.hpp
+  src/desktop/otf/Tag.hpp
+  src/desktop/otf/TableRecord.hpp
+  src/desktop/otf/TableDirectory.hpp
+  src/desktop/otf/FontFile.hpp
+  src/desktop/otf/io/InputStream.hpp
+  src/desktop/otf/io/OutputStream.hpp
+  src/desktop/otf/io/FileInputStream.hpp
+  src/desktop/otf/io/FileOutputStream.hpp
+  src/desktop/otf/io/ByteInputStream.hpp
+  src/desktop/otf/io/ByteOutputStream.hpp
+  src/desktop/otf/table/Table.hpp
+  src/desktop/otf/table/ReadonlyTable.hpp
+  src/desktop/otf/table/FontHeaderTable.hpp
 )
 if (APPLE)
   list(APPEND ksesh_files src/desktop/Application.mm)
