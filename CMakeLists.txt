@@ -106,6 +106,7 @@ list(APPEND ksesh_files
   src/desktop/otf/table/Table.hpp
   src/desktop/otf/table/ReadonlyTable.hpp
   src/desktop/otf/table/FontHeaderTable.hpp
+  src/desktop/otf/table/MaximumProfileTable.hpp
 )
 if (APPLE)
   list(APPEND ksesh_files src/desktop/Application.mm)
