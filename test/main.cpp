@@ -20,6 +20,7 @@
 #include "otf/table/ReadonlyTable.hpp"
 #include "otf/table/FontHeaderTable.hpp"
 #include "otf/table/MaximumProfileTable.hpp"
+#include "otf/table/IndexToLocationTable.hpp"
 #include "otf/FontFile.hpp"
 
 #include "String.hpp"

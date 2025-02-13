@@ -4,7 +4,7 @@ TEST_CASE("research") {
   FileInputStream fis(juce::File::getCurrentWorkingDirectory().getChildFile("egyptiantext-COLR-reordered.ttf"));
   REQUIRE(fis.ok());
   auto ff = FontFile::Read(fis);
-  CHECK(ff);
+  REQUIRE(ff);
   FileOutputStream fos(juce::File::getCurrentWorkingDirectory().getChildFile("egyptiantext-COLR-out.ttf"));
   CHECK(ff->write(fos));
 }
