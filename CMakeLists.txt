@@ -108,6 +108,7 @@ list(APPEND ksesh_files
   src/desktop/otf/table/FontHeaderTable.hpp
   src/desktop/otf/table/MaximumProfileTable.hpp
   src/desktop/otf/table/IndexToLocationTable.hpp
+  src/desktop/otf/table/GlyphDataTable.hpp
 )
 if (APPLE)
   list(APPEND ksesh_files src/desktop/Application.mm)
