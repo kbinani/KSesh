@@ -22,6 +22,7 @@
 #include "otf/table/MaximumProfileTable.hpp"
 #include "otf/table/IndexToLocationTable.hpp"
 #include "otf/table/GlyphDataTable.hpp"
+#include "otf/table/CharacterToGlyphIndexMapping.hpp"
 #include "otf/FontFile.hpp"
 
 #include "String.hpp"
