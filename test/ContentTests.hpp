@@ -1,10 +1,10 @@
 namespace ksesh::test {
 
 TEST_CASE("research") {
-  FileInputStream fis(juce::File::getCurrentWorkingDirectory().getChildFile("egyptiantext-COLR-reordered.ttf"));
-  auto ff = FontFile::Read(fis);
+  ksesh::otf::FileInputStream fis(juce::File::getCurrentWorkingDirectory().getChildFile("egyptiantext-COLR.ttf"));
+  auto ff = ksesh::otf::FontFile::Read(fis);
   REQUIRE(ff);
-  FileOutputStream fos(juce::File::getCurrentWorkingDirectory().getChildFile("egyptiantext-COLR-out.ttf"));
+  ksesh::otf::FileOutputStream fos(juce::File::getCurrentWorkingDirectory().getChildFile("egyptiantext-COLR-out.ttf"));
   CHECK(ff->write(fos));
 }
 
