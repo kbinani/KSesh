@@ -25,6 +25,7 @@
 #include "otf/table/PostScriptTable.hpp"
 #include "otf/table/OS2AndWindowsMetricsTable.hpp"
 #include "otf/table/HorizontalHeaderTable.hpp"
+#include "otf/table/HorizontalMetricsTable.hpp"
 #include "otf/FontFile.hpp"
 
 #include "String.hpp"
