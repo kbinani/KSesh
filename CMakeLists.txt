@@ -111,6 +111,7 @@ list(APPEND ksesh_files
   src/desktop/otf/table/GlyphDataTable.hpp
   src/desktop/otf/table/PostScriptTable.hpp
   src/desktop/otf/table/OS2AndWindowsMetricsTable.hpp
+  src/desktop/otf/table/HorizontalHeaderTable.hpp
 )
 if (APPLE)
   list(APPEND ksesh_files src/desktop/Application.mm)

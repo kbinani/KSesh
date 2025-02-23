@@ -24,6 +24,7 @@
 #include "otf/table/GlyphDataTable.hpp"
 #include "otf/table/PostScriptTable.hpp"
 #include "otf/table/OS2AndWindowsMetricsTable.hpp"
+#include "otf/table/HorizontalHeaderTable.hpp"
 #include "otf/FontFile.hpp"
 
 #include "String.hpp"
