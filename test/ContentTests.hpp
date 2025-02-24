@@ -10,7 +10,6 @@ TEST_CASE("F2DOT14") {
   for (auto [i, f] : data) {
     otf::F2DOT14 a;
     a.data = i;
-    auto w = a.toFloat();
     CHECK(a.toFloat() == f);
     auto b = otf::F2DOT14::FromFloat(f);
     CHECK(b.data == a.data);
