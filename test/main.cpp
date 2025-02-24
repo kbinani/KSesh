@@ -6,6 +6,8 @@
 #include <optional>
 #include <variant>
 
+#include "defer.hpp"
+
 #include "otf/Type.hpp"
 #include "otf/io/InputStream.hpp"
 #include "otf/io/OutputStream.hpp"

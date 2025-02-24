@@ -17,10 +17,13 @@ TEST_CASE("F2DOT14") {
 }
 
 TEST_CASE("research") {
-  ksesh::otf::FileInputStream fis(juce::File::getCurrentWorkingDirectory().getChildFile("egyptiantext-COLR.ttf"));
-  auto ff = ksesh::otf::FontFile::Read(fis);
+  using namespace ksesh::otf;
+  FileInputStream fis(juce::File::getCurrentWorkingDirectory().getChildFile("egyptiantext-COLR.ttf"));
+  auto ff = FontFile::Read(fis);
   REQUIRE(ff);
-  ksesh::otf::FileOutputStream fos(juce::File::getCurrentWorkingDirectory().getChildFile("egyptiantext-COLR-out.ttf"));
+  auto gid = ff->addCompositeGlyph("foo", GlyphDataTable::CompositeGlyph::GlyphRecord::New(1, 0, 0));
+  CHECK(gid);
+  FileOutputStream fos(juce::File::getCurrentWorkingDirectory().getChildFile("egyptiantext-COLR-out.ttf"));
   CHECK(ff->write(fos));
 }
 
