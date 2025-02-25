@@ -21,8 +21,10 @@ TEST_CASE("research") {
   FileInputStream fis(juce::File::getCurrentWorkingDirectory().getChildFile("egyptiantext-COLR.ttf"));
   auto ff = FontFile::Read(fis);
   REQUIRE(ff);
-  auto gid = ff->addCompositeGlyph("foo", GlyphDataTable::CompositeGlyph::GlyphRecord::New(1, 0, 0));
-  CHECK(gid);
+  auto gid0 = ff->addEmptyGlyph("foo");
+  CHECK(gid0);
+  auto gid1 = ff->addCompositeGlyph("bar", GlyphDataTable::CompositeGlyph::GlyphRecord::New(1, 0, 0));
+  CHECK(gid1);
   FileOutputStream fos(juce::File::getCurrentWorkingDirectory().getChildFile("egyptiantext-COLR-out.ttf"));
   CHECK(ff->write(fos));
 }
