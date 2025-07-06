@@ -574,11 +574,18 @@ private:
   }
 
   void copyWithoutFormatControl() {
-    if (!fContent) {
+    auto selected = fTextEditor->getSelectedText();
+    std::shared_ptr<Content> c;
+    if (selected) {
+      c = std::make_shared<Content>(U32StringFromJuceString(*selected), fFont);
+    } else if (fContent) {
+      c = fContent;
+    } else {
       return;
     }
+
     juce::String s;
-    for (auto const &line : fContent->lines) {
+    for (auto const &line : c->lines) {
       std::u32string l;
       for (char32_t ch : line->result) {
         if (0x13430 <= ch && ch <= 0x13455) {
@@ -595,11 +602,18 @@ private:
   }
 
   void copyWithFormatControl() {
-    if (!fContent) {
+    auto selected = fTextEditor->getSelectedText();
+    std::shared_ptr<Content> c;
+    if (selected) {
+      c = std::make_shared<Content>(U32StringFromJuceString(*selected), fFont);
+    } else if (fContent) {
+      c = fContent;
+    } else {
       return;
     }
+
     juce::String s;
-    for (auto const &line : fContent->lines) {
+    for (auto const &line : c->lines) {
       if (s.isNotEmpty()) {
         s += "\n";
       }

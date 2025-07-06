@@ -270,6 +270,15 @@ public:
     fEditor->setHighlightedRegion(juce::Range<int>(start, end));
   }
 
+  std::optional<juce::String> getSelectedText() {
+    juce::Range<int> range = fEditor->getHighlightedRegion();
+    if (range.isEmpty()) {
+      return std::nullopt;
+    }
+    juce::String all = fEditor->getText();
+    return all.substring(range.getStart(), range.getEnd());
+  }
+
   void resetText(juce::String const &s) {
     unbind();
     fEditor->setText(s);
