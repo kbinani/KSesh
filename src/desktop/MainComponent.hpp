@@ -173,6 +173,7 @@ public:
     case commandEditCopyAsUnicodeWithFormatControl:
       info.setInfo(TRANS("Copy text with format control"), {}, {}, 0);
       info.setActive((bool)fContent);
+      info.addDefaultKeypress('c', juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier);
       return;
 #if defined(JUCE_WINDOWS)
     case commandFileExportAsEmf:
