@@ -7,3 +7,6 @@
 [submodule "deps/doctest"]
 	path = deps/doctest
 	url = https://github.com/doctest/doctest.git
+[submodule "deps/eglyf"]
+	path = deps/eglyf
+	url = https://github.com/kbinani/eglyf.git
