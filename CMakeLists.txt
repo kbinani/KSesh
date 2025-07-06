@@ -113,6 +113,8 @@ juce_add_binary_data(ksesh-binary-data
     "res/translation/japanese.txt"
     "res/font/NewGardiner.ttf"
     "res/license/NewGardiner-OFL.txt"
+    "res/font/NotoSansEgyptianHieroglyphs-Regular.ttf"
+    "res/license/NotoSansEgyptianHieroglyphs-OFL.txt"
 )
 
 target_compile_definitions(ksesh

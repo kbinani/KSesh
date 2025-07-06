@@ -74,6 +74,10 @@ public:
                  "https://github.com/nederhof/newgardiner",
                  juce::String::fromUTF8(BinaryData::NewGardinerOFL_txt, BinaryData::NewGardinerOFL_txtSize),
                  fContent->fString);
+    addParagraph("Noto Sans Egyptian Hieroglyphs Font",
+                 "https://github.com/notofonts/egyptian-hieroglyphs",
+                 juce::String::fromUTF8(BinaryData::NotoSansEgyptianHieroglyphsOFL_txt, BinaryData::NotoSansEgyptianHieroglyphsOFL_txtSize),
+                 fContent->fString);
     addParagraph("JUCE Framework",
                  "https://github.com/juce-framework/JUCE, https://github.com/kbinani/JUCE",
                  juce::String::fromUTF8(BinaryData::JUCE_Framework_txt, BinaryData::JUCE_Framework_txtSize),
