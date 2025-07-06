@@ -12,6 +12,12 @@ public:
     Light = 3,
   };
 
+  enum FontFamily {
+    EgyptianText = 0,
+    NewGardiner = 1,
+    NotoSans = 2,
+  };
+
   AppSetting() {
     fRecentFiles.setMaxNumberOfItems(10);
     load();
@@ -263,6 +269,7 @@ private:
   PresentationSetting fPresentation;
   float fEditorFontSize = 24;
   bool fEnablePreview = true;
+  FontFamily fFontFamily = EgyptianText;
 };
 
 } // namespace ksesh
