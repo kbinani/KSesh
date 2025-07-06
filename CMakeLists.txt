@@ -111,6 +111,8 @@ juce_add_binary_data(ksesh-binary-data
     "res/license/KSesh.txt"
     "res/license/PDFGen.txt"
     "res/translation/japanese.txt"
+    "res/font/NewGardiner.ttf"
+    "res/license/NewGardiner-OFL.txt"
 )
 
 target_compile_definitions(ksesh

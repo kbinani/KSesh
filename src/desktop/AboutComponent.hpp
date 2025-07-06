@@ -70,6 +70,10 @@ public:
                  "https://github.com/microsoft/font-tools/tree/main/EgyptianOpenType/font",
                  juce::String::fromUTF8(BinaryData::Egyptian_Text_Font_txt, BinaryData::Egyptian_Text_Font_txtSize),
                  fContent->fString);
+    addParagraph("NewGardiner Font",
+                 "https://github.com/nederhof/newgardiner",
+                 juce::String::fromUTF8(BinaryData::NewGardinerOFL_txt, BinaryData::NewGardinerOFL_txtSize),
+                 fContent->fString);
     addParagraph("JUCE Framework",
                  "https://github.com/juce-framework/JUCE, https://github.com/kbinani/JUCE",
                  juce::String::fromUTF8(BinaryData::JUCE_Framework_txt, BinaryData::JUCE_Framework_txtSize),
