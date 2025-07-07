@@ -99,6 +99,10 @@ public:
     onChange();
   }
 
+  FontFamily fontFamily() const {
+    return fFontFamily;
+  }
+
 private:
   void onChange() {
     sendSynchronousChangeMessage();
@@ -161,6 +165,19 @@ private:
     o->setProperty(juce::Identifier("recent_files"), items.joinIntoString("\n"));
     o->setProperty("enable_preview", fEnablePreview);
     o->setProperty("version", int(1));
+    juce::String fontFamily = "EgyptianText";
+    switch (fFontFamily) {
+    case EgyptianText:
+      fontFamily = "EgyptianText";
+      break;
+    case NewGardiner:
+      fontFamily = "NewGardiner";
+      break;
+    case NotoSans:
+      fontFamily = "NotoSans";
+      break;
+    }
+    o->setProperty("font_family", fontFamily);
     juce::JSON::writeToStream(*stream, obj, {});
   }
 
@@ -211,6 +228,17 @@ private:
     auto enablePreview = o->getProperty("enable_preview");
     if (enablePreview.isBool()) {
       fEnablePreview = (bool)enablePreview;
+    }
+    auto fontFamily = o->getProperty("font_family");
+    if (fontFamily.isString()) {
+      juce::String ff = fontFamily;
+      if (ff == "NewGardiner") {
+        fFontFamily = NewGardiner;
+      } else if (ff == "NotoSans") {
+        fFontFamily = NotoSans;
+      } else {
+        fFontFamily = EgyptianText;
+      }
     }
   }
 

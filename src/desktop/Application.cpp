@@ -56,11 +56,31 @@ public:
 
     juce::LocalisedStrings::setCurrentMappings(CurrentLocalisedStrings());
 
-    HbBlobUniquePtr blob(hb_blob_create(BinaryData::eot_ttf,
-                                        BinaryData::eot_ttfSize,
-                                        HB_MEMORY_MODE_READONLY,
-                                        nullptr,
-                                        nullptr));
+    HbBlobUniquePtr blob;
+    switch (fSetting->fontFamily()) {
+    case AppSetting::NewGardiner:
+      blob.reset(hb_blob_create(BinaryData::NewGardiner_ttf,
+                                BinaryData::NewGardiner_ttfSize,
+                                HB_MEMORY_MODE_READONLY,
+                                nullptr,
+                                nullptr));
+      break;
+    case AppSetting::NotoSans:
+      blob.reset(hb_blob_create(BinaryData::NotoSansEgyptianHieroglyphsRegular_ttf,
+                                BinaryData::NotoSansEgyptianHieroglyphsRegular_ttfSize,
+                                HB_MEMORY_MODE_READONLY,
+                                nullptr,
+                                nullptr));
+      break;
+    case AppSetting::EgyptianText:
+    default:
+      blob.reset(hb_blob_create(BinaryData::eot_ttf,
+                                BinaryData::eot_ttfSize,
+                                HB_MEMORY_MODE_READONLY,
+                                nullptr,
+                                nullptr));
+      break;
+    }
     HbFaceUniquePtr face(hb_face_create(blob.get(), 0));
     fFont = HbMakeSharedFontPtr(hb_font_create(face.get()));
     fLaf = std::make_unique<LookAndFeel>();
