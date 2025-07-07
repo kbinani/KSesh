@@ -53,7 +53,8 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
         g.drawHorizontalLine(y - vp.getY() - dy, defaultIndent - vp.getX(), textWidth - defaultIndent - vp.getX());
       }
 
-      if (!fContent) {
+      auto content = fContent.lock();
+      if (!content) {
         return;
       }
       auto textColor = getLookAndFeel().findColour(juce::TextEditor::ColourIds::textColourId);
@@ -63,7 +64,7 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
 
       float constexpr caretWidth = 2;
       g.addTransform(juce::AffineTransform::translation(-vp.getX(), -vp.getY()));
-      fContent->draw(
+      content->draw(
           g,
           fSelectedRange.getStart(),
           fSelectedRange.getEnd(),
@@ -110,30 +111,31 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
 
     int indexAtPosition(float x, float y) const override {
       auto ret = super::indexAtPosition(x, y);
-      if (!fContent) {
+      auto content = fContent.lock();
+      if (!content) {
         return ret;
       }
-      if (fContent->lines.empty()) {
+      if (content->lines.empty()) {
         return ret;
       }
       auto p = fSetting->getPresentationSetting();
       float tx = x;
       float ty = y + p.fontSize;
       float lineHeight = p.fontSize + p.lineSpacing() + fSetting->getEditorFontSize();
-      int lineIndex = std::clamp<int>((int)floor(ty / lineHeight), 0, (int)fContent->lines.size() - 1);
+      int lineIndex = std::clamp<int>((int)floor(ty / lineHeight), 0, (int)content->lines.size() - 1);
       float offset = ty - lineIndex * lineHeight;
       if (0 <= offset && offset <= p.fontSize) {
         auto setting = getRenderSetting();
         auto maxWidth = getMaxWidth();
-        float const upem = (float)fContent->unitsPerEm;
+        float const upem = (float)content->unitsPerEm;
         float const scale = setting.fontSize / upem;
-        auto line = fContent->lines[lineIndex];
+        auto line = content->lines[lineIndex];
         auto bounds = line->boundingBox * scale;
         float drawScale = 1;
         if (bounds.getWidth() > maxWidth) {
           drawScale = maxWidth / bounds.getWidth();
         }
-        auto pos = fContent->closestPosition(getCaretPosition(), {tx / drawScale, ty}, setting);
+        auto pos = content->closestPosition(getCaretPosition(), {tx / drawScale, ty}, setting);
         return pos.location;
       } else {
         return ret;
@@ -161,7 +163,7 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
 
   private:
     std::shared_ptr<AppSetting> fSetting;
-    std::shared_ptr<Content> fContent;
+    std::weak_ptr<Content> fContent;
     juce::Range<int> fSelectedRange;
     Direction fDirection = Direction::Forward;
   };
@@ -169,13 +171,13 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
 public:
   struct Delegate {
     virtual ~Delegate() {};
-    virtual void textEditorComponentDidChangeContent(std::shared_ptr<Content> content, std::optional<juce::String> typing, int start, int end, Direction) = 0;
+    virtual void textEditorComponentDidChangeContentText(std::u32string const& contentText, std::optional<juce::String> typing, int start, int end, Direction) = 0;
     virtual void textEditorComponentDidChangeCaretPosition(juce::String const &typing, int start, int end, Direction) = 0;
     virtual void textEditorComponentDidGainFocus() = 0;
     virtual void textEditorComponentDidLostFocus() = 0;
   };
 
-  explicit TextEditorComponent(std::shared_ptr<hb_font_t> const &font, std::shared_ptr<AppSetting> const &setting) : fFont(font), fSetting(setting) {
+  explicit TextEditorComponent(std::shared_ptr<hb_font_t> const &font, std::shared_ptr<AppSetting> const &setting) : fSetting(setting) {
     fEditor = std::make_unique<TextEditor>(setting);
     fEditor->setMultiLine(true, false);
     fEditor->setReturnKeyStartsNewLine(true);
@@ -198,10 +200,6 @@ public:
   }
 
   void onClickSign(juce::String const &s) {
-    auto font = fFont.lock();
-    if (!font) {
-      return;
-    }
     unbind();
     auto text = fEditor->getText();
     auto selected = getSelectedRange();
@@ -231,13 +229,12 @@ public:
       } else if (nextCaret < caret) {
         fDirection = Direction::Backward;
       }
-      auto c = std::make_shared<Content>(U32StringFromJuceString(next), font);
+      auto c = U32StringFromJuceString(next);
       fEditor->setText(next, false);
       fEditor->setCaretPosition(nextCaret);
       fEditor->setSelectedRange(juce::Range<int>(nextCaret, nextCaret), fDirection);
-      fEditor->setContent(c);
+      fDelegate->textEditorComponentDidChangeContentText(c, std::nullopt, nextCaret, nextCaret, fDirection);
       bind();
-      fDelegate->textEditorComponentDidChangeContent(c, std::nullopt, nextCaret, nextCaret, fDirection);
     } else {
       auto str = s;
       if (selected.getEnd() >= text.length()) {
@@ -252,13 +249,12 @@ public:
       } else if (nextCaret < caret) {
         fDirection = Direction::Backward;
       }
-      auto c = std::make_shared<Content>(U32StringFromJuceString(next), font);
+      auto c = U32StringFromJuceString(next);
       fEditor->setText(next, false);
       fEditor->setCaretPosition(nextCaret);
       fEditor->setSelectedRange(juce::Range<int>(nextCaret, nextCaret), fDirection);
-      fEditor->setContent(c);
+      fDelegate->textEditorComponentDidChangeContentText(c, std::nullopt, nextCaret, nextCaret, fDirection);
       bind();
-      fDelegate->textEditorComponentDidChangeContent(c, std::nullopt, nextCaret, nextCaret, fDirection);
     }
   }
 
@@ -284,16 +280,13 @@ public:
   }
 
   void resetText(juce::String const &s) {
-    auto font = fFont.lock();
-    if (!font) {
-      return;
-    }
     unbind();
     fEditor->setText(s);
-    auto c = std::make_shared<Content>(U32StringFromJuceString(s), font);
-    fEditor->setHighlightedRegion(juce::Range<int>(s.length(), s.length()));
-    fEditor->setCaretPosition(s.length());
-    fEditor->setContent(c);
+    auto c = U32StringFromJuceString(s);
+    auto nextCaret = s.length();
+    fEditor->setHighlightedRegion(juce::Range<int>(nextCaret, nextCaret));
+    fEditor->setCaretPosition(nextCaret);
+    fDelegate->textEditorComponentDidChangeContentText(c, std::nullopt, nextCaret, nextCaret, fDirection);
     bind();
   }
 
@@ -302,6 +295,10 @@ public:
       return;
     }
     applySetting();
+  }
+
+  void setContent(std::shared_ptr<Content> const& content) {
+    fEditor->setContent(content);
   }
 
 private:
@@ -404,18 +401,13 @@ private:
   }
 
   void _onTextChange() {
-    auto font = fFont.lock();
-    if (!font) {
-      return;
-    }
     auto text = fEditor->getText();
     auto range = getSelectedRange();
-    auto c = std::make_shared<Content>(U32StringFromJuceString(text), font);
+    auto c = U32StringFromJuceString(text);
     auto typing = GetTypingAtCaret(text, range.getStart(), range.getEnd());
-    fEditor->setContent(c);
     fEditor->setSelectedRange(range, fDirection);
     if (fDelegate) {
-      fDelegate->textEditorComponentDidChangeContent(c, typing, range.getStart(), range.getEnd(), fDirection);
+      fDelegate->textEditorComponentDidChangeContentText(c, typing, range.getStart(), range.getEnd(), fDirection);
     }
   }
 
@@ -427,7 +419,6 @@ private:
   std::unique_ptr<TextEditor> fEditor;
   int fPrev = 0;
   Direction fDirection = Direction::Forward;
-  std::weak_ptr<hb_font_t> fFont;
   std::shared_ptr<AppSetting> fSetting;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TextEditorComponent)

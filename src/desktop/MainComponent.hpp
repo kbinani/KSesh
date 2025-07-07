@@ -29,33 +29,7 @@ public:
     int const width = 1280;
     int const height = 720;
 
-    HbBlobUniquePtr blob;
-    switch (fAppSetting->fontFamily()) {
-    case AppSetting::NewGardiner:
-      blob.reset(hb_blob_create(BinaryData::NewGardiner_ttf,
-                                BinaryData::NewGardiner_ttfSize,
-                                HB_MEMORY_MODE_READONLY,
-                                nullptr,
-                                nullptr));
-      break;
-    case AppSetting::NotoSans:
-      blob.reset(hb_blob_create(BinaryData::NotoSansEgyptianHieroglyphsRegular_ttf,
-                                BinaryData::NotoSansEgyptianHieroglyphsRegular_ttfSize,
-                                HB_MEMORY_MODE_READONLY,
-                                nullptr,
-                                nullptr));
-      break;
-    case AppSetting::EgyptianText:
-    default:
-      blob.reset(hb_blob_create(BinaryData::eot_ttf,
-                                BinaryData::eot_ttfSize,
-                                HB_MEMORY_MODE_READONLY,
-                                nullptr,
-                                nullptr));
-      break;
-    }
-    HbFaceUniquePtr face(hb_face_create(blob.get(), 0));
-    fFont = HbMakeSharedFontPtr(hb_font_create(face.get()));
+    fFont = LoadFont(fAppSetting->fontFamily());
 
     fTextEditor = std::make_unique<TextEditorComponent>(fFont, appSetting);
     fTextEditor->setBounds(0, 0, width / 2 - resizerSize / 2, height / 2 - resizerSize / 2);
@@ -565,6 +539,48 @@ public:
   }
 
 private:
+  static std::shared_ptr<hb_font_t> LoadFont(AppSetting::FontFamily fontFamily) {
+    HbBlobUniquePtr blob;
+    switch (fontFamily) {
+    case AppSetting::NewGardiner:
+      blob.reset(hb_blob_create(BinaryData::NewGardiner_ttf,
+                                BinaryData::NewGardiner_ttfSize,
+                                HB_MEMORY_MODE_READONLY,
+                                nullptr,
+                                nullptr));
+      break;
+    case AppSetting::NotoSans:
+      blob.reset(hb_blob_create(BinaryData::NotoSansEgyptianHieroglyphsRegular_ttf,
+                                BinaryData::NotoSansEgyptianHieroglyphsRegular_ttfSize,
+                                HB_MEMORY_MODE_READONLY,
+                                nullptr,
+                                nullptr));
+      break;
+    case AppSetting::EgyptianText:
+    default:
+      blob.reset(hb_blob_create(BinaryData::eot_ttf,
+                                BinaryData::eot_ttfSize,
+                                HB_MEMORY_MODE_READONLY,
+                                nullptr,
+                                nullptr));
+      break;
+    }
+    HbFaceUniquePtr face(hb_face_create(blob.get(), 0));
+    return HbMakeSharedFontPtr(hb_font_create(face.get()));
+  }
+
+  void changeFont(AppSetting::FontFamily fontFamily) {
+    auto next = LoadFont(fontFamily);
+    fSignList->setFont(next);
+    if (fContent) {
+      auto content = std::make_shared<Content>(fContent->raw, next);
+      fContent = content;
+      fHieroglyph->setContent(content);
+      fTextEditor->setContent(content);
+    }
+    fFont = next;
+  }
+
   void setFocusOwner(FocusOwner next, bool force = false) {
     if (next == fFocusOwner && !force) {
       return;
@@ -1036,7 +1052,8 @@ private:
     fHieroglyph->setSelectedRange(start, end, direction);
   }
 
-  void textEditorComponentDidChangeContent(std::shared_ptr<Content> content, std::optional<juce::String> typing, int start, int end, Direction direction) override {
+  void textEditorComponentDidChangeContentText(std::u32string const& contentText, std::optional<juce::String> typing, int start, int end, Direction direction) override {
+    auto content = std::make_shared<Content>(contentText, fFont);
     setContent(content);
     if (typing && fFocusOwner == FocusOwner::textEditor) {
       fSignList->setTyping(*typing);
@@ -1059,6 +1076,7 @@ private:
   void setContent(std::shared_ptr<Content> content) {
     fContent = content;
     fHieroglyph->setContent(content);
+    fTextEditor->setContent(content);
     fMenuModel->menuItemsChanged();
     bool wasDirty = fDirty;
     fDirty = true;

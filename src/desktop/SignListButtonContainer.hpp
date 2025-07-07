@@ -30,11 +30,8 @@ class SignListButtonContainer : public juce::Component {
   };
 
 public:
-  explicit SignListButtonContainer(std::shared_ptr<hb_font_t> const &font) : fFont(font) {
-    for (auto const &it : SignList::Signs()) {
-      auto s = makeSign(font, it.first, it.second);
-      fAllSigns[s->name] = s;
-    }
+  explicit SignListButtonContainer(std::shared_ptr<hb_font_t> const &font) {
+    setFont(font);
   }
 
   void paint(juce::Graphics &g) override {
@@ -132,13 +129,13 @@ public:
     repaint();
   }
 
-  int layout(int width) {
+  void layout(int width) {
     int y = 0;
     int x = 0;
     int maxY = 0;
     auto font = fFont.lock();
     if (!font) {
-      return 0;
+      return;
     }
     float scale = signButtonSignSize / (float)Harfbuzz::UnitsPerEm(font);
     fSignButtons.clear();
@@ -173,7 +170,7 @@ public:
     }
     fNumColumns = maxNumColumns;
     setBounds(0, 0, width, maxY);
-    return maxY;
+    return;
   }
 
   void updateFilter(juce::String const &activeCategory, juce::String const &typing) {
@@ -338,6 +335,15 @@ public:
     auto const &sign = fSigns[index];
     if (onClickSign) {
       onClickSign(*sign);
+    }
+  }
+
+  void setFont(std::shared_ptr<hb_font_t> const &font) {
+    fFont = font;
+    fAllSigns.clear();
+    for (auto const &it : SignList::Signs()) {
+      auto s = makeSign(font, it.first, it.second);
+      fAllSigns[s->name] = s;
     }
   }
 

@@ -268,6 +268,12 @@ public:
     fContainer->useSelectedSign();
   }
 
+  void setFont(std::shared_ptr<hb_font_t> const &font) {
+    fContainer->setFont(font);
+    fFont = font;
+    repaint();
+  }
+
 private:
   void updateButtonHit(juce::Point<int> const &p) {
     int hitTabButton = -1;

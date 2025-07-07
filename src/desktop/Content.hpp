@@ -344,7 +344,7 @@ class Content {
 #endif
 
 public:
-  Content(std::u32string const &raw, std::shared_ptr<hb_font_t> const &font) : unitsPerEm(Harfbuzz::UnitsPerEm(font)), font(font) {
+  Content(std::u32string const &raw, std::shared_ptr<hb_font_t> const &font) : unitsPerEm(Harfbuzz::UnitsPerEm(font)), font(font), raw(raw) {
     using namespace std;
     u32string::size_type offset = 0;
     while (offset < raw.size()) {
@@ -1153,6 +1153,7 @@ public:
   std::vector<std::shared_ptr<Line>> lines;
   unsigned int const unitsPerEm;
   std::weak_ptr<hb_font_t> font;
+  std::u32string const raw;
 };
 
 } // namespace ksesh

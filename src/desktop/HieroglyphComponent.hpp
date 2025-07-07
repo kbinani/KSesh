@@ -15,14 +15,15 @@ public:
 
   void paint(juce::Graphics &g) override {
     g.fillAll(getLookAndFeel().findColour(juce::TextEditor::ColourIds::backgroundColourId));
-    if (!fContent) {
+    auto content = fContent.lock();
+    if (!content) {
       return;
     }
     auto textColor = getLookAndFeel().findColour(juce::TextEditor::ColourIds::textColourId);
     auto highlightTextColor = getLookAndFeel().findColour(juce::TextEditor::ColourIds::highlightedTextColourId);
     auto caretColor = getLookAndFeel().findColour(juce::CaretComponent::caretColourId);
     auto highlightColor = getLookAndFeel().findColour(juce::TextEditor::highlightColourId);
-    fContent->draw(
+    content->draw(
         g,
         fStart,
         fEnd,
@@ -40,11 +41,12 @@ public:
   }
 
   void mouseDown(juce::MouseEvent const &e) override {
-    if (!fContent) {
+    auto content = fContent.lock();
+    if (!content) {
       return;
     }
     if (e.mods.isLeftButtonDown()) {
-      auto position = fContent->closestPosition(std::nullopt, e.getPosition().toFloat(), fSetting->getPresentationSetting());
+      auto position = content->closestPosition(std::nullopt, e.getPosition().toFloat(), fSetting->getPresentationSetting());
       fDown = position.location;
       setSelectedRange(position.location, position.location, position.direction);
       if (onSelectedRangeChange) {
@@ -54,12 +56,13 @@ public:
   }
 
   void mouseDrag(juce::MouseEvent const &e) override {
-    if (!fContent) {
+    auto content = fContent.lock();
+    if (!content) {
       return;
     }
     if (e.mods.isLeftButtonDown()) {
       if (fDown) {
-        auto position = fContent->closestPosition(*fDown, e.getPosition().toFloat(), fSetting->getPresentationSetting());
+        auto position = content->closestPosition(*fDown, e.getPosition().toFloat(), fSetting->getPresentationSetting());
         int start = std::min<int>(position.location, *fDown);
         int end = std::max<int>(position.location, *fDown);
         setSelectedRange(start, end, position.direction);
@@ -72,7 +75,7 @@ public:
 
   void setContent(std::shared_ptr<Content> const &c) {
     fContent = c;
-    if (fContent) {
+    if (c) {
       repaint();
     }
   }
@@ -81,8 +84,9 @@ public:
     fStart = start;
     fEnd = end;
     fDirection = direction;
-    if (fContent) {
-      fCursor = fContent->cursor(start, end, direction, fSetting->getPresentationSetting());
+    auto content = fContent.lock();
+    if (content) {
+      fCursor = content->cursor(start, end, direction, fSetting->getPresentationSetting());
     }
     repaint();
   }
@@ -91,8 +95,9 @@ public:
     if (source != fSetting.get()) {
       return;
     }
-    if (fContent) {
-      fCursor = fContent->cursor(fStart, fEnd, fDirection, fSetting->getPresentationSetting());
+    auto content = fContent.lock();
+    if (content) {
+      fCursor = content->cursor(fStart, fEnd, fDirection, fSetting->getPresentationSetting());
       repaint();
     }
   }
@@ -102,7 +107,7 @@ public:
 
 private:
   std::shared_ptr<AppSetting> fSetting;
-  std::shared_ptr<Content> fContent;
+  std::weak_ptr<Content> fContent;
   Cursor fCursor;
   std::optional<int> fDown;
   int fStart = 0;
