@@ -679,6 +679,10 @@ public:
     if (!bb) {
       return {};
     }
+    auto font = this->font.lock();
+    if (!font) {
+      return {};
+    }
     int width = (int)ceil(bb->getRight()) + setting.padding;
     int height = (int)ceil(bb->getBottom()) + setting.padding;
     struct Data {
@@ -838,6 +842,10 @@ public:
     float const lineSpacing = setting.lineSpacing() / scale;
     float dx = padding;
     float dy = padding;
+    auto font = this->font.lock();
+    if (!font) {
+      return;
+    }
     g.saveState();
     g.addTransform(juce::AffineTransform::scale(scale, scale));
     g.setColour(juce::Colours::black);
@@ -872,6 +880,10 @@ public:
     float const scale = setting.fontSize / upem;
     float const padding = setting.padding / scale;
     float const lineSpacing = setting.lineSpacing() / scale;
+    auto font = this->font.lock();
+    if (!font) {
+      return;
+    }
 
     g.saveState();
     g.setColour(highlightColor);
@@ -1140,7 +1152,7 @@ public:
 
   std::vector<std::shared_ptr<Line>> lines;
   unsigned int const unitsPerEm;
-  std::shared_ptr<hb_font_t> font;
+  std::weak_ptr<hb_font_t> font;
 };
 
 } // namespace ksesh

@@ -6,7 +6,6 @@ class MainWindow : public juce::DocumentWindow {
 public:
   MainWindow(
       juce::String name,
-      std::shared_ptr<hb_font_t> const &font,
       std::unique_ptr<juce::ApplicationCommandManager> const &commandManager,
       std::shared_ptr<AppSetting> appSetting)
       : juce::DocumentWindow(
@@ -14,7 +13,7 @@ public:
             juce::Desktop::getInstance().getDefaultLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId),
             juce::DocumentWindow::allButtons) {
     setUsingNativeTitleBar(true);
-    fMain = std::make_unique<MainComponent>(font, commandManager, appSetting);
+    fMain = std::make_unique<MainComponent>(commandManager, appSetting);
     fMain->onSaveFilePathChanged = [this](juce::File const &file, bool modified) {
       auto name = file == juce::File() ? TRANS("Unnamed") : file.getFullPathName();
       setName(JUCE_APPLICATION_NAME_STRING + juce::String(" - ") + name + (modified ? " *" : ""));

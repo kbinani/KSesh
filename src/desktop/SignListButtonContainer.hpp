@@ -32,7 +32,7 @@ class SignListButtonContainer : public juce::Component {
 public:
   explicit SignListButtonContainer(std::shared_ptr<hb_font_t> const &font) : fFont(font) {
     for (auto const &it : SignList::Signs()) {
-      auto s = makeSign(it.first, it.second);
+      auto s = makeSign(font, it.first, it.second);
       fAllSigns[s->name] = s;
     }
   }
@@ -44,7 +44,12 @@ public:
     auto highlightTextColor = getLookAndFeel().findColour(juce::TextButton::textColourOnId);
     auto activeColor = getLookAndFeel().findColour(juce::TextButton::buttonOnColourId);
 
-    float scale = 1.0f / Harfbuzz::UnitsPerEm(fFont);
+    auto font = fFont.lock();
+    if (!font) {
+      return;
+    }
+
+    float scale = 1.0f / Harfbuzz::UnitsPerEm(font);
 
     for (int i = 0; i < (int)fSignButtons.size(); i++) {
       auto const &sb = fSignButtons[i];
@@ -131,7 +136,11 @@ public:
     int y = 0;
     int x = 0;
     int maxY = 0;
-    float scale = signButtonSignSize / (float)Harfbuzz::UnitsPerEm(fFont);
+    auto font = fFont.lock();
+    if (!font) {
+      return 0;
+    }
+    float scale = signButtonSignSize / (float)Harfbuzz::UnitsPerEm(font);
     fSignButtons.clear();
     float rowHeight = signButtonHeaderHeight + signButtonSignHeight + signButtonMdCHeight;
     int maxNumColumns = 1;
@@ -333,11 +342,11 @@ public:
   }
 
 private:
-  std::shared_ptr<Sign> makeSign(std::u32string const &name, std::u32string const &sign) {
+  std::shared_ptr<Sign> makeSign(std::shared_ptr<hb_font_t> const &font, std::u32string const &name, std::u32string const &sign) {
     auto s = std::make_shared<Sign>();
     s->name = JuceStringFromU32String(name);
     s->path = std::make_shared<juce::Path>();
-    *s->path = Harfbuzz::CreatePath(sign, fFont);
+    *s->path = Harfbuzz::CreatePath(sign, font);
 
     auto found = SignList::MapReverse(sign);
     std::vector<juce::String> mdc;
@@ -394,7 +403,7 @@ public:
   std::function<void(Sign const &)> onClickSign;
 
 private:
-  std::shared_ptr<hb_font_t> fFont;
+  std::weak_ptr<hb_font_t> fFont;
   std::vector<std::shared_ptr<Sign>> fSigns;
   std::vector<SignButton> fSignButtons;
   int fHitSignButton = -1;

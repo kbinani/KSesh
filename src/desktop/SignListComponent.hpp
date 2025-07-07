@@ -36,37 +36,37 @@ public:
   explicit SignListComponent(std::shared_ptr<hb_font_t> const &font) : fFont(font), fOverlayColor(juce::Colours::transparentBlack) {
     using namespace std::literals::string_literals;
     fCategories.push_back(Category("typing"));
-    fCategories.push_back(makeCategory("A", U"𓀀"s));
-    fCategories.push_back(makeCategory("B", U"𓁐"s));
-    fCategories.push_back(makeCategory("C", U"𓁚"s));
-    fCategories.push_back(makeCategory("D", U"𓁶"s));
-    fCategories.push_back(makeCategory("E", U"𓃒"s));
-    fCategories.push_back(makeCategory("F", U"𓃾"s));
-    fCategories.push_back(makeCategory("G", U"𓄿"s));
-    fCategories.push_back(makeCategory("H", U"𓅿"s));
-    fCategories.push_back(makeCategory("I", U"𓆈"s));
-    fCategories.push_back(makeCategory("K", U"𓆛"s));
-    fCategories.push_back(makeCategory("L", U"𓆣"s));
-    fCategories.push_back(makeCategory("M", U"𓆭"s));
-    fCategories.push_back(makeCategory("N", U"𓇯"s));
-    fCategories.push_back(makeCategory("O", U"𓉐"s));
-    fCategories.push_back(makeCategory("P", U"𓊛"s));
-    fCategories.push_back(makeCategory("Q", U"𓊨"s));
-    fCategories.push_back(makeCategory("R", U"𓊯"s));
-    fCategories.push_back(makeCategory("S", U"𓋑"s));
-    fCategories.push_back(makeCategory("T", U"𓌇"s));
-    fCategories.push_back(makeCategory("U", U"𓌳"s));
-    fCategories.push_back(makeCategory("V", U"𓍢"s));
-    fCategories.push_back(makeCategory("W", U"𓎯"s));
-    fCategories.push_back(makeCategory("X", U"𓏏"s));
-    fCategories.push_back(makeCategory("Y", U"𓏛"s));
-    fCategories.push_back(makeCategory("Z", U"𓏤"s));
-    fCategories.push_back(makeCategory("Aa", U"𓐍"s));
+    fCategories.push_back(makeCategory(font, "A", U"𓀀"s));
+    fCategories.push_back(makeCategory(font, "B", U"𓁐"s));
+    fCategories.push_back(makeCategory(font, "C", U"𓁚"s));
+    fCategories.push_back(makeCategory(font, "D", U"𓁶"s));
+    fCategories.push_back(makeCategory(font, "E", U"𓃒"s));
+    fCategories.push_back(makeCategory(font, "F", U"𓃾"s));
+    fCategories.push_back(makeCategory(font, "G", U"𓄿"s));
+    fCategories.push_back(makeCategory(font, "H", U"𓅿"s));
+    fCategories.push_back(makeCategory(font, "I", U"𓆈"s));
+    fCategories.push_back(makeCategory(font, "K", U"𓆛"s));
+    fCategories.push_back(makeCategory(font, "L", U"𓆣"s));
+    fCategories.push_back(makeCategory(font, "M", U"𓆭"s));
+    fCategories.push_back(makeCategory(font, "N", U"𓇯"s));
+    fCategories.push_back(makeCategory(font, "O", U"𓉐"s));
+    fCategories.push_back(makeCategory(font, "P", U"𓊛"s));
+    fCategories.push_back(makeCategory(font, "Q", U"𓊨"s));
+    fCategories.push_back(makeCategory(font, "R", U"𓊯"s));
+    fCategories.push_back(makeCategory(font, "S", U"𓋑"s));
+    fCategories.push_back(makeCategory(font, "T", U"𓌇"s));
+    fCategories.push_back(makeCategory(font, "U", U"𓌳"s));
+    fCategories.push_back(makeCategory(font, "V", U"𓍢"s));
+    fCategories.push_back(makeCategory(font, "W", U"𓎯"s));
+    fCategories.push_back(makeCategory(font, "X", U"𓏏"s));
+    fCategories.push_back(makeCategory(font, "Y", U"𓏛"s));
+    fCategories.push_back(makeCategory(font, "Z", U"𓏤"s));
+    fCategories.push_back(makeCategory(font, "Aa", U"𓐍"s));
     fCategories.push_back(Category("tall"));
     fCategories.push_back(Category("wide"));
     fCategories.push_back(Category("small"));
-    // fCategories.push_back(makeCategory("NL", U"𓈠");
-    // fCategories.push_back(makeCategory("NU", U"𓈶");
+    // fCategories.push_back(makeCategory(font, "NL", U"𓈠");
+    // fCategories.push_back(makeCategory(font, "NU", U"𓈶");
 
     fViewport = std::make_unique<juce::Viewport>();
     addAndMakeVisible(*fViewport);
@@ -99,7 +99,12 @@ public:
     auto highlightTextColor = getLookAndFeel().findColour(juce::TextButton::textColourOnId);
     auto activeColor = getLookAndFeel().findColour(juce::TextButton::buttonOnColourId);
 
-    float scale = 1.0f / Harfbuzz::UnitsPerEm(fFont);
+    auto font = fFont.lock();
+    if (!font) {
+      return;
+    }
+
+    float scale = 1.0f / Harfbuzz::UnitsPerEm(font);
     float space = 2;
 
     for (int i = 0; i < (int)fTabButtons.size(); i++) {
@@ -288,9 +293,9 @@ private:
     }
   }
 
-  Category makeCategory(juce::String const &name, std::u32string const &sign) {
+  Category makeCategory(std::shared_ptr<hb_font_t> const &font, juce::String const &name, std::u32string const &sign) {
     auto path = std::make_shared<juce::Path>();
-    *path = Harfbuzz::CreatePath(sign, fFont);
+    *path = Harfbuzz::CreatePath(sign, font);
     return Category(name, path);
   }
 
@@ -332,7 +337,7 @@ public:
 private:
   std::unique_ptr<juce::Viewport> fViewport;
   std::unique_ptr<SignListButtonContainer> fContainer;
-  std::shared_ptr<hb_font_t> fFont;
+  std::weak_ptr<hb_font_t> fFont;
   std::vector<Category> fCategories;
   std::vector<TabButton> fTabButtons;
 

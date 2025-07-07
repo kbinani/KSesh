@@ -25,11 +25,39 @@ class MainComponent : public juce::Component, public juce::Timer, public juce::A
   };
 
 public:
-  MainComponent(std::shared_ptr<hb_font_t> const &font, std::unique_ptr<juce::ApplicationCommandManager> const &commandManager, std::shared_ptr<AppSetting> appSetting) : fFont(font), fAppSetting(appSetting), fNumModalComponents(std::make_shared<int>(0)), fNativeMessageBoxCoroner(fNumModalComponents) {
+  MainComponent(std::unique_ptr<juce::ApplicationCommandManager> const &commandManager, std::shared_ptr<AppSetting> appSetting) : fAppSetting(appSetting), fNumModalComponents(std::make_shared<int>(0)), fNativeMessageBoxCoroner(fNumModalComponents) {
     int const width = 1280;
     int const height = 720;
 
-    fTextEditor = std::make_unique<TextEditorComponent>(font, appSetting);
+    HbBlobUniquePtr blob;
+    switch (fAppSetting->fontFamily()) {
+    case AppSetting::NewGardiner:
+      blob.reset(hb_blob_create(BinaryData::NewGardiner_ttf,
+                                BinaryData::NewGardiner_ttfSize,
+                                HB_MEMORY_MODE_READONLY,
+                                nullptr,
+                                nullptr));
+      break;
+    case AppSetting::NotoSans:
+      blob.reset(hb_blob_create(BinaryData::NotoSansEgyptianHieroglyphsRegular_ttf,
+                                BinaryData::NotoSansEgyptianHieroglyphsRegular_ttfSize,
+                                HB_MEMORY_MODE_READONLY,
+                                nullptr,
+                                nullptr));
+      break;
+    case AppSetting::EgyptianText:
+    default:
+      blob.reset(hb_blob_create(BinaryData::eot_ttf,
+                                BinaryData::eot_ttfSize,
+                                HB_MEMORY_MODE_READONLY,
+                                nullptr,
+                                nullptr));
+      break;
+    }
+    HbFaceUniquePtr face(hb_face_create(blob.get(), 0));
+    fFont = HbMakeSharedFontPtr(hb_font_create(face.get()));
+
+    fTextEditor = std::make_unique<TextEditorComponent>(fFont, appSetting);
     fTextEditor->setBounds(0, 0, width / 2 - resizerSize / 2, height / 2 - resizerSize / 2);
     fTextEditor->fDelegate = this;
 
@@ -43,7 +71,7 @@ public:
     fVerticalSplitter->setBounds(width / 2 - resizerSize / 2, 0, resizerSize, height / 2 - resizerSize / 2);
     fHieroglyph->setVisible(appSetting->isPreviewEnabled());
 
-    fSignList = std::make_unique<SignListComponent>(font);
+    fSignList = std::make_unique<SignListComponent>(fFont);
     fSignList->setBounds(0, height / 2 + resizerSize / 2, width, height / 2 - resizerSize / 2);
     fSignList->onClickSign = [this](Sign const &sign) {
       onClickSign(sign);
@@ -626,9 +654,13 @@ private:
     if (fAbout || fExample) {
       return;
     }
+    auto font = fFont;
+    if (!font) {
+      return;
+    }
     auto prevFocus = fFocusOwner;
     fTextEditor->blur();
-    fExample = std::make_unique<ExampleComponent>(fFont, fAppSetting);
+    fExample = std::make_unique<ExampleComponent>(font, fAppSetting);
     fExample->setBounds(getLocalBounds());
     *fNumModalComponents += 1;
     addAndMakeVisible(*fExample);

@@ -86,10 +86,14 @@ mAa\r3 xrw)"}};
 
 private:
   void onSelectorChange() {
+    auto font = fFont.lock();
+    if (!font) {
+      return;
+    }
     int index = fSelector->getSelectedId() - 1;
     if (0 <= index && index < (int)fExamples.size()) {
       auto e = fExamples[index];
-      auto c = std::make_shared<Content>(U32StringFromJuceString(e.content), fFont);
+      auto c = std::make_shared<Content>(U32StringFromJuceString(e.content), font);
       fEditor->resetText(e.content);
       fEditor->focus();
     }
@@ -98,7 +102,7 @@ private:
 private:
   std::unique_ptr<TextEditorComponent> fEditor;
   std::unique_ptr<juce::ShapeButton> fClose;
-  std::shared_ptr<hb_font_t> fFont;
+  std::weak_ptr<hb_font_t> fFont;
   std::unique_ptr<juce::ComboBox> fSelector;
   std::vector<Example> fExamples;
 };

@@ -198,6 +198,10 @@ public:
   }
 
   void onClickSign(juce::String const &s) {
+    auto font = fFont.lock();
+    if (!font) {
+      return;
+    }
     unbind();
     auto text = fEditor->getText();
     auto selected = getSelectedRange();
@@ -227,7 +231,7 @@ public:
       } else if (nextCaret < caret) {
         fDirection = Direction::Backward;
       }
-      auto c = std::make_shared<Content>(U32StringFromJuceString(next), fFont);
+      auto c = std::make_shared<Content>(U32StringFromJuceString(next), font);
       fEditor->setText(next, false);
       fEditor->setCaretPosition(nextCaret);
       fEditor->setSelectedRange(juce::Range<int>(nextCaret, nextCaret), fDirection);
@@ -248,7 +252,7 @@ public:
       } else if (nextCaret < caret) {
         fDirection = Direction::Backward;
       }
-      auto c = std::make_shared<Content>(U32StringFromJuceString(next), fFont);
+      auto c = std::make_shared<Content>(U32StringFromJuceString(next), font);
       fEditor->setText(next, false);
       fEditor->setCaretPosition(nextCaret);
       fEditor->setSelectedRange(juce::Range<int>(nextCaret, nextCaret), fDirection);
@@ -280,9 +284,13 @@ public:
   }
 
   void resetText(juce::String const &s) {
+    auto font = fFont.lock();
+    if (!font) {
+      return;
+    }
     unbind();
     fEditor->setText(s);
-    auto c = std::make_shared<Content>(U32StringFromJuceString(s), fFont);
+    auto c = std::make_shared<Content>(U32StringFromJuceString(s), font);
     fEditor->setHighlightedRegion(juce::Range<int>(s.length(), s.length()));
     fEditor->setCaretPosition(s.length());
     fEditor->setContent(c);
@@ -396,9 +404,13 @@ private:
   }
 
   void _onTextChange() {
+    auto font = fFont.lock();
+    if (!font) {
+      return;
+    }
     auto text = fEditor->getText();
     auto range = getSelectedRange();
-    auto c = std::make_shared<Content>(U32StringFromJuceString(text), fFont);
+    auto c = std::make_shared<Content>(U32StringFromJuceString(text), font);
     auto typing = GetTypingAtCaret(text, range.getStart(), range.getEnd());
     fEditor->setContent(c);
     fEditor->setSelectedRange(range, fDirection);
@@ -415,7 +427,7 @@ private:
   std::unique_ptr<TextEditor> fEditor;
   int fPrev = 0;
   Direction fDirection = Direction::Forward;
-  std::shared_ptr<hb_font_t> fFont;
+  std::weak_ptr<hb_font_t> fFont;
   std::shared_ptr<AppSetting> fSetting;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TextEditorComponent)

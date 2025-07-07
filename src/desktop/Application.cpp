@@ -56,33 +56,6 @@ public:
 
     juce::LocalisedStrings::setCurrentMappings(CurrentLocalisedStrings());
 
-    HbBlobUniquePtr blob;
-    switch (fSetting->fontFamily()) {
-    case AppSetting::NewGardiner:
-      blob.reset(hb_blob_create(BinaryData::NewGardiner_ttf,
-                                BinaryData::NewGardiner_ttfSize,
-                                HB_MEMORY_MODE_READONLY,
-                                nullptr,
-                                nullptr));
-      break;
-    case AppSetting::NotoSans:
-      blob.reset(hb_blob_create(BinaryData::NotoSansEgyptianHieroglyphsRegular_ttf,
-                                BinaryData::NotoSansEgyptianHieroglyphsRegular_ttfSize,
-                                HB_MEMORY_MODE_READONLY,
-                                nullptr,
-                                nullptr));
-      break;
-    case AppSetting::EgyptianText:
-    default:
-      blob.reset(hb_blob_create(BinaryData::eot_ttf,
-                                BinaryData::eot_ttfSize,
-                                HB_MEMORY_MODE_READONLY,
-                                nullptr,
-                                nullptr));
-      break;
-    }
-    HbFaceUniquePtr face(hb_face_create(blob.get(), 0));
-    fFont = HbMakeSharedFontPtr(hb_font_create(face.get()));
     fLaf = std::make_unique<LookAndFeel>();
     fLaf->setColourScheme(fSetting->getColorScheme(juce::Desktop::getInstance().isDarkModeActive()));
     juce::LookAndFeel::setDefaultLookAndFeel(fLaf.get());
@@ -90,7 +63,7 @@ public:
 
     fCommandManager = std::make_unique<juce::ApplicationCommandManager>();
     fCommandManager->registerAllCommandsForTarget(this);
-    fMainWindow = std::make_unique<MainWindow>(getApplicationName(), fFont, fCommandManager, fSetting);
+    fMainWindow = std::make_unique<MainWindow>(getApplicationName(), fCommandManager, fSetting);
   }
 
   void getAllCommands(juce::Array<juce::CommandID> &commands) override {
@@ -216,7 +189,6 @@ private:
 private:
   std::unique_ptr<MainWindow> fMainWindow;
   std::unique_ptr<LookAndFeel> fLaf;
-  std::shared_ptr<hb_font_t> fFont;
   std::shared_ptr<AppSetting> fSetting;
   std::unique_ptr<juce::ApplicationCommandManager> fCommandManager;
 };
