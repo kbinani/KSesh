@@ -34,7 +34,8 @@ elseif (APPLE)
   set(ksesh_icon_big "res/app-icon/macos/icon_512x512@2x.png")
 endif()
 
-add_subdirectory(deps/JUCE)
+add_subdirectory(deps/JUCE EXCLUDE_FROM_ALL)
+add_subdirectory(deps/eglyf EXCLUDE_FROM_ALL)
 
 # Developer accidentally uploaded an app binary to the appstoreconnect with wrong version number.
 # The appstoreconnect doesn't allow version numbers to go down, so we apply a higher value than CFBundleShortVersionString.
@@ -139,7 +140,7 @@ elseif (APPLE)
   endforeach()
 endif()
 
-target_include_directories(ksesh PRIVATE deps/PDFGen)
+target_include_directories(ksesh PRIVATE deps/PDFGen deps/eglyf/include deps/eglyf/src)
 target_link_libraries(ksesh
   PRIVATE
     ksesh-binary-data

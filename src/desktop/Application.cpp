@@ -3,6 +3,7 @@
 #include "PDFGen.hpp"
 #include <iostream>
 #include "defer.hpp"
+#include <eglyf.hpp>
 
 #pragma GCC diagnostic ignored "-Wunused-variable"
 

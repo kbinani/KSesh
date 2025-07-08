@@ -2,7 +2,7 @@
 
 namespace ksesh {
 
-class MainComponent : public juce::Component, public juce::Timer, public juce::ApplicationCommandTarget, public TextEditorComponent::Delegate {
+class MainComponent : public juce::Component, public juce::Timer, public juce::AsyncUpdater, public juce::ApplicationCommandTarget, public TextEditorComponent::Delegate {
   enum : int {
     resizerSize = 8,
     bottomBarHeight = 24,
@@ -29,7 +29,8 @@ public:
     int const width = 1280;
     int const height = 720;
 
-    fFont = LoadFont(fAppSetting->fontFamily());
+    fFont = LoadEgyptianTextFont();
+    fFontLoaded = AppSetting::FontFamily::EgyptianText;
 
     fTextEditor = std::make_unique<TextEditorComponent>(fFont, appSetting);
     fTextEditor->setBounds(0, 0, width / 2 - resizerSize / 2, height / 2 - resizerSize / 2);
@@ -88,9 +89,23 @@ public:
     setSize(width, height);
     startTimerHz(1);
     updateOverlayColors();
+
+    std::promise<std::shared_ptr<hb_font_t>> promiseNewGardiner;
+    fFontFutureNewGardiner = promiseNewGardiner.get_future();
+    std::thread(&MainComponent::transformFont, this, std::move(promiseNewGardiner), AppSetting::FontFamily::NewGardiner).detach();
+
+    std::promise<std::shared_ptr<hb_font_t>> promiseNotoSans;
+    fFontFutureNotoSans = promiseNotoSans.get_future();
+    std::thread(&MainComponent::transformFont, this, std::move(promiseNotoSans), AppSetting::FontFamily::NotoSans).detach();
   }
 
   ~MainComponent() {
+    if (fFontFutureNewGardiner.valid()) {
+      fFontFutureNewGardiner.get();
+    }
+    if (fFontFutureNotoSans.valid()) {
+      fFontFutureNotoSans.get();
+    }
 #if defined(JUCE_MAC)
     juce::MenuBarModel::setMacMainMenu(nullptr);
 #endif
@@ -333,10 +348,12 @@ public:
     case commandViewChangeFontNewGardiner:
       info.setInfo("NewGardiner", {}, {}, 0);
       info.setTicked(fAppSetting->fontFamily() == AppSetting::FontFamily::NewGardiner);
+      info.setActive((bool)fFontNewGardiner);
       return;
     case commandViewChangeFontNotoSans:
       info.setInfo("Noto Sans Egyptian Hieroglyph", {}, {}, 0);
       info.setTicked(fAppSetting->fontFamily() == AppSetting::FontFamily::NotoSans);
+      info.setActive((bool)fFontNotoSans);
       return;
     case commandViewTogglePreviewVisibility:
       info.setInfo(TRANS("Preview"), {}, {}, 0);
@@ -559,39 +576,101 @@ public:
     setFocusOwner(fFocusOwner, true);
   }
 
+  void handleAsyncUpdate() override {
+    if (!fFontNewGardiner && fFontFutureNewGardiner.valid()) {
+      if (fFontFutureNewGardiner.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {
+        fFontNewGardiner = fFontFutureNewGardiner.get();
+      }
+    }
+    if (!fFontNotoSans && fFontFutureNotoSans.valid()) {
+      if (fFontFutureNotoSans.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {
+        fFontNotoSans = fFontFutureNotoSans.get();
+      }
+    }
+    updateMenuModel();
+    changeFont(fAppSetting->fontFamily());
+  }
+
 private:
-  static std::shared_ptr<hb_font_t> LoadFont(AppSetting::FontFamily fontFamily) {
-    HbBlobUniquePtr blob;
+  void transformFont(std::promise<std::shared_ptr<hb_font_t>> promise, AppSetting::FontFamily fontFamily) {
+    defer {
+      triggerAsyncUpdate();
+    };
+    std::string_view data;
     switch (fontFamily) {
-    case AppSetting::NewGardiner:
-      blob.reset(hb_blob_create(BinaryData::NewGardiner_ttf,
-                                BinaryData::NewGardiner_ttfSize,
-                                HB_MEMORY_MODE_READONLY,
-                                nullptr,
-                                nullptr));
+    case AppSetting::FontFamily::EgyptianText:
+      promise.set_value(nullptr);
+      return;
+    case AppSetting::FontFamily::NewGardiner:
+      data = std::string_view(BinaryData::NewGardiner_ttf, BinaryData::NewGardiner_ttfSize);
       break;
-    case AppSetting::NotoSans:
-      blob.reset(hb_blob_create(BinaryData::NotoSansEgyptianHieroglyphsRegular_ttf,
-                                BinaryData::NotoSansEgyptianHieroglyphsRegular_ttfSize,
-                                HB_MEMORY_MODE_READONLY,
-                                nullptr,
-                                nullptr));
-      break;
-    case AppSetting::EgyptianText:
-    default:
-      blob.reset(hb_blob_create(BinaryData::eot_ttf,
-                                BinaryData::eot_ttfSize,
-                                HB_MEMORY_MODE_READONLY,
-                                nullptr,
-                                nullptr));
+    case AppSetting::FontFamily::NotoSans:
+      data = std::string_view(BinaryData::NotoSansEgyptianHieroglyphsRegular_ttf, BinaryData::NotoSansEgyptianHieroglyphsRegular_ttfSize);
       break;
     }
+    eglyf::ByteInputStream inputStream(data);
+    std::shared_ptr<eglyf::Font> font;
+    if (auto st = eglyf::Font::Read(inputStream, font); !st.ok()) {
+      promise.set_value(nullptr);
+      return;
+    }
+    eglyf::Config config;
+    config.enableSubstMdc = false;
+    if (auto st = eglyf::Transformer::Transform(font, config); !st.ok()) {
+      promise.set_value(nullptr);
+      return;
+    }
+    eglyf::ByteOutputStream outputStream;
+    if (auto st = font->write(outputStream); !st.ok()) {
+      promise.set_value(nullptr);
+      return;
+    }
+    std::string transformed = outputStream.data();
+    HbBlobUniquePtr blob(hb_blob_create(transformed.data(), transformed.size(), HB_MEMORY_MODE_READONLY, nullptr, nullptr));
+    HbFaceUniquePtr face(hb_face_create(blob.get(), 0));
+    auto hbFont = HbMakeSharedFontPtr(hb_font_create(face.get()));
+    promise.set_value(hbFont);
+  }
+
+  static std::shared_ptr<hb_font_t> LoadEgyptianTextFont() {
+    HbBlobUniquePtr blob(hb_blob_create(BinaryData::eot_ttf,
+                                        BinaryData::eot_ttfSize,
+                                        HB_MEMORY_MODE_READONLY,
+                                        nullptr,
+                                        nullptr));
     HbFaceUniquePtr face(hb_face_create(blob.get(), 0));
     return HbMakeSharedFontPtr(hb_font_create(face.get()));
   }
 
   void changeFont(AppSetting::FontFamily fontFamily) {
-    auto next = LoadFont(fontFamily);
+    if (fontFamily == fFontLoaded) {
+      return;
+    }
+    std::shared_ptr<hb_font_t> next;
+    switch (fontFamily) {
+    case AppSetting::FontFamily::EgyptianText:
+      next = LoadEgyptianTextFont();
+      fFontLoaded = fontFamily;
+      break;
+    case AppSetting::FontFamily::NewGardiner:
+      if (fFontNewGardiner) {
+        next = fFontNewGardiner;
+        fFontLoaded = fontFamily;
+      } else {
+        next = LoadEgyptianTextFont();
+        fFontLoaded = AppSetting::FontFamily::EgyptianText;
+      }
+      break;
+    case AppSetting::FontFamily::NotoSans:
+      if (fFontNotoSans) {
+        next = fFontNotoSans;
+        fFontLoaded = fontFamily;
+      } else {
+        next = LoadEgyptianTextFont();
+        fFontLoaded = AppSetting::FontFamily::EgyptianText;
+      }
+      break;
+    }
     fSignList->setFont(next);
     if (fContent) {
       auto content = std::make_shared<Content>(fContent->raw, next);
@@ -1122,6 +1201,7 @@ private:
   std::unique_ptr<SignListComponent> fSignList;
   std::unique_ptr<BottomToolBar> fBottomToolBar;
   std::shared_ptr<hb_font_t> fFont;
+  AppSetting::FontFamily fFontLoaded;
   std::unique_ptr<MenuBarModel> fMenuModel;
 #if !defined(JUCE_MAC)
   std::unique_ptr<juce::MenuBarComponent> fMenuComponent;
@@ -1140,6 +1220,11 @@ private:
   FocusOwner fFocusOwner = FocusOwner::textEditor;
   std::shared_ptr<int> fNumModalComponents;
   ModalFinishDetector fNativeMessageBoxCoroner;
+
+  std::future<std::shared_ptr<hb_font_t>> fFontFutureNewGardiner;
+  std::future<std::shared_ptr<hb_font_t>> fFontFutureNotoSans;
+  std::shared_ptr<hb_font_t> fFontNewGardiner;
+  std::shared_ptr<hb_font_t> fFontNotoSans;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };
