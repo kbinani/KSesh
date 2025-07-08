@@ -103,6 +103,11 @@ public:
     return fFontFamily;
   }
 
+  void setFontFamily(FontFamily ff) {
+    fFontFamily = ff;
+    onChange();
+  }
+
 private:
   void onChange() {
     sendSynchronousChangeMessage();

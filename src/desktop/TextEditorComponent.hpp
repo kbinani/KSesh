@@ -171,7 +171,7 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
 public:
   struct Delegate {
     virtual ~Delegate() {};
-    virtual void textEditorComponentDidChangeContentText(std::u32string const& contentText, std::optional<juce::String> typing, int start, int end, Direction) = 0;
+    virtual void textEditorComponentDidChangeContentText(std::u32string const &contentText, std::optional<juce::String> typing, int start, int end, Direction) = 0;
     virtual void textEditorComponentDidChangeCaretPosition(juce::String const &typing, int start, int end, Direction) = 0;
     virtual void textEditorComponentDidGainFocus() = 0;
     virtual void textEditorComponentDidLostFocus() = 0;
@@ -297,7 +297,7 @@ public:
     applySetting();
   }
 
-  void setContent(std::shared_ptr<Content> const& content) {
+  void setContent(std::shared_ptr<Content> const &content) {
     fEditor->setContent(content);
   }
 

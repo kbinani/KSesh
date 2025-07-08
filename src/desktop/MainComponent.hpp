@@ -326,6 +326,18 @@ public:
     case commandUpdateMenuModel:
       info.setInfo("Update menu model", {}, {}, juce::ApplicationCommandInfo::hiddenFromKeyEditor);
       return;
+    case commandViewChangeFontEgyptianText:
+      info.setInfo("EgyptianText", {}, {}, 0);
+      info.setTicked(fAppSetting->fontFamily() == AppSetting::FontFamily::EgyptianText);
+      return;
+    case commandViewChangeFontNewGardiner:
+      info.setInfo("NewGardiner", {}, {}, 0);
+      info.setTicked(fAppSetting->fontFamily() == AppSetting::FontFamily::NewGardiner);
+      return;
+    case commandViewChangeFontNotoSans:
+      info.setInfo("Noto Sans Egyptian Hieroglyph", {}, {}, 0);
+      info.setTicked(fAppSetting->fontFamily() == AppSetting::FontFamily::NotoSans);
+      return;
     case commandViewTogglePreviewVisibility:
       info.setInfo(TRANS("Preview"), {}, {}, 0);
       info.setTicked(fHieroglyph->isVisible());
@@ -510,6 +522,15 @@ public:
     case commandHelpExample:
       showExampleComponent();
       return true;
+    case commandViewChangeFontEgyptianText:
+      changeFont(AppSetting::FontFamily::EgyptianText);
+      return true;
+    case commandViewChangeFontNewGardiner:
+      changeFont(AppSetting::FontFamily::NewGardiner);
+      return true;
+    case commandViewChangeFontNotoSans:
+      changeFont(AppSetting::FontFamily::NotoSans);
+      return true;
     case commandViewTogglePreviewVisibility: {
       bool visible = !fHieroglyph->isVisible();
       fHieroglyph->setVisible(visible);
@@ -578,6 +599,7 @@ private:
       fHieroglyph->setContent(content);
       fTextEditor->setContent(content);
     }
+    fAppSetting->setFontFamily(fontFamily);
     fFont = next;
   }
 
@@ -1052,7 +1074,7 @@ private:
     fHieroglyph->setSelectedRange(start, end, direction);
   }
 
-  void textEditorComponentDidChangeContentText(std::u32string const& contentText, std::optional<juce::String> typing, int start, int end, Direction direction) override {
+  void textEditorComponentDidChangeContentText(std::u32string const &contentText, std::optional<juce::String> typing, int start, int end, Direction direction) override {
     auto content = std::make_shared<Content>(contentText, fFont);
     setContent(content);
     if (typing && fFocusOwner == FocusOwner::textEditor) {

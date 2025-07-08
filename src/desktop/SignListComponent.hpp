@@ -34,39 +34,7 @@ class SignListComponent : public juce::Component {
 
 public:
   explicit SignListComponent(std::shared_ptr<hb_font_t> const &font) : fFont(font), fOverlayColor(juce::Colours::transparentBlack) {
-    using namespace std::literals::string_literals;
-    fCategories.push_back(Category("typing"));
-    fCategories.push_back(makeCategory(font, "A", U"𓀀"s));
-    fCategories.push_back(makeCategory(font, "B", U"𓁐"s));
-    fCategories.push_back(makeCategory(font, "C", U"𓁚"s));
-    fCategories.push_back(makeCategory(font, "D", U"𓁶"s));
-    fCategories.push_back(makeCategory(font, "E", U"𓃒"s));
-    fCategories.push_back(makeCategory(font, "F", U"𓃾"s));
-    fCategories.push_back(makeCategory(font, "G", U"𓄿"s));
-    fCategories.push_back(makeCategory(font, "H", U"𓅿"s));
-    fCategories.push_back(makeCategory(font, "I", U"𓆈"s));
-    fCategories.push_back(makeCategory(font, "K", U"𓆛"s));
-    fCategories.push_back(makeCategory(font, "L", U"𓆣"s));
-    fCategories.push_back(makeCategory(font, "M", U"𓆭"s));
-    fCategories.push_back(makeCategory(font, "N", U"𓇯"s));
-    fCategories.push_back(makeCategory(font, "O", U"𓉐"s));
-    fCategories.push_back(makeCategory(font, "P", U"𓊛"s));
-    fCategories.push_back(makeCategory(font, "Q", U"𓊨"s));
-    fCategories.push_back(makeCategory(font, "R", U"𓊯"s));
-    fCategories.push_back(makeCategory(font, "S", U"𓋑"s));
-    fCategories.push_back(makeCategory(font, "T", U"𓌇"s));
-    fCategories.push_back(makeCategory(font, "U", U"𓌳"s));
-    fCategories.push_back(makeCategory(font, "V", U"𓍢"s));
-    fCategories.push_back(makeCategory(font, "W", U"𓎯"s));
-    fCategories.push_back(makeCategory(font, "X", U"𓏏"s));
-    fCategories.push_back(makeCategory(font, "Y", U"𓏛"s));
-    fCategories.push_back(makeCategory(font, "Z", U"𓏤"s));
-    fCategories.push_back(makeCategory(font, "Aa", U"𓐍"s));
-    fCategories.push_back(Category("tall"));
-    fCategories.push_back(Category("wide"));
-    fCategories.push_back(Category("small"));
-    // fCategories.push_back(makeCategory(font, "NL", U"𓈠");
-    // fCategories.push_back(makeCategory(font, "NU", U"𓈶");
+    CreateCategories(font, fCategories);
 
     fViewport = std::make_unique<juce::Viewport>();
     addAndMakeVisible(*fViewport);
@@ -271,10 +239,50 @@ public:
   void setFont(std::shared_ptr<hb_font_t> const &font) {
     fContainer->setFont(font);
     fFont = font;
+    std::vector<Category> categories;
+    CreateCategories(font, categories);
+    fCategories.swap(categories);
+    layout();
     repaint();
   }
 
 private:
+  static void CreateCategories(std::shared_ptr<hb_font_t> const &font, std::vector<Category> &categories) {
+    using namespace std::literals::string_literals;
+    categories.push_back(Category("typing"));
+    categories.push_back(MakeCategory(font, "A", U"𓀀"s));
+    categories.push_back(MakeCategory(font, "B", U"𓁐"s));
+    categories.push_back(MakeCategory(font, "C", U"𓁚"s));
+    categories.push_back(MakeCategory(font, "D", U"𓁶"s));
+    categories.push_back(MakeCategory(font, "E", U"𓃒"s));
+    categories.push_back(MakeCategory(font, "F", U"𓃾"s));
+    categories.push_back(MakeCategory(font, "G", U"𓄿"s));
+    categories.push_back(MakeCategory(font, "H", U"𓅿"s));
+    categories.push_back(MakeCategory(font, "I", U"𓆈"s));
+    categories.push_back(MakeCategory(font, "K", U"𓆛"s));
+    categories.push_back(MakeCategory(font, "L", U"𓆣"s));
+    categories.push_back(MakeCategory(font, "M", U"𓆭"s));
+    categories.push_back(MakeCategory(font, "N", U"𓇯"s));
+    categories.push_back(MakeCategory(font, "O", U"𓉐"s));
+    categories.push_back(MakeCategory(font, "P", U"𓊛"s));
+    categories.push_back(MakeCategory(font, "Q", U"𓊨"s));
+    categories.push_back(MakeCategory(font, "R", U"𓊯"s));
+    categories.push_back(MakeCategory(font, "S", U"𓋑"s));
+    categories.push_back(MakeCategory(font, "T", U"𓌇"s));
+    categories.push_back(MakeCategory(font, "U", U"𓌳"s));
+    categories.push_back(MakeCategory(font, "V", U"𓍢"s));
+    categories.push_back(MakeCategory(font, "W", U"𓎯"s));
+    categories.push_back(MakeCategory(font, "X", U"𓏏"s));
+    categories.push_back(MakeCategory(font, "Y", U"𓏛"s));
+    categories.push_back(MakeCategory(font, "Z", U"𓏤"s));
+    categories.push_back(MakeCategory(font, "Aa", U"𓐍"s));
+    categories.push_back(Category("tall"));
+    categories.push_back(Category("wide"));
+    categories.push_back(Category("small"));
+    // categories.push_back(MakeCategory(font, "NL", U"𓈠");
+    // categories.push_back(MakeCategory(font, "NU", U"𓈶");
+  }
+
   void updateButtonHit(juce::Point<int> const &p) {
     int hitTabButton = -1;
     for (int i = 0; i < (int)fTabButtons.size(); i++) {
@@ -299,7 +307,7 @@ private:
     }
   }
 
-  Category makeCategory(std::shared_ptr<hb_font_t> const &font, juce::String const &name, std::u32string const &sign) {
+  static Category MakeCategory(std::shared_ptr<hb_font_t> const &font, juce::String const &name, std::u32string const &sign) {
     auto path = std::make_shared<juce::Path>();
     *path = Harfbuzz::CreatePath(sign, font);
     return Category(name, path);

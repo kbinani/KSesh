@@ -71,6 +71,9 @@ enum CommandID : juce::CommandID {
 #if defined(JUCE_MAC)
   commandEditCopyAsPdf,
 #endif
+  commandViewChangeFontEgyptianText,
+  commandViewChangeFontNewGardiner,
+  commandViewChangeFontNotoSans,
   commandViewTogglePreviewVisibility,
   commandHelpAbout,
   commandHelpExample,

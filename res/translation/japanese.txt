@@ -139,3 +139,5 @@ countries: jp
 "Select the right sign" = "右のサインを選択"
 
 "Select the left sign" = "左のサインを選択"
+
+"Font" = "フォント"

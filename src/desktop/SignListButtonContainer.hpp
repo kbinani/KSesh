@@ -170,7 +170,6 @@ public:
     }
     fNumColumns = maxNumColumns;
     setBounds(0, 0, width, maxY);
-    return;
   }
 
   void updateFilter(juce::String const &activeCategory, juce::String const &typing) {
@@ -341,10 +340,24 @@ public:
   void setFont(std::shared_ptr<hb_font_t> const &font) {
     fFont = font;
     fAllSigns.clear();
+    std::vector<juce::String> signNames;
+    for (auto const &sign : fSigns) {
+      signNames.push_back(sign->name);
+    }
+    std::vector<std::shared_ptr<Sign>> signs;
     for (auto const &it : SignList::Signs()) {
       auto s = makeSign(font, it.first, it.second);
       fAllSigns[s->name] = s;
     }
+    for (auto const &name : signNames) {
+      auto found = fAllSigns.find(name);
+      if (found != fAllSigns.end()) {
+        signs.push_back(found->second);
+      }
+    }
+    fSigns.swap(signs);
+    layout(getWidth());
+    repaint();
   }
 
 private:

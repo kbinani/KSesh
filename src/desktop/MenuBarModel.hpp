@@ -110,6 +110,11 @@ public:
       menu.addSubMenu(TRANS("Sign"), sign, true);
     } else if (topLevelMenuIndex == 2) {
       // View
+      juce::PopupMenu font;
+      font.addCommandItem(fManager, commandViewChangeFontEgyptianText);
+      font.addCommandItem(fManager, commandViewChangeFontNewGardiner);
+      font.addCommandItem(fManager, commandViewChangeFontNotoSans);
+      menu.addSubMenu(TRANS("Font"), font, true);
       menu.addCommandItem(fManager, commandViewTogglePreviewVisibility);
       juce::PopupMenu theme;
       theme.addCommandItem(fManager, commandViewThemeAuto);
