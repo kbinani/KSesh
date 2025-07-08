@@ -93,6 +93,7 @@ list(APPEND ksesh_files
   src/desktop/AboutComponent.hpp
   src/desktop/ExampleComponent.hpp
   src/desktop/defer.hpp
+  src/desktop/FontFamily.hpp
 )
 if (APPLE)
   list(APPEND ksesh_files src/desktop/Application.mm)

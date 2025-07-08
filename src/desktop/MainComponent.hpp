@@ -30,7 +30,7 @@ public:
     int const height = 720;
 
     fFont = LoadEgyptianTextFont();
-    fFontLoaded = AppSetting::FontFamily::EgyptianText;
+    fFontLoaded = FontFamily::EgyptianText;
 
     fTextEditor = std::make_unique<TextEditorComponent>(fFont, appSetting);
     fTextEditor->setBounds(0, 0, width / 2 - resizerSize / 2, height / 2 - resizerSize / 2);
@@ -92,11 +92,11 @@ public:
 
     std::promise<std::shared_ptr<hb_font_t>> promiseNewGardiner;
     fFontFutureNewGardiner = promiseNewGardiner.get_future();
-    std::thread(&MainComponent::transformFont, this, std::move(promiseNewGardiner), AppSetting::FontFamily::NewGardiner).detach();
+    std::thread(&MainComponent::transformFont, this, std::move(promiseNewGardiner), FontFamily::NewGardiner).detach();
 
     std::promise<std::shared_ptr<hb_font_t>> promiseNotoSans;
     fFontFutureNotoSans = promiseNotoSans.get_future();
-    std::thread(&MainComponent::transformFont, this, std::move(promiseNotoSans), AppSetting::FontFamily::NotoSans).detach();
+    std::thread(&MainComponent::transformFont, this, std::move(promiseNotoSans), FontFamily::NotoSans).detach();
   }
 
   ~MainComponent() {
@@ -343,16 +343,16 @@ public:
       return;
     case commandViewChangeFontEgyptianText:
       info.setInfo("EgyptianText", {}, {}, 0);
-      info.setTicked(fAppSetting->fontFamily() == AppSetting::FontFamily::EgyptianText);
+      info.setTicked(fAppSetting->fontFamily() == FontFamily::EgyptianText);
       return;
     case commandViewChangeFontNewGardiner:
       info.setInfo("NewGardiner", {}, {}, 0);
-      info.setTicked(fAppSetting->fontFamily() == AppSetting::FontFamily::NewGardiner);
+      info.setTicked(fAppSetting->fontFamily() == FontFamily::NewGardiner);
       info.setActive((bool)fFontNewGardiner);
       return;
     case commandViewChangeFontNotoSans:
       info.setInfo("Noto Sans Egyptian Hieroglyph", {}, {}, 0);
-      info.setTicked(fAppSetting->fontFamily() == AppSetting::FontFamily::NotoSans);
+      info.setTicked(fAppSetting->fontFamily() == FontFamily::NotoSans);
       info.setActive((bool)fFontNotoSans);
       return;
     case commandViewTogglePreviewVisibility:
@@ -540,13 +540,13 @@ public:
       showExampleComponent();
       return true;
     case commandViewChangeFontEgyptianText:
-      changeFont(AppSetting::FontFamily::EgyptianText);
+      changeFont(FontFamily::EgyptianText);
       return true;
     case commandViewChangeFontNewGardiner:
-      changeFont(AppSetting::FontFamily::NewGardiner);
+      changeFont(FontFamily::NewGardiner);
       return true;
     case commandViewChangeFontNotoSans:
-      changeFont(AppSetting::FontFamily::NotoSans);
+      changeFont(FontFamily::NotoSans);
       return true;
     case commandViewTogglePreviewVisibility: {
       bool visible = !fHieroglyph->isVisible();
@@ -592,19 +592,19 @@ public:
   }
 
 private:
-  void transformFont(std::promise<std::shared_ptr<hb_font_t>> promise, AppSetting::FontFamily fontFamily) {
+  void transformFont(std::promise<std::shared_ptr<hb_font_t>> promise, FontFamily fontFamily) {
     defer {
       triggerAsyncUpdate();
     };
     std::string_view data;
     switch (fontFamily) {
-    case AppSetting::FontFamily::EgyptianText:
+    case FontFamily::EgyptianText:
       promise.set_value(nullptr);
       return;
-    case AppSetting::FontFamily::NewGardiner:
+    case FontFamily::NewGardiner:
       data = std::string_view(BinaryData::NewGardiner_ttf, BinaryData::NewGardiner_ttfSize);
       break;
-    case AppSetting::FontFamily::NotoSans:
+    case FontFamily::NotoSans:
       data = std::string_view(BinaryData::NotoSansEgyptianHieroglyphsRegular_ttf, BinaryData::NotoSansEgyptianHieroglyphsRegular_ttfSize);
       break;
     }
@@ -642,32 +642,32 @@ private:
     return HbMakeSharedFontPtr(hb_font_create(face.get()));
   }
 
-  void changeFont(AppSetting::FontFamily fontFamily) {
+  void changeFont(FontFamily fontFamily) {
     if (fontFamily == fFontLoaded) {
       return;
     }
     std::shared_ptr<hb_font_t> next;
     switch (fontFamily) {
-    case AppSetting::FontFamily::EgyptianText:
+    case FontFamily::EgyptianText:
       next = LoadEgyptianTextFont();
       fFontLoaded = fontFamily;
       break;
-    case AppSetting::FontFamily::NewGardiner:
+    case FontFamily::NewGardiner:
       if (fFontNewGardiner) {
         next = fFontNewGardiner;
         fFontLoaded = fontFamily;
       } else {
         next = LoadEgyptianTextFont();
-        fFontLoaded = AppSetting::FontFamily::EgyptianText;
+        fFontLoaded = FontFamily::EgyptianText;
       }
       break;
-    case AppSetting::FontFamily::NotoSans:
+    case FontFamily::NotoSans:
       if (fFontNotoSans) {
         next = fFontNotoSans;
         fFontLoaded = fontFamily;
       } else {
         next = LoadEgyptianTextFont();
-        fFontLoaded = AppSetting::FontFamily::EgyptianText;
+        fFontLoaded = FontFamily::EgyptianText;
       }
       break;
     }
@@ -1201,7 +1201,7 @@ private:
   std::unique_ptr<SignListComponent> fSignList;
   std::unique_ptr<BottomToolBar> fBottomToolBar;
   std::shared_ptr<hb_font_t> fFont;
-  AppSetting::FontFamily fFontLoaded;
+  FontFamily fFontLoaded;
   std::unique_ptr<MenuBarModel> fMenuModel;
 #if !defined(JUCE_MAC)
   std::unique_ptr<juce::MenuBarComponent> fMenuComponent;

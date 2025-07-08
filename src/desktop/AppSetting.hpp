@@ -12,12 +12,6 @@ public:
     Light = 3,
   };
 
-  enum FontFamily {
-    EgyptianText = 0,
-    NewGardiner = 1,
-    NotoSans = 2,
-  };
-
   AppSetting() {
     fRecentFiles.setMaxNumberOfItems(10);
     load();
@@ -172,13 +166,13 @@ private:
     o->setProperty("version", int(1));
     juce::String fontFamily = "EgyptianText";
     switch (fFontFamily) {
-    case EgyptianText:
+    case FontFamily::EgyptianText:
       fontFamily = "EgyptianText";
       break;
-    case NewGardiner:
+    case FontFamily::NewGardiner:
       fontFamily = "NewGardiner";
       break;
-    case NotoSans:
+    case FontFamily::NotoSans:
       fontFamily = "NotoSans";
       break;
     }
@@ -238,11 +232,11 @@ private:
     if (fontFamily.isString()) {
       juce::String ff = fontFamily;
       if (ff == "NewGardiner") {
-        fFontFamily = NewGardiner;
+        fFontFamily = FontFamily::NewGardiner;
       } else if (ff == "NotoSans") {
-        fFontFamily = NotoSans;
+        fFontFamily = FontFamily::NotoSans;
       } else {
-        fFontFamily = EgyptianText;
+        fFontFamily = FontFamily::EgyptianText;
       }
     }
   }
@@ -302,7 +296,7 @@ private:
   PresentationSetting fPresentation;
   float fEditorFontSize = 24;
   bool fEnablePreview = true;
-  FontFamily fFontFamily = EgyptianText;
+  FontFamily fFontFamily = FontFamily::EgyptianText;
 };
 
 } // namespace ksesh

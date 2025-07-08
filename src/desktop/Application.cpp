@@ -14,6 +14,7 @@
 #include "SignList.hpp"
 #include "PresentationSetting.hpp"
 #include "Content.hpp"
+#include "FontFamily.hpp"
 #include "AppSetting.hpp"
 #include "Clipboard.hpp"
 #include "TextEditorComponent.hpp"
