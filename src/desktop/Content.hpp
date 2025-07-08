@@ -969,6 +969,10 @@ public:
     using namespace std;
     string out;
 #if defined(JUCE_WINDOWS)
+    auto font = this->font.lock();
+    if (!font) {
+      return out;
+    }
     auto [widthf, heightf] = getSize(setting);
     LONG width = (LONG)ceil(widthf);
     LONG height = (LONG)ceil(heightf);
