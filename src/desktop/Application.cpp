@@ -160,7 +160,7 @@ public:
   }
 
   void splashScreenDidFinishLoadingFont(FontSet const &fontSet) override {
-    fSplash->deleteAfterDelay(juce::RelativeTime::milliseconds(300), false);
+    fSplash->deleteAfterDelay(juce::RelativeTime::seconds(1), false);
     fSplash.release();
 
     fMainWindow = std::make_unique<MainWindow>(getApplicationName(), fCommandManager, fSetting, fontSet);
