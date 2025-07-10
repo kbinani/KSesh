@@ -36,11 +36,11 @@ public:
   }
 
   void paint(juce::Graphics &g) override {
-    g.fillAll(juce::Colours::white);
+    g.fillAll(juce::Colours::white.darker());
     if (fAppIcon.isValid()) {
       g.drawImageWithin(fAppIcon, 30, 30, 120, 120, {});
     }
-    g.setColour(juce::Colours::black);
+    g.setColour(juce::Colours::black.brighter());
     g.setFont(50);
     float x = 170;
     float baseline = 140;
