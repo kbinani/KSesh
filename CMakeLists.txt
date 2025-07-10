@@ -119,6 +119,7 @@ juce_add_binary_data(ksesh-binary-data
     "res/license/NewGardiner-OFL.txt"
     "res/font/NotoSansEgyptianHieroglyphs-Regular.ttf"
     "res/license/NotoSansEgyptianHieroglyphs-OFL.txt"
+    "res/app-icon/windows/icon_512x512.png"
 )
 
 target_compile_definitions(ksesh

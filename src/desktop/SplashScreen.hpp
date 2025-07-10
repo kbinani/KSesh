@@ -22,6 +22,8 @@ public:
     std::promise<std::shared_ptr<hb_font_t>> promiseNotoSans;
     fFontFutureNotoSans = promiseNotoSans.get_future();
     std::thread(&SplashScreen::transformFont, this, std::move(promiseNotoSans), FontFamily::NotoSans).detach();
+
+    fAppIcon = juce::ImageFileFormat::loadFrom(BinaryData::icon_512x512_png, BinaryData::icon_512x512_pngSize);
   }
 
   ~SplashScreen() {
@@ -34,7 +36,18 @@ public:
   }
 
   void paint(juce::Graphics &g) override {
-    g.fillAll(juce::Colours::red);
+    g.fillAll(juce::Colours::white);
+    if (fAppIcon.isValid()) {
+      g.drawImageWithin(fAppIcon, 30, 30, 120, 120, {});
+    }
+    g.setColour(juce::Colours::black);
+    g.setFont(50);
+    float x = 170;
+    float baseline = 140;
+    g.drawSingleLineText(JUCE_APPLICATION_NAME_STRING, x, baseline);
+    x += g.getCurrentFont().getStringWidthFloat(JUCE_APPLICATION_NAME_STRING);
+    g.setFont(25);
+    g.drawSingleLineText(" " JUCE_APPLICATION_VERSION_STRING, x, baseline);
   }
 
   void handleAsyncUpdate() override {
@@ -124,6 +137,7 @@ private:
   std::future<std::shared_ptr<hb_font_t>> fFontFutureNewGardiner;
   std::future<std::shared_ptr<hb_font_t>> fFontFutureNotoSans;
   FontSet fFontSet;
+  juce::Image fAppIcon;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SplashScreen)
 };
