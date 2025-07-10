@@ -1061,7 +1061,7 @@ private:
 
   void textEditorComponentDidLostFocus() override {
     if (fFocusOwner == FocusOwner::textEditor) {
-      if (*fNumModalComponents == 0) {
+      if (*fNumModalComponents == 0 && isShowing()) {
         fTextEditor->focus();
       }
     }
