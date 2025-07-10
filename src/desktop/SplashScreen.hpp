@@ -115,7 +115,7 @@ private:
       return;
     }
     std::string transformed = outputStream.data();
-    HbBlobUniquePtr blob(hb_blob_create(transformed.data(), transformed.size(), HB_MEMORY_MODE_READONLY, nullptr, nullptr));
+    HbBlobUniquePtr blob(hb_blob_create(transformed.data(), transformed.size(), HB_MEMORY_MODE_DUPLICATE, nullptr, nullptr));
     HbFaceUniquePtr face(hb_face_create(blob.get(), 0));
     auto hbFont = HbMakeSharedFontPtr(hb_font_create(face.get()));
     promise.set_value(hbFont);
