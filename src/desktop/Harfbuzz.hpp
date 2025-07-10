@@ -100,10 +100,8 @@ public:
   }
 
   static hb_buffer_t *CreateBuffer(std::u32string const &t, std::shared_ptr<hb_font_t> const &font) {
-    std::u8string utf8 = U8StringFromU32String(t);
-
     HbBufferUniquePtr buffer(hb_buffer_create());
-    hb_buffer_add_utf8(buffer.get(), (char const *)utf8.c_str(), -1, 0, -1);
+    hb_buffer_add_utf32(buffer.get(), (uint32_t const *)t.c_str(), t.size(), 0, -1);
     hb_buffer_set_direction(buffer.get(), HB_DIRECTION_LTR);
     hb_buffer_set_script(buffer.get(), HB_SCRIPT_EGYPTIAN_HIEROGLYPHS);
     hb_buffer_set_cluster_level(buffer.get(), HB_BUFFER_CLUSTER_LEVEL_CHARACTERS);

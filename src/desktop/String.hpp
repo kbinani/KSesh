@@ -22,8 +22,4 @@ inline std::u32string U32StringFromJuceString(juce::String const &s) {
   return std::u32string((char32_t const *)s.toUTF32().getAddress());
 }
 
-inline std::u32string U32StringFromU8string(std::u8string const &s) {
-  return U32StringFromJuceString(juce::String::fromUTF8(s.c_str()));
-}
-
 } // namespace ksesh
