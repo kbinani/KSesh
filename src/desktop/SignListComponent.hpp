@@ -94,7 +94,7 @@ public:
         g.setColour(textColor);
       }
       if (tb.path) {
-        float textWidth = g.getCurrentFont().getStringWidthFloat(tb.name);
+        float textWidth = juce::GlyphArrangement::getStringWidth(g.getCurrentFont(), tb.name);
 
         auto bounds = tb.path->getBoundsTransformed(juce::AffineTransform::scale(scale * tabButtonSignSize, scale * tabButtonSignSize));
         float totalWidth = textWidth + bounds.getWidth();

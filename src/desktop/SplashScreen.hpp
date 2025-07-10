@@ -45,7 +45,7 @@ public:
     float x = 170;
     float baseline = 140;
     g.drawSingleLineText(JUCE_APPLICATION_NAME_STRING, x, baseline);
-    x += g.getCurrentFont().getStringWidthFloat(JUCE_APPLICATION_NAME_STRING);
+    x += juce::GlyphArrangement::getStringWidth(g.getCurrentFont(), JUCE_APPLICATION_NAME_STRING);
     g.setFont(25);
     g.drawSingleLineText(" " JUCE_APPLICATION_VERSION_STRING, x, baseline);
   }
