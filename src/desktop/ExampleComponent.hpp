@@ -41,7 +41,8 @@ mAa\r3 xrw)"}};
     }
     addAndMakeVisible(*fSelector);
     auto e = fExamples[0];
-    auto c = std::make_shared<Content>(U32StringFromJuceString(e.content), font->fFont);
+    fContent = std::make_shared<Content>(U32StringFromJuceString(e.content), font->fFont);
+    fEditor->setContent(fContent);
     fEditor->resetText(e.content);
     fSelector->setSelectedId(1);
     fSelector->onChange = [this]() {
@@ -94,7 +95,9 @@ private:
     if (0 <= index && index < (int)fExamples.size()) {
       auto e = fExamples[index];
       auto c = std::make_shared<Content>(U32StringFromJuceString(e.content), font->fFont);
+      fEditor->setContent(c);
       fEditor->resetText(e.content);
+      fContent = c;
       fEditor->focus();
     }
   }
@@ -105,6 +108,7 @@ private:
   std::weak_ptr<FontAdapter> fFont;
   std::unique_ptr<juce::ComboBox> fSelector;
   std::vector<Example> fExamples;
+  std::shared_ptr<Content> fContent;
 };
 
 } // namespace ksesh
