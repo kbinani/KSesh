@@ -29,10 +29,9 @@ public:
     int const width = 1280;
     int const height = 720;
 
-    auto font = fontSet.select(fAppSetting->fontFamily());
-    fFont = font->fFont;
+    fFont = fontSet.select(fAppSetting->fontFamily());
 
-    fTextEditor = std::make_unique<TextEditorComponent>(fFont, appSetting);
+    fTextEditor = std::make_unique<TextEditorComponent>(fFont->fFont, appSetting);
     fTextEditor->setBounds(0, 0, width / 2 - resizerSize / 2, height / 2 - resizerSize / 2);
     fTextEditor->fDelegate = this;
 
@@ -46,7 +45,7 @@ public:
     fVerticalSplitter->setBounds(width / 2 - resizerSize / 2, 0, resizerSize, height / 2 - resizerSize / 2);
     fHieroglyph->setVisible(appSetting->isPreviewEnabled());
 
-    fSignList = std::make_unique<SignListComponent>(font);
+    fSignList = std::make_unique<SignListComponent>(fFont);
     fSignList->setBounds(0, height / 2 + resizerSize / 2, width, height / 2 - resizerSize / 2);
     fSignList->onClickSign = [this](Sign const &sign) {
       onClickSign(sign);
@@ -573,7 +572,7 @@ private:
       fTextEditor->setContent(content);
     }
     fAppSetting->setFontFamily(fontFamily);
-    fFont = next->fFont;
+    fFont = next;
   }
 
   void setFocusOwner(FocusOwner next, bool force = false) {
@@ -616,7 +615,7 @@ private:
     auto selected = fTextEditor->getSelectedText();
     std::shared_ptr<Content> c;
     if (selected) {
-      c = std::make_shared<Content>(U32StringFromJuceString(*selected), fFont);
+      c = std::make_shared<Content>(U32StringFromJuceString(*selected), fFont->fFont);
     } else if (fContent) {
       c = fContent;
     } else {
@@ -644,7 +643,7 @@ private:
     auto selected = fTextEditor->getSelectedText();
     std::shared_ptr<Content> c;
     if (selected) {
-      c = std::make_shared<Content>(U32StringFromJuceString(*selected), fFont);
+      c = std::make_shared<Content>(U32StringFromJuceString(*selected), fFont->fFont);
     } else if (fContent) {
       c = fContent;
     } else {
@@ -671,7 +670,7 @@ private:
     }
     auto prevFocus = fFocusOwner;
     fTextEditor->blur();
-    fExample = std::make_unique<ExampleComponent>(font, fAppSetting);
+    fExample = std::make_unique<ExampleComponent>(font->fFont, fAppSetting);
     fExample->setBounds(getLocalBounds());
     *fNumModalComponents += 1;
     addAndMakeVisible(*fExample);
@@ -725,7 +724,7 @@ private:
   void newDocument() {
     fSave = juce::File();
     fDirty = false;
-    auto c = std::make_shared<Content>(U"", fFont);
+    auto c = std::make_shared<Content>(U"", fFont->fFont);
     setContent(c);
     fHieroglyph->setSelectedRange(0, 0, Direction::Forward);
     fTextEditor->resetText("");
@@ -785,7 +784,7 @@ private:
       return;
     }
     auto str = stream->readString();
-    auto c = std::make_shared<Content>(U32StringFromJuceString(str), fFont);
+    auto c = std::make_shared<Content>(U32StringFromJuceString(str), fFont->fFont);
     setContent(c);
     fSave = file;
     fDirty = false;
@@ -1048,7 +1047,7 @@ private:
   }
 
   void textEditorComponentDidChangeContentText(std::u32string const &contentText, std::optional<juce::String> typing, int start, int end, Direction direction) override {
-    auto content = std::make_shared<Content>(contentText, fFont);
+    auto content = std::make_shared<Content>(contentText, fFont->fFont);
     setContent(content);
     if (typing && fFocusOwner == FocusOwner::textEditor) {
       fSignList->setTyping(*typing);
@@ -1094,7 +1093,7 @@ private:
   std::unique_ptr<HieroglyphComponent> fHieroglyph;
   std::unique_ptr<SignListComponent> fSignList;
   std::unique_ptr<BottomToolBar> fBottomToolBar;
-  std::shared_ptr<hb_font_t> fFont;
+  std::shared_ptr<FontAdapter> fFont;
   std::unique_ptr<MenuBarModel> fMenuModel;
 #if !defined(JUCE_MAC)
   std::unique_ptr<juce::MenuBarComponent> fMenuComponent;
