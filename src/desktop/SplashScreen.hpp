@@ -11,15 +11,15 @@ public:
   };
 
   explicit SplashScreen(Delegate *delegate) : juce::SplashScreen("KSesh", 640, 360, true), fDelegate(delegate) {
-    std::promise<std::shared_ptr<Font>> promiseEgyptianText;
+    std::promise<std::shared_ptr<FontAdapter>> promiseEgyptianText;
     fFontFutureEgyptianText = promiseEgyptianText.get_future();
     std::thread(LoadEgyptianTextFont, std::move(promiseEgyptianText)).detach();
 
-    std::promise<std::shared_ptr<Font>> promiseNewGardiner;
+    std::promise<std::shared_ptr<FontAdapter>> promiseNewGardiner;
     fFontFutureNewGardiner = promiseNewGardiner.get_future();
     std::thread(&SplashScreen::transformFont, this, std::move(promiseNewGardiner), FontFamily::NewGardiner).detach();
 
-    std::promise<std::shared_ptr<Font>> promiseNotoSans;
+    std::promise<std::shared_ptr<FontAdapter>> promiseNotoSans;
     fFontFutureNotoSans = promiseNotoSans.get_future();
     std::thread(&SplashScreen::transformFont, this, std::move(promiseNotoSans), FontFamily::NotoSans).detach();
 
@@ -81,7 +81,7 @@ public:
   }
 
 private:
-  void transformFont(std::promise<std::shared_ptr<Font>> promise, FontFamily fontFamily) {
+  void transformFont(std::promise<std::shared_ptr<FontAdapter>> promise, FontFamily fontFamily) {
     defer {
       triggerAsyncUpdate();
     };
@@ -118,10 +118,10 @@ private:
     HbBlobUniquePtr blob(hb_blob_create(transformed.data(), transformed.size(), HB_MEMORY_MODE_DUPLICATE, nullptr, nullptr));
     HbFaceUniquePtr face(hb_face_create(blob.get(), 0));
     auto hbFont = HbMakeSharedFontPtr(hb_font_create(face.get()));
-    promise.set_value(std::make_shared<Font>(hbFont));
+    promise.set_value(std::make_shared<FontAdapter>(hbFont));
   }
 
-  static void LoadEgyptianTextFont(std::promise<std::shared_ptr<Font>> promise) {
+  static void LoadEgyptianTextFont(std::promise<std::shared_ptr<FontAdapter>> promise) {
     HbBlobUniquePtr blob(hb_blob_create(BinaryData::eot_ttf,
                                         BinaryData::eot_ttfSize,
                                         HB_MEMORY_MODE_READONLY,
@@ -129,15 +129,15 @@ private:
                                         nullptr));
     HbFaceUniquePtr face(hb_face_create(blob.get(), 0));
     auto hbFont = HbMakeSharedFontPtr(hb_font_create(face.get()));
-    auto font = std::make_shared<Font>(hbFont);
+    auto font = std::make_shared<FontAdapter>(hbFont);
     promise.set_value(font);
   }
 
 private:
   Delegate *const fDelegate;
-  std::future<std::shared_ptr<Font>> fFontFutureEgyptianText;
-  std::future<std::shared_ptr<Font>> fFontFutureNewGardiner;
-  std::future<std::shared_ptr<Font>> fFontFutureNotoSans;
+  std::future<std::shared_ptr<FontAdapter>> fFontFutureEgyptianText;
+  std::future<std::shared_ptr<FontAdapter>> fFontFutureNewGardiner;
+  std::future<std::shared_ptr<FontAdapter>> fFontFutureNotoSans;
   FontSet fFontSet;
   juce::Image fAppIcon;
 

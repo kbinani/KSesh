@@ -2,7 +2,7 @@
 
 namespace ksesh {
 
-class Font {
+class FontAdapter {
   struct Data {
     juce::Path path;
     int dx;
@@ -10,7 +10,7 @@ class Font {
   };
 
 public:
-  explicit Font(std::shared_ptr<hb_font_t> const &font) : fFont(font) {
+  explicit FontAdapter(std::shared_ptr<hb_font_t> const &font) : fFont(font) {
     juce::Path path = Harfbuzz::CreatePath(U"𓄿𓇋𓇌𓂝𓅱𓃀𓊪𓆑𓅓𓈖𓂋𓉔𓎛𓐍𓄡𓋴𓊃𓈙𓈎𓎡𓎼𓏏𓍿𓂧𓆓", font.get());
     auto bounds = path.getBounds();
     dy = bounds.getY();

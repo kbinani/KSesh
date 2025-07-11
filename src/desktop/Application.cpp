@@ -9,7 +9,7 @@
 
 #include "String.hpp"
 #include "Harfbuzz.hpp"
-#include "Font.hpp"
+#include "FontAdapter.hpp"
 #include "BinaryData.hpp"
 #include "Insertions.hpp"
 #include "SignList.hpp"
