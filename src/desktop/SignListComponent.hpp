@@ -33,8 +33,8 @@ class SignListComponent : public juce::Component {
   };
 
 public:
-  explicit SignListComponent(std::shared_ptr<FontAdapter> const &font) : fFont(font->fFont), fOverlayColor(juce::Colours::transparentBlack) {
-    CreateCategories(font->fFont, fCategories);
+  explicit SignListComponent(std::shared_ptr<FontAdapter> const &font) : fFont(font), fOverlayColor(juce::Colours::transparentBlack) {
+    CreateCategories(font, fCategories);
 
     fViewport = std::make_unique<juce::Viewport>();
     addAndMakeVisible(*fViewport);
@@ -72,7 +72,6 @@ public:
       return;
     }
 
-    float scale = 1.0f / Harfbuzz::UnitsPerEm(font.get());
     float space = 2;
 
     for (int i = 0; i < (int)fTabButtons.size(); i++) {
@@ -96,14 +95,14 @@ public:
       if (tb.path) {
         float textWidth = juce::GlyphArrangement::getStringWidth(g.getCurrentFont(), tb.name);
 
-        auto bounds = tb.path->getBoundsTransformed(juce::AffineTransform::scale(scale * tabButtonSignSize, scale * tabButtonSignSize));
+        auto bounds = tb.path->getBoundsTransformed(juce::AffineTransform::scale(tabButtonSignSize, tabButtonSignSize));
         float totalWidth = textWidth + bounds.getWidth();
         float x0 = tb.x + tb.width * 0.5f - totalWidth * 0.5f;
         g.drawText(tb.name, juce::Rectangle<float>(x0 + textWidth - textWidth * 2 - space, tb.y, textWidth * 2, tabButtonHeight), juce::Justification::centredRight);
         g.saveState();
         float x = x0 + textWidth - bounds.getX() + space;
         float y = tb.y + tb.height * 0.5f - bounds.getHeight() * 0.5f - bounds.getY();
-        g.addTransform(juce::AffineTransform(scale * tabButtonSignSize, 0, x, 0, scale * tabButtonSignSize, y));
+        g.addTransform(juce::AffineTransform(tabButtonSignSize, 0, x, 0, tabButtonSignSize, y));
         g.fillPath(*tb.path);
         g.restoreState();
       } else {
@@ -238,16 +237,16 @@ public:
 
   void setFont(std::shared_ptr<FontAdapter> const &font) {
     fContainer->setFont(font);
-    fFont = font->fFont;
+    fFont = font;
     std::vector<Category> categories;
-    CreateCategories(font->fFont, categories);
+    CreateCategories(font, categories);
     fCategories.swap(categories);
     layout();
     repaint();
   }
 
 private:
-  static void CreateCategories(std::shared_ptr<hb_font_t> const &font, std::vector<Category> &categories) {
+  static void CreateCategories(std::shared_ptr<FontAdapter> const &font, std::vector<Category> &categories) {
     using namespace std::literals::string_literals;
     categories.push_back(Category("typing"));
     categories.push_back(MakeCategory(font, "A", U"𓀀"s));
@@ -307,9 +306,9 @@ private:
     }
   }
 
-  static Category MakeCategory(std::shared_ptr<hb_font_t> const &font, juce::String const &name, std::u32string const &sign) {
+  static Category MakeCategory(std::shared_ptr<FontAdapter> const &font, juce::String const &name, std::u32string const &sign) {
     auto path = std::make_shared<juce::Path>();
-    *path = Harfbuzz::CreatePath(sign, font.get());
+    *path = font->path(sign, 1);
     return Category(name, path);
   }
 
@@ -351,7 +350,7 @@ public:
 private:
   std::unique_ptr<juce::Viewport> fViewport;
   std::unique_ptr<SignListButtonContainer> fContainer;
-  std::weak_ptr<hb_font_t> fFont;
+  std::weak_ptr<FontAdapter> fFont;
   std::vector<Category> fCategories;
   std::vector<TabButton> fTabButtons;
 
