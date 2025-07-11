@@ -233,7 +233,9 @@ public:
       fEditor->setText(next, false);
       fEditor->setCaretPosition(nextCaret);
       fEditor->setSelectedRange(juce::Range<int>(nextCaret, nextCaret), fDirection);
-      fDelegate->textEditorComponentDidChangeContentText(c, std::nullopt, nextCaret, nextCaret, fDirection);
+      if (fDelegate) {
+        fDelegate->textEditorComponentDidChangeContentText(c, std::nullopt, nextCaret, nextCaret, fDirection);
+      }
       bind();
     } else {
       auto str = s;
@@ -253,7 +255,9 @@ public:
       fEditor->setText(next, false);
       fEditor->setCaretPosition(nextCaret);
       fEditor->setSelectedRange(juce::Range<int>(nextCaret, nextCaret), fDirection);
-      fDelegate->textEditorComponentDidChangeContentText(c, std::nullopt, nextCaret, nextCaret, fDirection);
+      if (fDelegate) {
+        fDelegate->textEditorComponentDidChangeContentText(c, std::nullopt, nextCaret, nextCaret, fDirection);
+      }
       bind();
     }
   }
@@ -286,7 +290,9 @@ public:
     auto nextCaret = s.length();
     fEditor->setHighlightedRegion(juce::Range<int>(nextCaret, nextCaret));
     fEditor->setCaretPosition(nextCaret);
-    fDelegate->textEditorComponentDidChangeContentText(c, std::nullopt, nextCaret, nextCaret, fDirection);
+    if (fDelegate) {
+      fDelegate->textEditorComponentDidChangeContentText(c, std::nullopt, nextCaret, nextCaret, fDirection);
+    }
     bind();
   }
 
