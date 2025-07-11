@@ -205,7 +205,7 @@ public:
       result += it.ch;
     }
 
-    HbBufferUniquePtr buffer(Harfbuzz::CreateBuffer(result, font));
+    HbBufferUniquePtr buffer(Harfbuzz::CreateBuffer(result, font.get()));
 
     hb_font_extents_t extents{};
     hb_font_get_h_extents(font.get(), &extents);
@@ -213,14 +213,14 @@ public:
     auto descender = extents.descender;
     unitsPerEm = hb_face_get_upem(hb_font_get_face(font.get()));
 
-    Harfbuzz::CreateGlyphInformations(buffer, font, glyphs);
+    Harfbuzz::CreateGlyphInformations(buffer, font.get(), glyphs);
 
     uint32_t lastCluster = 0;
     int index = 0;
     optional<juce::Rectangle<float>> bb;
     float maxX = 0;
     for (auto const &info : glyphs) {
-      juce::Path path = Harfbuzz::CreatePath(info.glyphId, font, info.x, info.y);
+      juce::Path path = Harfbuzz::CreatePath(info.glyphId, font.get(), info.x, info.y);
       juce::Rectangle<float> bounds = path.getBounds();
       if (info.cluster != lastCluster) {
         auto sub = result.substr(lastCluster, info.cluster - lastCluster);
@@ -343,7 +343,7 @@ class Content {
 #endif
 
 public:
-  Content(std::u32string const &raw, std::shared_ptr<hb_font_t> const &font) : unitsPerEm(Harfbuzz::UnitsPerEm(font)), font(font), raw(raw) {
+  Content(std::u32string const &raw, std::shared_ptr<hb_font_t> const &font) : unitsPerEm(Harfbuzz::UnitsPerEm(font.get())), font(font), raw(raw) {
     using namespace std;
     u32string::size_type offset = 0;
     while (offset < raw.size()) {
@@ -850,7 +850,7 @@ public:
     g.setColour(juce::Colours::black);
     for (auto const &line : lines) {
       for (auto const &glyph : line->glyphs) {
-        auto path = Harfbuzz::CreatePath(glyph.glyphId, font, glyph.x + dx, glyph.y + dy);
+        auto path = Harfbuzz::CreatePath(glyph.glyphId, font.get(), glyph.x + dx, glyph.y + dy);
         if (path.getBounds().isEmpty()) {
           continue;
         }
@@ -919,7 +919,7 @@ public:
         g.addTransform(juce::AffineTransform::scale(*maxWidth / bounds.getWidth(), 1));
       }
       for (auto const &glyph : line->glyphs) {
-        auto path = Harfbuzz::CreatePath(glyph.glyphId, font, glyph.x + dx, glyph.y + dy);
+        auto path = Harfbuzz::CreatePath(glyph.glyphId, font.get(), glyph.x + dx, glyph.y + dy);
         if (path.getBounds().isEmpty()) {
           continue;
         }

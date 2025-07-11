@@ -72,7 +72,7 @@ public:
       return;
     }
 
-    float scale = 1.0f / Harfbuzz::UnitsPerEm(font);
+    float scale = 1.0f / Harfbuzz::UnitsPerEm(font.get());
     float space = 2;
 
     for (int i = 0; i < (int)fTabButtons.size(); i++) {
@@ -309,7 +309,7 @@ private:
 
   static Category MakeCategory(std::shared_ptr<hb_font_t> const &font, juce::String const &name, std::u32string const &sign) {
     auto path = std::make_shared<juce::Path>();
-    *path = Harfbuzz::CreatePath(sign, font);
+    *path = Harfbuzz::CreatePath(sign, font.get());
     return Category(name, path);
   }
 

@@ -77,15 +77,15 @@ class Harfbuzz {
   }
 
 public:
-  static juce::Path CreatePath(int glyphId, std::shared_ptr<hb_font_t> const &font, int dx = 0, int dy = 0) {
+  static juce::Path CreatePath(int glyphId, hb_font_t *font, int dx = 0, int dy = 0) {
     Data data;
     data.dx = dx;
     data.dy = dy;
-    hb_font_draw_glyph(font.get(), glyphId, GetDrawFuncs(), &data);
+    hb_font_draw_glyph(font, glyphId, GetDrawFuncs(), &data);
     return data.path;
   }
 
-  static juce::Path CreatePath(std::u32string const &t, std::shared_ptr<hb_font_t> const &font) {
+  static juce::Path CreatePath(std::u32string const &t, hb_font_t *font) {
     juce::Path ret;
     HbBufferUniquePtr buffer(CreateBuffer(t, font));
     std::vector<GlyphInformation> glyphs;
@@ -99,24 +99,24 @@ public:
     return ret;
   }
 
-  static hb_buffer_t *CreateBuffer(std::u32string const &t, std::shared_ptr<hb_font_t> const &font) {
+  static hb_buffer_t *CreateBuffer(std::u32string const &t, hb_font_t *font) {
     HbBufferUniquePtr buffer(hb_buffer_create());
     hb_buffer_add_utf32(buffer.get(), (uint32_t const *)t.c_str(), t.size(), 0, -1);
     hb_buffer_set_direction(buffer.get(), HB_DIRECTION_LTR);
     hb_buffer_set_script(buffer.get(), HB_SCRIPT_EGYPTIAN_HIEROGLYPHS);
     hb_buffer_set_cluster_level(buffer.get(), HB_BUFFER_CLUSTER_LEVEL_CHARACTERS);
-    hb_shape(font.get(), buffer.get(), nullptr, 0);
+    hb_shape(font, buffer.get(), nullptr, 0);
 
     return buffer.release();
   }
 
-  static void CreateGlyphInformations(HbBufferUniquePtr const &buffer, std::shared_ptr<hb_font_t> const &font, std::vector<GlyphInformation> &out) {
+  static void CreateGlyphInformations(HbBufferUniquePtr const &buffer, hb_font_t *font, std::vector<GlyphInformation> &out) {
     out.clear();
 
     hb_font_extents_t extents{};
-    hb_font_get_h_extents(font.get(), &extents);
+    hb_font_get_h_extents(font, &extents);
     auto descender = extents.descender;
-    int unitsPerEm = hb_face_get_upem(hb_font_get_face(font.get()));
+    int unitsPerEm = hb_face_get_upem(hb_font_get_face(font));
 
     unsigned int numGlyphs = hb_buffer_get_length(buffer.get());
     hb_glyph_info_t *glyphInfo = hb_buffer_get_glyph_infos(buffer.get(), nullptr);
@@ -139,8 +139,8 @@ public:
     }
   }
 
-  static unsigned int UnitsPerEm(std::shared_ptr<hb_font_t> const &font) {
-    return hb_face_get_upem(hb_font_get_face(font.get()));
+  static unsigned int UnitsPerEm(hb_font_t *font) {
+    return hb_face_get_upem(hb_font_get_face(font));
   }
 };
 

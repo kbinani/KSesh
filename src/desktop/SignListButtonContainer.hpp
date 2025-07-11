@@ -46,7 +46,7 @@ public:
       return;
     }
 
-    float scale = 1.0f / Harfbuzz::UnitsPerEm(font);
+    float scale = 1.0f / Harfbuzz::UnitsPerEm(font.get());
 
     for (int i = 0; i < (int)fSignButtons.size(); i++) {
       auto const &sb = fSignButtons[i];
@@ -137,7 +137,7 @@ public:
     if (!font) {
       return;
     }
-    float scale = signButtonSignSize / (float)Harfbuzz::UnitsPerEm(font);
+    float scale = signButtonSignSize / (float)Harfbuzz::UnitsPerEm(font.get());
     fSignButtons.clear();
     float rowHeight = signButtonHeaderHeight + signButtonSignHeight + signButtonMdCHeight;
     int maxNumColumns = 1;
@@ -365,7 +365,7 @@ private:
     auto s = std::make_shared<Sign>();
     s->name = JuceStringFromU32String(name);
     s->path = std::make_shared<juce::Path>();
-    *s->path = Harfbuzz::CreatePath(sign, font);
+    *s->path = Harfbuzz::CreatePath(sign, font.get());
 
     auto found = SignList::MapReverse(sign);
     std::vector<juce::String> mdc;
