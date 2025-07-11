@@ -118,6 +118,10 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
       if (content->lines.empty()) {
         return ret;
       }
+      auto font = content->font.lock();
+      if (!font) {
+        return ret;
+      }
       auto p = fSetting->getPresentationSetting();
       float tx = x;
       float ty = y + p.fontSize;
@@ -127,10 +131,10 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
       if (0 <= offset && offset <= p.fontSize) {
         auto setting = getRenderSetting();
         auto maxWidth = getMaxWidth();
-        float const upem = (float)content->unitsPerEm;
-        float const scale = setting.fontSize / upem;
+        float const fontSize = setting.fontSize;
         auto line = content->lines[lineIndex];
-        auto bounds = line->boundingBox * scale;
+        auto mtx = juce::AffineTransform::translation(0, -font->fDy).scaled(font->fScale * fontSize);
+        auto bounds = line->boundingBox.transformedBy(mtx);
         float drawScale = 1;
         if (bounds.getWidth() > maxWidth) {
           drawScale = maxWidth / bounds.getWidth();

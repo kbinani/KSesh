@@ -77,6 +77,15 @@ class Harfbuzz {
   }
 
 public:
+  static juce::Path CreatePath(int glyphId, hb_font_t *font, juce::AffineTransform const &tx) {
+    Data data;
+    data.dx = 0;
+    data.dy = 0;
+    hb_font_draw_glyph(font, glyphId, GetDrawFuncs(), &data);
+    data.path.applyTransform(tx);
+    return data.path;
+  }
+
   static juce::Path CreatePath(int glyphId, hb_font_t *font, int dx = 0, int dy = 0) {
     Data data;
     data.dx = dx;
@@ -137,10 +146,6 @@ public:
       cursorX += xAdvance;
       cursorY += yAdvance;
     }
-  }
-
-  static unsigned int UnitsPerEm(hb_font_t *font) {
-    return hb_face_get_upem(hb_font_get_face(font));
   }
 };
 

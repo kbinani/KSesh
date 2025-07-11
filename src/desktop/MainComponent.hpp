@@ -566,7 +566,7 @@ private:
     auto next = fFontSet.select(fontFamily);
     fSignList->setFont(next);
     if (fContent) {
-      auto content = std::make_shared<Content>(fContent->raw, next->fFont);
+      auto content = std::make_shared<Content>(fContent->raw, next);
       fContent = content;
       fHieroglyph->setContent(content);
       fTextEditor->setContent(content);
@@ -615,7 +615,7 @@ private:
     auto selected = fTextEditor->getSelectedText();
     std::shared_ptr<Content> c;
     if (selected) {
-      c = std::make_shared<Content>(U32StringFromJuceString(*selected), fFont->fFont);
+      c = std::make_shared<Content>(U32StringFromJuceString(*selected), fFont);
     } else if (fContent) {
       c = fContent;
     } else {
@@ -643,7 +643,7 @@ private:
     auto selected = fTextEditor->getSelectedText();
     std::shared_ptr<Content> c;
     if (selected) {
-      c = std::make_shared<Content>(U32StringFromJuceString(*selected), fFont->fFont);
+      c = std::make_shared<Content>(U32StringFromJuceString(*selected), fFont);
     } else if (fContent) {
       c = fContent;
     } else {
@@ -724,7 +724,7 @@ private:
   void newDocument() {
     fSave = juce::File();
     fDirty = false;
-    auto c = std::make_shared<Content>(U"", fFont->fFont);
+    auto c = std::make_shared<Content>(U"", fFont);
     setContent(c);
     fHieroglyph->setSelectedRange(0, 0, Direction::Forward);
     fTextEditor->resetText("");
@@ -784,7 +784,7 @@ private:
       return;
     }
     auto str = stream->readString();
-    auto c = std::make_shared<Content>(U32StringFromJuceString(str), fFont->fFont);
+    auto c = std::make_shared<Content>(U32StringFromJuceString(str), fFont);
     setContent(c);
     fSave = file;
     fDirty = false;
@@ -1047,7 +1047,7 @@ private:
   }
 
   void textEditorComponentDidChangeContentText(std::u32string const &contentText, std::optional<juce::String> typing, int start, int end, Direction direction) override {
-    auto content = std::make_shared<Content>(contentText, fFont->fFont);
+    auto content = std::make_shared<Content>(contentText, fFont);
     setContent(content);
     if (typing && fFocusOwner == FocusOwner::textEditor) {
       fSignList->setTyping(*typing);

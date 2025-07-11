@@ -41,7 +41,7 @@ mAa\r3 xrw)"}};
     }
     addAndMakeVisible(*fSelector);
     auto e = fExamples[0];
-    fContent = std::make_shared<Content>(U32StringFromJuceString(e.content), font->fFont);
+    fContent = std::make_shared<Content>(U32StringFromJuceString(e.content), font);
     fEditor->setContent(fContent);
     fEditor->resetText(e.content);
     fSelector->setSelectedId(1);
@@ -94,7 +94,7 @@ private:
     int index = fSelector->getSelectedId() - 1;
     if (0 <= index && index < (int)fExamples.size()) {
       auto e = fExamples[index];
-      auto c = std::make_shared<Content>(U32StringFromJuceString(e.content), font->fFont);
+      auto c = std::make_shared<Content>(U32StringFromJuceString(e.content), font);
       fEditor->setContent(c);
       fEditor->resetText(e.content);
       fContent = c;

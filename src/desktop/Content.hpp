@@ -36,7 +36,7 @@ struct Cluster {
 
 class Line {
 public:
-  Line(int rawOffset, std::u32string const &raw, std::shared_ptr<hb_font_t> const &font) : rawOffset(rawOffset), raw(raw) {
+  Line(int rawOffset, std::u32string const &raw, std::shared_ptr<FontAdapter> const &font) : rawOffset(rawOffset), raw(raw) {
     using namespace std;
     using namespace std::literals::string_literals;
     vector<CharBase> chars;
@@ -205,22 +205,15 @@ public:
       result += it.ch;
     }
 
-    HbBufferUniquePtr buffer(Harfbuzz::CreateBuffer(result, font.get()));
-
-    hb_font_extents_t extents{};
-    hb_font_get_h_extents(font.get(), &extents);
-    auto ascender = extents.ascender;
-    auto descender = extents.descender;
-    unitsPerEm = hb_face_get_upem(hb_font_get_face(font.get()));
-
-    Harfbuzz::CreateGlyphInformations(buffer, font.get(), glyphs);
+    HbBufferUniquePtr buffer(Harfbuzz::CreateBuffer(result, font->fFont.get()));
+    Harfbuzz::CreateGlyphInformations(buffer, font->fFont.get(), glyphs);
 
     uint32_t lastCluster = 0;
     int index = 0;
     optional<juce::Rectangle<float>> bb;
     float maxX = 0;
     for (auto const &info : glyphs) {
-      juce::Path path = Harfbuzz::CreatePath(info.glyphId, font.get(), info.x, info.y);
+      juce::Path path = Harfbuzz::CreatePath(info.glyphId, font->fFont.get(), info.x, info.y);
       juce::Rectangle<float> bounds = path.getBounds();
       if (info.cluster != lastCluster) {
         auto sub = result.substr(lastCluster, info.cluster - lastCluster);
@@ -256,7 +249,7 @@ public:
       }
     }
 
-    boundingBox = juce::Rectangle<float>(0, 0, maxX, ascender - descender);
+    boundingBox = juce::Rectangle<float>(0, 0, maxX, 1.0f / font->fScale);
   }
 
 public:
@@ -265,7 +258,6 @@ public:
   juce::Rectangle<float> boundingBox;
   std::vector<Char> chars;
   HbBufferUniquePtr buffer;
-  int unitsPerEm;
   std::vector<GlyphInformation> glyphs;
   int rawOffset;
   std::u32string const raw;
@@ -343,7 +335,7 @@ class Content {
 #endif
 
 public:
-  Content(std::u32string const &raw, std::shared_ptr<hb_font_t> const &font) : unitsPerEm(Harfbuzz::UnitsPerEm(font.get())), font(font), raw(raw) {
+  Content(std::u32string const &raw, std::shared_ptr<FontAdapter> const &font) : font(font), raw(raw) {
     using namespace std;
     u32string::size_type offset = 0;
     while (offset < raw.size()) {
@@ -554,8 +546,7 @@ public:
     float lineSpacing = setting.lineSpacing();
     float padding = setting.padding;
 
-    float upem = unitsPerEm;
-    auto scale = fontSize / upem;
+    auto scale = fontSize;
     if (selectionStart == selectionEnd) {
       auto location = cursorLocation(selectionStart, direction);
       if (!location) {
@@ -662,7 +653,7 @@ public:
 
   std::string toPDF(PresentationSetting const &setting) const {
     using namespace std;
-    float scale = setting.fontSize / (float)unitsPerEm;
+    float scale = setting.fontSize;
     optional<juce::Rectangle<float>> bb;
     float dx = setting.padding;
     float dy = setting.padding;
@@ -776,8 +767,7 @@ public:
         nullptr, nullptr);
 
     hb_font_extents_t extents{};
-    hb_font_get_h_extents(font.get(), &extents);
-    auto descender = extents.descender;
+    hb_font_get_h_extents(font->fFont.get(), &extents);
 
     unique_ptr<pdf_doc, juce::FunctionPointerDestructor<pdf_destroy>> doc(pdf_create(width, height, nullptr));
     pdf_append_page(doc.get());
@@ -787,30 +777,30 @@ public:
       unsigned int numGlyphs = hb_buffer_get_length(line->buffer.get());
       hb_glyph_info_t *glyphInfo = hb_buffer_get_glyph_infos(line->buffer.get(), nullptr);
       hb_glyph_position_t *glyphPos = hb_buffer_get_glyph_positions(line->buffer.get(), nullptr);
-      hb_position_t cursorX = 0;
-      hb_position_t cursorY = 0;
+      float cursorX = 0;
+      float cursorY = 0;
       for (unsigned int i = 0; i < numGlyphs; i++) {
         auto glyphId = glyphInfo[i].codepoint;
         auto xOffset = glyphPos[i].x_offset;
         auto yOffset = glyphPos[i].y_offset;
         auto xAdvance = glyphPos[i].x_advance;
         auto yAdvance = glyphPos[i].y_advance;
-        float x = cursorX + xOffset;
-        float y = cursorY + yOffset;
+        float x = cursorX + xOffset * font->fScale;
+        float y = cursorY + yOffset * font->fScale;
 
         Data data;
-        data.scale = scale;
+        data.scale = scale * font->fScale;
         data.tx = x;
-        data.ty = y - descender;
+        data.ty = y - font->fDy;
         data.dx = setting.padding;
         data.dy = height - lineIndex * (setting.fontSize + setting.lineSpacing()) - setting.padding - setting.fontSize;
         data.buffer.push_back({.op = 'm', .x1 = 0, .y1 = 0});
-        hb_font_draw_glyph(font.get(), glyphId, funcs.get(), &data);
+        hb_font_draw_glyph(font->fFont.get(), glyphId, funcs.get(), &data);
         if (data.buffer.size() > 1) {
           pdf_add_custom_path(doc.get(), nullptr, data.buffer.data(), data.buffer.size(), 0, 0, PDF_BLACK);
         }
-        cursorX += xAdvance;
-        cursorY += yAdvance;
+        cursorX += xAdvance * font->fScale;
+        cursorY += yAdvance * font->fScale;
       }
       lineIndex++;
     }
@@ -823,8 +813,7 @@ public:
     if (lines.empty()) {
       return std::make_pair<float>(2 * setting.padding, 2 * setting.padding);
     }
-    float upem = (float)unitsPerEm;
-    float const scale = setting.fontSize / upem;
+    float const scale = setting.fontSize;
     float height = setting.padding * 2 + setting.fontSize * lines.size() + setting.lineSpacing() * (lines.size() - 1);
     float width = setting.padding * 2;
     for (auto const &line : lines) {
@@ -835,10 +824,9 @@ public:
   }
 
   void draw(juce::Graphics &g, PresentationSetting const &setting) const {
-    float upem = (float)unitsPerEm;
-    float const scale = setting.fontSize / upem;
-    float const padding = setting.padding / scale;
-    float const lineSpacing = setting.lineSpacing() / scale;
+    float const scale = setting.fontSize;
+    float const padding = setting.padding;
+    float const lineSpacing = setting.lineSpacing();
     float dx = padding;
     float dy = padding;
     auto font = this->font.lock();
@@ -850,13 +838,13 @@ public:
     g.setColour(juce::Colours::black);
     for (auto const &line : lines) {
       for (auto const &glyph : line->glyphs) {
-        auto path = Harfbuzz::CreatePath(glyph.glyphId, font.get(), glyph.x + dx, glyph.y + dy);
+        auto path = Harfbuzz::CreatePath(glyph.glyphId, font->fFont.get(), juce::AffineTransform::translation(glyph.x, glyph.y - font->fDy).scaled(font->fScale).translated(dx, dy));
         if (path.getBounds().isEmpty()) {
           continue;
         }
         g.fillPath(path);
       }
-      dy += lineSpacing + upem;
+      dy += lineSpacing + scale;
     }
     g.restoreState();
   }
@@ -875,10 +863,9 @@ public:
       std::optional<float> maxWidth = std::nullopt) {
     auto cursor = this->cursor(start, end, direction, setting);
 
-    float const upem = (float)unitsPerEm;
-    float const scale = setting.fontSize / upem;
-    float const padding = setting.padding / scale;
-    float const lineSpacing = setting.lineSpacing() / scale;
+    float const fontSize = setting.fontSize;
+    float const padding = setting.padding;
+    float const lineSpacing = setting.lineSpacing();
     auto font = this->font.lock();
     if (!font) {
       return;
@@ -886,9 +873,10 @@ public:
 
     g.saveState();
     g.setColour(highlightColor);
+    auto tx = juce::AffineTransform::translation(0, -font->fDy).scaled(font->fScale * fontSize);
     for (auto const &rect : cursor.selectionRects) {
       auto line = lines[rect.lineIndex];
-      auto bounds = line->boundingBox * scale;
+      auto bounds = line->boundingBox.transformedBy(tx);
       bool shrink = false;
       if (maxWidth && bounds.getWidth() > *maxWidth) {
         shrink = true;
@@ -905,13 +893,12 @@ public:
     float dx = padding;
     float dy = padding;
     g.saveState();
-    g.addTransform(juce::AffineTransform::scale(scale, scale));
     juce::Range<int> selection(start, end);
     for (auto const &line : lines) {
       if (start == end) {
         g.setColour(textColor);
       }
-      auto bounds = line->boundingBox * scale;
+      auto bounds = line->boundingBox.transformedBy(tx);
       bool shrink = false;
       if (maxWidth && bounds.getWidth() > *maxWidth) {
         shrink = true;
@@ -919,7 +906,7 @@ public:
         g.addTransform(juce::AffineTransform::scale(*maxWidth / bounds.getWidth(), 1));
       }
       for (auto const &glyph : line->glyphs) {
-        auto path = Harfbuzz::CreatePath(glyph.glyphId, font.get(), glyph.x + dx, glyph.y + dy);
+        auto path = Harfbuzz::CreatePath(glyph.glyphId, font->fFont.get(), juce::AffineTransform::translation(glyph.x, glyph.y - font->fDy).scaled(font->fScale).translated(dx, dy));
         if (path.getBounds().isEmpty()) {
           continue;
         }
@@ -941,14 +928,14 @@ public:
       if (shrink) {
         g.restoreState();
       }
-      dy += lineSpacing + upem;
+      dy += lineSpacing + fontSize;
     }
     g.restoreState();
 
     if (cursor.rect) {
       g.setColour(caretColor);
       auto line = lines[cursor.rect->lineIndex];
-      auto bounds = line->boundingBox * scale;
+      auto bounds = line->boundingBox.transformedBy(tx);
       bool shrink = false;
       float scale = 1;
       if (maxWidth && bounds.getWidth() > *maxWidth) {
@@ -1085,29 +1072,26 @@ public:
       ScopedHandle<HBRUSH, ::DeleteObject> brush(::CreateSolidBrush(RGB(0, 0, 0)));
       ::SelectObject(hdc, brush);
 
-      float const scale = setting.fontSize / (float)unitsPerEm;
+      float const fontSize = setting.fontSize;
       float dy = 0;
 
       ::ModifyWorldTransform(hdc, nullptr, MWT_IDENTITY);
       XFORM mtx;
-      mtx.eM11 = scale;
+      mtx.eM11 = font->fScale * fontSize;
       mtx.eM12 = 0;
       mtx.eM21 = 0;
-      mtx.eM22 = scale;
+      mtx.eM22 = font->fScale * fontSize;
       mtx.eDx = setting.padding;
-      mtx.eDy = setting.padding;
+      mtx.eDy = setting.padding - font->fDy / (font->fScale * fontSize);
       ::SetWorldTransform(hdc, &mtx);
 
-      hb_font_extents_t extents{};
-      hb_font_get_h_extents(font.get(), &extents);
-      auto descender = extents.descender;
       for (int lineIndex = 0; lineIndex < (int)lines.size(); lineIndex++) {
         auto const &line = lines[lineIndex];
         unsigned int numGlyphs = hb_buffer_get_length(line->buffer.get());
         hb_glyph_info_t *glyphInfo = hb_buffer_get_glyph_infos(line->buffer.get(), nullptr);
         hb_glyph_position_t *glyphPos = hb_buffer_get_glyph_positions(line->buffer.get(), nullptr);
-        hb_position_t cursorX = 0;
-        hb_position_t cursorY = -(unitsPerEm + descender);
+        float cursorX = 0;
+        float cursorY = 0;
         for (unsigned int i = 0; i < numGlyphs; i++) {
           auto glyphId = glyphInfo[i].codepoint;
           auto xOffset = glyphPos[i].x_offset;
@@ -1123,14 +1107,14 @@ public:
           data.ty = y;
           data.dx = 0;
           data.dy = dy;
-          hb_font_draw_glyph(font.get(), glyphId, funcs.get(), &data);
+          hb_font_draw_glyph(font->fFont.get(), glyphId, funcs.get(), &data);
           if (data.end()) {
             ::FillPath(hdc);
           }
           cursorX += xAdvance;
           cursorY += yAdvance;
         }
-        dy += setting.lineSpacing() / scale + setting.fontSize / scale;
+        dy += setting.lineSpacing() + setting.fontSize;
       }
     }
 
@@ -1154,8 +1138,7 @@ public:
   }
 
   std::vector<std::shared_ptr<Line>> lines;
-  unsigned int const unitsPerEm;
-  std::weak_ptr<hb_font_t> font;
+  std::weak_ptr<FontAdapter> font;
   std::u32string const raw;
 };
 
