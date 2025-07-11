@@ -133,11 +133,10 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
         auto maxWidth = getMaxWidth();
         float const fontSize = setting.fontSize;
         auto line = content->lines[lineIndex];
-        auto mtx = juce::AffineTransform::translation(0, -font->fDy).scaled(font->fScale * fontSize);
-        auto bounds = line->boundingBox.transformedBy(mtx);
+        float xMax = line->width * font->fScale * fontSize;
         float drawScale = 1;
-        if (bounds.getWidth() > maxWidth) {
-          drawScale = maxWidth / bounds.getWidth();
+        if (xMax > maxWidth) {
+          drawScale = maxWidth / xMax;
         }
         auto pos = content->closestPosition(getCaretPosition(), {tx / drawScale, ty}, setting);
         return pos.location;

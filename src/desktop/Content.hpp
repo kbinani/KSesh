@@ -249,13 +249,13 @@ public:
       }
     }
 
-    boundingBox = juce::Rectangle<float>(0, 0, maxX, 1.0f / font->fScale);
+    width = maxX;
   }
 
 public:
   std::u32string result;
   std::vector<Cluster> clusters;
-  juce::Rectangle<float> boundingBox;
+  float width;
   std::vector<Char> chars;
   HbBufferUniquePtr buffer;
   std::vector<GlyphInformation> glyphs;
@@ -542,11 +542,18 @@ public:
       int selectionEnd,
       Direction direction,
       PresentationSetting const &setting) {
-    float fontSize = setting.fontSize;
-    float lineSpacing = setting.lineSpacing();
-    float padding = setting.padding;
+    float const fontSize = setting.fontSize;
+    float const lineSpacing = setting.lineSpacing();
+    float const padding = setting.padding;
+    float const caretExpand = setting.caretExpand;
+    auto font = this->font.lock();
+    if (!font) {
+      Cursor ret;
+      return ret;
+    }
 
     auto scale = fontSize;
+    auto mtx = juce::AffineTransform::translation(0, -font->fDy).scaled(font->fScale * fontSize);
     if (selectionStart == selectionEnd) {
       auto location = cursorLocation(selectionStart, direction);
       if (!location) {
@@ -559,13 +566,12 @@ public:
         float dx = padding;
         float dy = padding + (fontSize + lineSpacing) * lineIndex;
         auto line = this->lines[lineIndex];
-        auto bounds = (line->boundingBox * scale).expanded(setting.caretExpand);
         Cursor ret;
         ret.rect = {lineIndex, juce::Rectangle<float>(
-                                   dx + bounds.getX() + bounds.getWidth(),
-                                   dy + bounds.getY(),
+                                   dx + line->width * font->fScale * fontSize,
+                                   dy,
                                    0,
-                                   bounds.getHeight())};
+                                   fontSize)};
         return ret;
       } else {
         int lineIndex;
@@ -595,7 +601,8 @@ public:
           Cursor ret;
           return ret;
         }
-        auto bounds = ((*cluster.bounds) * scale).expanded(setting.caretExpand);
+        //        auto bounds = ((*cluster.bounds) * scale).expanded(setting.caretExpand);
+        auto bounds = cluster.bounds->transformedBy(mtx).expanded(caretExpand);
         if (std::holds_alternative<CursorLocationLeft>(*location)) {
           Cursor ret;
           ret.rect = {lineIndex, juce::Rectangle<float>(dx + bounds.getX(), dy + bounds.getY(), 0, bounds.getHeight())};
@@ -653,28 +660,27 @@ public:
 
   std::string toPDF(PresentationSetting const &setting) const {
     using namespace std;
-    float scale = setting.fontSize;
-    optional<juce::Rectangle<float>> bb;
-    float dx = setting.padding;
-    float dy = setting.padding;
-    for (auto const &line : lines) {
-      auto bounds = (line->boundingBox * scale).translated(dx, dy);
-      if (bb) {
-        bb = bb->getUnion(bounds);
-      } else {
-        bb = bounds;
-      }
-      dy += setting.lineSpacing() + setting.fontSize;
-    }
-    if (!bb) {
-      return {};
-    }
+    float const fontSize = setting.fontSize;
     auto font = this->font.lock();
     if (!font) {
       return {};
     }
-    int width = (int)ceil(bb->getRight()) + setting.padding;
-    int height = (int)ceil(bb->getBottom()) + setting.padding;
+    optional<float> right;
+    float dy = setting.padding;
+    for (auto const &line : lines) {
+      float xMax = line->width * font->fScale * fontSize;
+      if (right) {
+        right = std::max(*right, xMax);
+      } else {
+        right = xMax;
+      }
+      dy += setting.lineSpacing() + setting.fontSize;
+    }
+    if (!right) {
+      return {};
+    }
+    int width = (int)ceil(*right) + setting.padding;
+    int height = (int)ceil(dy) + setting.padding;
     struct Data {
       float scale;
       float dx;
@@ -789,7 +795,7 @@ public:
         float y = cursorY + yOffset * font->fScale;
 
         Data data;
-        data.scale = scale * font->fScale;
+        data.scale = fontSize * font->fScale;
         data.tx = x;
         data.ty = y - font->fDy;
         data.dx = setting.padding;
@@ -810,15 +816,20 @@ public:
   }
 
   std::pair<float, float> getSize(PresentationSetting const &setting) const {
+    float const fontSize = setting.fontSize;
+    float const padding = setting.padding;
     if (lines.empty()) {
-      return std::make_pair<float>(2 * setting.padding, 2 * setting.padding);
+      return std::make_pair<float>(2 * padding, 2 * padding);
     }
-    float const scale = setting.fontSize;
-    float height = setting.padding * 2 + setting.fontSize * lines.size() + setting.lineSpacing() * (lines.size() - 1);
-    float width = setting.padding * 2;
+    auto font = this->font.lock();
+    if (!font) {
+      return std::make_pair<float>(2 * padding, 2 * padding);
+    }
+    float height = padding * 2 + fontSize * lines.size() + setting.lineSpacing() * (lines.size() - 1);
+    float width = padding * 2;
     for (auto const &line : lines) {
-      auto bb = (line->boundingBox * scale).translated(setting.padding, setting.padding);
-      width = std::max(width, bb.getRight() + setting.padding);
+      float right = line->width * font->fScale * fontSize;
+      width = std::max(width, right + padding);
     }
     return std::make_pair(width, height);
   }
@@ -870,18 +881,27 @@ public:
     if (!font) {
       return;
     }
+    std::optional<float> availableWidth;
+    if (maxWidth) {
+      float remaining = *maxWidth - 2 * padding;
+      if (remaining <= 0) {
+        return;
+      }
+      availableWidth = remaining;
+    }
+    g.saveState();
+    g.addTransform(juce::AffineTransform::translation(padding, padding));
 
     g.saveState();
     g.setColour(highlightColor);
-    auto tx = juce::AffineTransform::translation(0, -font->fDy).scaled(font->fScale * fontSize);
     for (auto const &rect : cursor.selectionRects) {
       auto line = lines[rect.lineIndex];
-      auto bounds = line->boundingBox.transformedBy(tx);
+      float width = line->width * font->fScale * fontSize;
       bool shrink = false;
-      if (maxWidth && bounds.getWidth() > *maxWidth) {
+      if (availableWidth && width > *availableWidth) {
         shrink = true;
         g.saveState();
-        g.addTransform(juce::AffineTransform::scale(*maxWidth / bounds.getWidth(), 1));
+        g.addTransform(juce::AffineTransform::scale(*availableWidth / width, 1));
       }
       g.fillRect(rect.rect);
       if (shrink) {
@@ -890,23 +910,27 @@ public:
     }
     g.restoreState();
 
-    float dx = padding;
-    float dy = padding;
+    float dy = 0;
     g.saveState();
     juce::Range<int> selection(start, end);
     for (auto const &line : lines) {
       if (start == end) {
         g.setColour(textColor);
       }
-      auto bounds = line->boundingBox.transformedBy(tx);
+
+      float width = line->width * font->fScale * fontSize;
       bool shrink = false;
-      if (maxWidth && bounds.getWidth() > *maxWidth) {
+      if (availableWidth && width > *availableWidth) {
         shrink = true;
         g.saveState();
-        g.addTransform(juce::AffineTransform::scale(*maxWidth / bounds.getWidth(), 1));
+        g.addTransform(juce::AffineTransform::scale(*availableWidth / width, 1));
       }
       for (auto const &glyph : line->glyphs) {
-        auto path = Harfbuzz::CreatePath(glyph.glyphId, font->fFont.get(), juce::AffineTransform::translation(glyph.x, glyph.y - font->fDy).scaled(font->fScale).translated(dx, dy));
+        auto path = Harfbuzz::CreatePath(glyph.glyphId,
+                                         font->fFont.get(),
+                                         juce::AffineTransform::translation(glyph.x, glyph.y - font->fDy)
+                                             .scaled(font->fScale * fontSize)
+                                             .translated(0, dy));
         if (path.getBounds().isEmpty()) {
           continue;
         }
@@ -935,13 +959,13 @@ public:
     if (cursor.rect) {
       g.setColour(caretColor);
       auto line = lines[cursor.rect->lineIndex];
-      auto bounds = line->boundingBox.transformedBy(tx);
+      float width = line->width * font->fScale * fontSize;
       bool shrink = false;
       float scale = 1;
-      if (maxWidth && bounds.getWidth() > *maxWidth) {
+      if (availableWidth && width > *availableWidth) {
         shrink = true;
         g.saveState();
-        scale = *maxWidth / bounds.getWidth();
+        scale = *availableWidth / width;
         g.addTransform(juce::AffineTransform::scale(scale, 1));
       }
       g.fillRect(cursor.rect->rect.expanded(caretWidth * 0.5f / scale, 0));
@@ -949,6 +973,8 @@ public:
         g.restoreState();
       }
     }
+
+    g.restoreState();
   }
 
   std::string toEMF(PresentationSetting const &setting) const {
