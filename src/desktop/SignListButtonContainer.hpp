@@ -30,7 +30,7 @@ class SignListButtonContainer : public juce::Component {
   };
 
 public:
-  explicit SignListButtonContainer(std::shared_ptr<hb_font_t> const &font) {
+  explicit SignListButtonContainer(std::shared_ptr<FontAdapter> const &font) {
     setFont(font);
   }
 
@@ -45,8 +45,6 @@ public:
     if (!font) {
       return;
     }
-
-    float scale = 1.0f / Harfbuzz::UnitsPerEm(font.get());
 
     for (int i = 0; i < (int)fSignButtons.size(); i++) {
       auto const &sb = fSignButtons[i];
@@ -79,10 +77,10 @@ public:
         }
       }
       g.saveState();
-      auto bounds = sb.path->getBoundsTransformed(juce::AffineTransform::scale(scale * signButtonSignSize, scale * signButtonSignSize));
+      auto bounds = sb.path->getBoundsTransformed(juce::AffineTransform::scale(signButtonSignSize, signButtonSignSize));
       float x = sb.x + sb.width * 0.5f - bounds.getWidth() * 0.5f - bounds.getX();
       float y = sb.y + signButtonHeaderHeight + signButtonSignHeight * 0.5f - bounds.getHeight() * 0.5f - bounds.getY();
-      g.addTransform(juce::AffineTransform(scale * signButtonSignSize, 0, x, 0, scale * signButtonSignSize, y));
+      g.addTransform(juce::AffineTransform(signButtonSignSize, 0, x, 0, signButtonSignSize, y));
       g.fillPath(*sb.path);
       g.restoreState();
     }
@@ -137,7 +135,7 @@ public:
     if (!font) {
       return;
     }
-    float scale = signButtonSignSize / (float)Harfbuzz::UnitsPerEm(font.get());
+    float scale = signButtonSignSize;
     fSignButtons.clear();
     float rowHeight = signButtonHeaderHeight + signButtonSignHeight + signButtonMdCHeight;
     int maxNumColumns = 1;
@@ -337,7 +335,7 @@ public:
     }
   }
 
-  void setFont(std::shared_ptr<hb_font_t> const &font) {
+  void setFont(std::shared_ptr<FontAdapter> const &font) {
     fFont = font;
     fAllSigns.clear();
     std::vector<juce::String> signNames;
@@ -361,11 +359,11 @@ public:
   }
 
 private:
-  std::shared_ptr<Sign> makeSign(std::shared_ptr<hb_font_t> const &font, std::u32string const &name, std::u32string const &sign) {
+  std::shared_ptr<Sign> makeSign(std::shared_ptr<FontAdapter> const &font, std::u32string const &name, std::u32string const &sign) {
     auto s = std::make_shared<Sign>();
     s->name = JuceStringFromU32String(name);
     s->path = std::make_shared<juce::Path>();
-    *s->path = Harfbuzz::CreatePath(sign, font.get());
+    *s->path = font->path(sign, 1);
 
     auto found = SignList::MapReverse(sign);
     std::vector<juce::String> mdc;
@@ -422,7 +420,7 @@ public:
   std::function<void(Sign const &)> onClickSign;
 
 private:
-  std::weak_ptr<hb_font_t> fFont;
+  std::weak_ptr<FontAdapter> fFont;
   std::vector<std::shared_ptr<Sign>> fSigns;
   std::vector<SignButton> fSignButtons;
   int fHitSignButton = -1;

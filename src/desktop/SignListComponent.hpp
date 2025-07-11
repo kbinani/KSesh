@@ -33,8 +33,8 @@ class SignListComponent : public juce::Component {
   };
 
 public:
-  explicit SignListComponent(std::shared_ptr<hb_font_t> const &font) : fFont(font), fOverlayColor(juce::Colours::transparentBlack) {
-    CreateCategories(font, fCategories);
+  explicit SignListComponent(std::shared_ptr<FontAdapter> const &font) : fFont(font->fFont), fOverlayColor(juce::Colours::transparentBlack) {
+    CreateCategories(font->fFont, fCategories);
 
     fViewport = std::make_unique<juce::Viewport>();
     addAndMakeVisible(*fViewport);
@@ -236,11 +236,11 @@ public:
     fContainer->useSelectedSign();
   }
 
-  void setFont(std::shared_ptr<hb_font_t> const &font) {
+  void setFont(std::shared_ptr<FontAdapter> const &font) {
     fContainer->setFont(font);
-    fFont = font;
+    fFont = font->fFont;
     std::vector<Category> categories;
-    CreateCategories(font, categories);
+    CreateCategories(font->fFont, categories);
     fCategories.swap(categories);
     layout();
     repaint();

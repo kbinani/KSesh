@@ -29,7 +29,8 @@ public:
     int const width = 1280;
     int const height = 720;
 
-    fFont = fontSet.select(fAppSetting->fontFamily())->fFont;
+    auto font = fontSet.select(fAppSetting->fontFamily());
+    fFont = font->fFont;
 
     fTextEditor = std::make_unique<TextEditorComponent>(fFont, appSetting);
     fTextEditor->setBounds(0, 0, width / 2 - resizerSize / 2, height / 2 - resizerSize / 2);
@@ -45,7 +46,7 @@ public:
     fVerticalSplitter->setBounds(width / 2 - resizerSize / 2, 0, resizerSize, height / 2 - resizerSize / 2);
     fHieroglyph->setVisible(appSetting->isPreviewEnabled());
 
-    fSignList = std::make_unique<SignListComponent>(fFont);
+    fSignList = std::make_unique<SignListComponent>(font);
     fSignList->setBounds(0, height / 2 + resizerSize / 2, width, height / 2 - resizerSize / 2);
     fSignList->onClickSign = [this](Sign const &sign) {
       onClickSign(sign);
@@ -564,7 +565,7 @@ public:
 private:
   void changeFont(FontFamily fontFamily) {
     auto next = fFontSet.select(fontFamily);
-    fSignList->setFont(next->fFont);
+    fSignList->setFont(next);
     if (fContent) {
       auto content = std::make_shared<Content>(fContent->raw, next->fFont);
       fContent = content;
