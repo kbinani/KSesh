@@ -177,7 +177,7 @@ public:
     virtual void textEditorComponentDidLostFocus() = 0;
   };
 
-  explicit TextEditorComponent(std::shared_ptr<hb_font_t> const &font, std::shared_ptr<AppSetting> const &setting) : fSetting(setting) {
+  explicit TextEditorComponent(std::shared_ptr<AppSetting> const &setting) : fSetting(setting) {
     fEditor = std::make_unique<TextEditor>(setting);
     fEditor->setMultiLine(true, false);
     fEditor->setReturnKeyStartsNewLine(true);

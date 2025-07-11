@@ -31,7 +31,7 @@ public:
 
     fFont = fontSet.select(fAppSetting->fontFamily());
 
-    fTextEditor = std::make_unique<TextEditorComponent>(fFont->fFont, appSetting);
+    fTextEditor = std::make_unique<TextEditorComponent>(appSetting);
     fTextEditor->setBounds(0, 0, width / 2 - resizerSize / 2, height / 2 - resizerSize / 2);
     fTextEditor->fDelegate = this;
 
@@ -670,7 +670,7 @@ private:
     }
     auto prevFocus = fFocusOwner;
     fTextEditor->blur();
-    fExample = std::make_unique<ExampleComponent>(font->fFont, fAppSetting);
+    fExample = std::make_unique<ExampleComponent>(font, fAppSetting);
     fExample->setBounds(getLocalBounds());
     *fNumModalComponents += 1;
     addAndMakeVisible(*fExample);

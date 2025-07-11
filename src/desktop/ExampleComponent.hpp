@@ -16,8 +16,8 @@ class ExampleComponent : public juce::Component {
   };
 
 public:
-  ExampleComponent(std::shared_ptr<hb_font_t> const &font, std::shared_ptr<AppSetting> const &setting) : fFont(font) {
-    fEditor = std::make_unique<TextEditorComponent>(font, setting);
+  ExampleComponent(std::shared_ptr<FontAdapter> const &font, std::shared_ptr<AppSetting> const &setting) : fFont(font) {
+    fEditor = std::make_unique<TextEditorComponent>(setting);
     fEditor->fOnEscapeKey = []() {
       juce::JUCEApplication::getInstance()->invoke(CommandID::commandHelpExampleClose, true);
     };
@@ -41,7 +41,7 @@ mAa\r3 xrw)"}};
     }
     addAndMakeVisible(*fSelector);
     auto e = fExamples[0];
-    auto c = std::make_shared<Content>(U32StringFromJuceString(e.content), font);
+    auto c = std::make_shared<Content>(U32StringFromJuceString(e.content), font->fFont);
     fEditor->resetText(e.content);
     fSelector->setSelectedId(1);
     fSelector->onChange = [this]() {
@@ -93,7 +93,7 @@ private:
     int index = fSelector->getSelectedId() - 1;
     if (0 <= index && index < (int)fExamples.size()) {
       auto e = fExamples[index];
-      auto c = std::make_shared<Content>(U32StringFromJuceString(e.content), font);
+      auto c = std::make_shared<Content>(U32StringFromJuceString(e.content), font->fFont);
       fEditor->resetText(e.content);
       fEditor->focus();
     }
@@ -102,7 +102,7 @@ private:
 private:
   std::unique_ptr<TextEditorComponent> fEditor;
   std::unique_ptr<juce::ShapeButton> fClose;
-  std::weak_ptr<hb_font_t> fFont;
+  std::weak_ptr<FontAdapter> fFont;
   std::unique_ptr<juce::ComboBox> fSelector;
   std::vector<Example> fExamples;
 };
