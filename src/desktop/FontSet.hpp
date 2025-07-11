@@ -3,11 +3,11 @@
 namespace ksesh {
 
 struct FontSet {
-  std::shared_ptr<hb_font_t> fEgyptianText;
-  std::shared_ptr<hb_font_t> fNewGardiner;
-  std::shared_ptr<hb_font_t> fNotoSans;
+  std::shared_ptr<Font> fEgyptianText;
+  std::shared_ptr<Font> fNewGardiner;
+  std::shared_ptr<Font> fNotoSans;
 
-  std::shared_ptr<hb_font_t> select(FontFamily family) const {
+  std::shared_ptr<Font> select(FontFamily family) const {
     if (family == FontFamily::NewGardiner && fNewGardiner) {
       return fNewGardiner;
     } else if (family == FontFamily::NotoSans && fNotoSans) {

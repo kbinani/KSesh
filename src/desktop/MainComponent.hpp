@@ -29,7 +29,7 @@ public:
     int const width = 1280;
     int const height = 720;
 
-    fFont = fontSet.select(fAppSetting->fontFamily());
+    fFont = fontSet.select(fAppSetting->fontFamily())->fFont;
 
     fTextEditor = std::make_unique<TextEditorComponent>(fFont, appSetting);
     fTextEditor->setBounds(0, 0, width / 2 - resizerSize / 2, height / 2 - resizerSize / 2);
@@ -564,15 +564,15 @@ public:
 private:
   void changeFont(FontFamily fontFamily) {
     auto next = fFontSet.select(fontFamily);
-    fSignList->setFont(next);
+    fSignList->setFont(next->fFont);
     if (fContent) {
-      auto content = std::make_shared<Content>(fContent->raw, next);
+      auto content = std::make_shared<Content>(fContent->raw, next->fFont);
       fContent = content;
       fHieroglyph->setContent(content);
       fTextEditor->setContent(content);
     }
     fAppSetting->setFontFamily(fontFamily);
-    fFont = next;
+    fFont = next->fFont;
   }
 
   void setFocusOwner(FocusOwner next, bool force = false) {

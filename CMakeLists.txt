@@ -96,6 +96,7 @@ list(APPEND ksesh_files
   src/desktop/FontFamily.hpp
   src/desktop/SplashScreen.hpp
   src/desktop/FontSet.hpp
+  src/desktop/Font.hpp
 )
 if (APPLE)
   list(APPEND ksesh_files src/desktop/Application.mm)
