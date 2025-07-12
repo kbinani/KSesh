@@ -11,7 +11,7 @@ class FontAdapter {
 
 public:
   explicit FontAdapter(std::shared_ptr<hb_font_t> const &font) : fFont(font) {
-    juce::Path path = Harfbuzz::CreatePath(U"𓄿𓇋𓇌𓂝𓅱𓃀𓊪𓆑𓅓𓈖𓂋𓉔𓎛𓐍𓄡𓋴𓊃𓈙𓈎𓎡𓎼𓏏𓍿𓂧𓆓", font.get());
+    juce::Path path = Harfbuzz::CreatePath(U"𓍹𓐼𓀀𓍹𓐼𓀀𓐽𓍺𓐽𓍺", font.get());
     auto bounds = path.getBounds();
     fDy = bounds.getY();
     fScale = 1.0f / bounds.getHeight();
