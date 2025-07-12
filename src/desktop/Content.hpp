@@ -576,9 +576,6 @@ public:
       availableWidth = remaining;
     }
     g.saveState();
-    g.addTransform(juce::AffineTransform::translation(padding, padding));
-
-    g.saveState();
     g.setColour(highlightColor);
     for (auto const &rect : cursor.selectionRects) {
       auto line = lines[rect.lineIndex];
@@ -596,7 +593,8 @@ public:
     }
     g.restoreState();
 
-    float dy = 0;
+    float const dx = padding;
+    float dy = padding;
     g.saveState();
     juce::Range<int> selection(start, end);
     for (auto const &line : lines) {
@@ -616,7 +614,7 @@ public:
                                          font->fFont.get(),
                                          juce::AffineTransform::translation(glyph.x, glyph.y - font->fDy)
                                              .scaled(font->fScale * fontSize)
-                                             .translated(0, dy));
+                                             .translated(dx, dy));
         if (path.getBounds().isEmpty()) {
           continue;
         }
@@ -659,8 +657,6 @@ public:
         g.restoreState();
       }
     }
-
-    g.restoreState();
   }
 
   std::string toEMF(PresentationSetting const &setting) const {

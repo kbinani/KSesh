@@ -182,7 +182,6 @@ public:
     float maxX = 0;
     for (auto const &info : glyphs) {
       juce::Path path = Harfbuzz::CreatePath(info.glyphId, font->fFont.get(), info.x, info.y);
-      juce::Rectangle<float> bounds = path.getBounds();
       if (info.cluster != lastCluster) {
         auto sub = result.substr(lastCluster, info.cluster - lastCluster);
         clusters.push_back(Cluster(index, bb, lastCluster));
@@ -190,7 +189,8 @@ public:
         lastCluster = info.cluster;
         bb = nullopt;
       }
-      if (bounds.getWidth() > 0 && bounds.getHeight() > 0) {
+      if (!path.isEmpty()) {
+        juce::Rectangle<float> bounds = path.getBounds();
         maxX = std::max(maxX, bounds.getRight());
         if (bb) {
           bb = bb->getUnion(bounds);
