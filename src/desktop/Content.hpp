@@ -513,14 +513,14 @@ public:
     float height = padding * 2 + fontSize * lines.size() + setting.lineSpacing() * (lines.size() - 1);
     float width = padding * 2;
     for (auto const &line : lines) {
-      float right = line->width * font->fScale * fontSize;
-      width = std::max(width, right + padding);
+      float w = line->width * font->fScale * fontSize;
+      width = std::max(width, w + 2 * padding);
     }
     return std::make_pair(width, height);
   }
 
   void draw(juce::Graphics &g, PresentationSetting const &setting) const {
-    float const scale = setting.fontSize;
+    float const fontSize = setting.fontSize;
     float const padding = setting.padding;
     float const lineSpacing = setting.lineSpacing();
     float dx = padding;
@@ -530,17 +530,16 @@ public:
       return;
     }
     g.saveState();
-    g.addTransform(juce::AffineTransform::scale(scale, scale));
     g.setColour(juce::Colours::black);
     for (auto const &line : lines) {
       for (auto const &glyph : line->glyphs) {
-        auto path = Harfbuzz::CreatePath(glyph.glyphId, font->fFont.get(), juce::AffineTransform::translation(glyph.x, glyph.y - font->fDy).scaled(font->fScale).translated(dx, dy));
+        auto path = Harfbuzz::CreatePath(glyph.glyphId, font->fFont.get(), juce::AffineTransform::translation(glyph.x, glyph.y - font->fDy).scaled(font->fScale * fontSize).translated(dx, dy));
         if (path.getBounds().isEmpty()) {
           continue;
         }
         g.fillPath(path);
       }
-      dy += lineSpacing + scale;
+      dy += lineSpacing + fontSize;
     }
     g.restoreState();
   }
