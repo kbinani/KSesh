@@ -97,6 +97,15 @@ list(APPEND ksesh_files
   src/desktop/SplashScreen.hpp
   src/desktop/FontSet.hpp
   src/desktop/FontAdapter.hpp
+  src/desktop/CharBase.hpp
+  src/desktop/Char.hpp
+  src/desktop/Cluster.hpp
+  src/desktop/Line.hpp
+  src/desktop/Direction.hpp
+  src/desktop/LineAndCluster.hpp
+  src/desktop/CursorLocation.hpp
+  src/desktop/Cursor.hpp
+  src/desktop/CaretLocation.hpp
 )
 if (APPLE)
   list(APPEND ksesh_files src/desktop/Application.mm)
