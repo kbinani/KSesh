@@ -239,7 +239,6 @@ public:
       return ret;
     }
 
-    auto scale = fontSize;
     auto mtx = juce::AffineTransform::translation(0, -font->fDy).scaled(font->fScale * fontSize);
     if (selectionStart == selectionEnd) {
       auto location = cursorLocation(selectionStart, direction);
@@ -327,7 +326,7 @@ public:
             if (!cluster.bounds || cluster.cluster != ch.cluster) {
               continue;
             }
-            auto bounds = ((*cluster.bounds) * scale).expanded(setting.caretExpand).translated(dx, dy);
+            auto bounds = cluster.bounds->transformedBy(mtx).expanded(setting.caretExpand).translated(dx, dy);
             if (bb) {
               bb = bb->getUnion(bounds);
             } else {
