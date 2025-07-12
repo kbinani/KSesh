@@ -38,6 +38,7 @@ public:
   void paint(juce::Graphics &g) override {
     g.fillAll(juce::Colours::white.darker());
     if (fAppIcon.isValid()) {
+      g.setOpacity(1.0f);
       g.drawImageWithin(fAppIcon, 30, 30, 120, 120, {});
     }
     g.setColour(juce::Colours::black.brighter());
