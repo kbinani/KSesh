@@ -32,7 +32,7 @@
   ==============================================================================
 */
 
-namespace juce
+namespace ksesh
 {
 
 // a word or space that can't be broken down any further
@@ -2803,4 +2803,4 @@ std::unique_ptr<AccessibilityHandler> TextEditor::createAccessibilityHandler()
     return std::make_unique<EditorAccessibilityHandler> (*this);
 }
 
-} // namespace juce
+} // namespace ksesh
