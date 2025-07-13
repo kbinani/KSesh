@@ -31,7 +31,7 @@ public:
 
     fFont = fontSet.select(fAppSetting->fontFamily());
 
-    fTextEditor = std::make_unique<TextEditorComponent>(appSetting);
+    fTextEditor = std::make_unique<TextEditorComponent>(fFont, appSetting);
     fTextEditor->setBounds(0, 0, width / 2 - resizerSize / 2, height / 2 - resizerSize / 2);
     fTextEditor->fDelegate = this;
 
@@ -144,12 +144,12 @@ public:
       return;
     case commandFileSave:
       info.setInfo(TRANS("Save"), {}, {}, 0);
-      info.setActive((bool)fContent);
+      info.setActive((bool)fContent.lock());
       info.addDefaultKeypress('s', juce::ModifierKeys::commandModifier);
       return;
     case commandFileSaveAs:
       info.setInfo(TRANS("Save As") + "...", {}, {}, 0);
-      info.setActive((bool)fContent);
+      info.setActive((bool)fContent.lock());
       info.addDefaultKeypress('s', juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier);
       return;
     case commandFileExportAsPng1x:
@@ -166,25 +166,25 @@ public:
       return;
     case commandFileExportAsPdf:
       info.setInfo(TRANS("Export as PDF"), {}, {}, 0);
-      info.setActive((bool)fContent);
+      info.setActive((bool)fContent.lock());
       return;
     case commandEditCopyAsUnicodeWithoutFormatControl:
       info.setInfo(TRANS("Copy text"), {}, {}, 0);
-      info.setActive((bool)fContent);
+      info.setActive((bool)fContent.lock());
       return;
     case commandEditCopyAsUnicodeWithFormatControl:
       info.setInfo(TRANS("Copy text with format control"), {}, {}, 0);
-      info.setActive((bool)fContent);
+      info.setActive((bool)fContent.lock());
       info.addDefaultKeypress('c', juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier);
       return;
 #if defined(JUCE_WINDOWS)
     case commandFileExportAsEmf:
       info.setInfo(TRANS("Export as EMF"), {}, {}, 0);
-      info.setActive((bool)fContent);
+      info.setActive((bool)fContent.lock());
       return;
     case commandEditCopyAsEmf:
       info.setInfo(TRANS("Copy as EMF"), {}, {}, 0);
-      info.setActive((bool)fContent);
+      info.setActive((bool)fContent.lock());
       return;
 #endif
     case commandFileExit:
@@ -320,7 +320,7 @@ public:
 #if defined(JUCE_MAC)
     case commandEditCopyAsPdf:
       info.setInfo(TRANS("Copy as PDF"), {}, {}, 0);
-      info.setActive((bool)fContent);
+      info.setActive((bool)fContent.lock());
       return;
 #endif
     case commandUpdateMenuModel:
@@ -374,8 +374,9 @@ public:
       assert(false);
       return;
     }
-    if (fContent) {
-      auto [w, h] = getPngSize(scale);
+    auto content = fContent.lock();
+    if (content) {
+      auto [w, h] = content->getSizeCeiled(fAppSetting->getPresentationSetting(), scale);
       info.setInfo(leading + juce::String(" (") + juce::String(w) + juce::String(" x ") + juce::String(h) + juce::String(")"), {}, {}, 0);
       info.setActive(true);
     } else {
@@ -565,12 +566,7 @@ private:
   void changeFont(FontFamily fontFamily) {
     auto next = fFontSet.select(fontFamily);
     fSignList->setFont(next);
-    if (fContent) {
-      auto content = std::make_shared<Content>(fContent->raw, next);
-      fContent = content;
-      fHieroglyph->setContent(content);
-      fTextEditor->setContent(content);
-    }
+    fTextEditor->changeFont(next);
     fAppSetting->setFontFamily(fontFamily);
     fFont = next;
   }
@@ -616,9 +612,10 @@ private:
     std::shared_ptr<Content> c;
     if (selected) {
       c = std::make_shared<Content>(U32StringFromJuceString(*selected), fFont);
-    } else if (fContent) {
-      c = fContent;
     } else {
+      c = fContent.lock();
+    }
+    if (!c) {
       return;
     }
 
@@ -644,9 +641,10 @@ private:
     std::shared_ptr<Content> c;
     if (selected) {
       c = std::make_shared<Content>(U32StringFromJuceString(*selected), fFont);
-    } else if (fContent) {
-      c = fContent;
     } else {
+      c = fContent.lock();
+    }
+    if (!c) {
       return;
     }
 
@@ -796,7 +794,8 @@ private:
   }
 
   void saveDocumentWithNewName(std::function<void()> then = nullptr) {
-    if (!fContent) {
+    auto content = fContent.lock();
+    if (!content) {
       return;
     }
     if (!fSaveFileChooser) {
@@ -804,7 +803,7 @@ private:
     }
     launchFileChooser(*fSaveFileChooser, juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::warnAboutOverwriting, [this, then](juce::FileChooser const &chooser) {
       auto file = chooser.getResult();
-      if (file == juce::File() || !fContent) {
+      if (file == juce::File()) {
         return;
       }
       if (saveDocumentTo(file)) {
@@ -854,14 +853,15 @@ private:
   }
 
   bool saveDocumentTo(juce::File const &file) const {
-    if (!fContent) {
+    auto content = fContent.lock();
+    if (!content) {
       return false;
     }
     if (file == juce::File()) {
       return false;
     }
     std::u32string ret;
-    for (auto const &line : fContent->lines) {
+    for (auto const &line : content->lines) {
       if (!ret.empty()) {
         ret += U"\n";
       }
@@ -881,28 +881,25 @@ private:
     return stream->write(u8.c_str(), u8.size());
   }
 
-  std::pair<int, int> getPngSize(float scale) {
-    auto [widthf, heightf] = fContent->getSize(fAppSetting->getPresentationSetting());
-    int width = (int)ceil(widthf * scale);
-    int height = (int)ceil(heightf * scale);
-    return std::make_pair(width, height);
-  }
-
   void exportAsPng(float scale) {
+    auto content = fContent.lock();
+    if (!content) {
+      return;
+    }
     if (!fExportPngFileChooser) {
       fExportPngFileChooser = std::make_unique<juce::FileChooser>(TRANS("Export as PNG"), juce::File(), "*.png");
     }
-    launchFileChooser(*fExportPngFileChooser, juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::warnAboutOverwriting, [this, scale](juce::FileChooser const &chooser) {
+    launchFileChooser(*fExportPngFileChooser, juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::warnAboutOverwriting, [this, content, scale](juce::FileChooser const &chooser) {
       auto file = chooser.getResult();
-      if (file == juce::File() || !fContent) {
+      if (file == juce::File()) {
         return;
       }
-      auto [width, height] = getPngSize(scale);
+      auto [width, height] = content->getSizeCeiled(fAppSetting->getPresentationSetting(), scale);
       juce::Image img(juce::Image::PixelFormat::ARGB, width, height, true);
       {
         juce::Graphics g(img);
         g.addTransform(juce::AffineTransform::scale(scale, scale));
-        fContent->draw(g, fAppSetting->getPresentationSetting());
+        content->draw(g, fAppSetting->getPresentationSetting());
       }
       auto stream = file.createOutputStream();
       auto title = TRANS("Error");
@@ -928,15 +925,19 @@ private:
   }
 
   void exportAsPdf() {
+    auto content = fContent.lock();
+    if (!content) {
+      return;
+    }
     if (!fExportPdfFileChooser) {
       fExportPdfFileChooser = std::make_unique<juce::FileChooser>(TRANS("Export as PDF"), juce::File(), "*.pdf");
     }
-    launchFileChooser(*fExportPdfFileChooser, juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::warnAboutOverwriting, [this](juce::FileChooser const &chooser) {
+    launchFileChooser(*fExportPdfFileChooser, juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::warnAboutOverwriting, [this, content](juce::FileChooser const &chooser) {
       auto file = chooser.getResult();
-      if (file == juce::File() || !fContent) {
+      if (file == juce::File()) {
         return;
       }
-      auto str = fContent->toPDF(fAppSetting->getPresentationSetting());
+      auto str = content->toPDF(fAppSetting->getPresentationSetting());
       auto stream = file.createOutputStream();
       auto title = TRANS("Error");
       auto message = TRANS("Failed to export as PDF");
@@ -961,24 +962,30 @@ private:
 
 #if defined(JUCE_MAC)
   void copyAsPdf() {
-    if (!fContent) {
+    auto content = fContent.lock();
+    if (!content) {
       return;
     }
-    auto str = fContent->toPDF(fAppSetting->getPresentationSetting());
+    auto str = content->toPDF(fAppSetting->getPresentationSetting());
     Clipboard::Store(str, Clipboard::Type::Pdf);
   }
 #endif
 
+#if defined(JUCE_WINDOWS)
   void exportAsEmf() {
+    auto content = fContent.lock();
+    if (!content) {
+      return;
+    }
     if (!fExportEmfFileChooser) {
       fExportEmfFileChooser = std::make_unique<juce::FileChooser>(TRANS("Export as EMF"), juce::File(), "*.emf");
     }
-    launchFileChooser(*fExportEmfFileChooser, juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::warnAboutOverwriting, [this](juce::FileChooser const &chooser) {
+    launchFileChooser(*fExportEmfFileChooser, juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::warnAboutOverwriting, [this, content](juce::FileChooser const &chooser) {
       auto file = chooser.getResult();
-      if (file == juce::File() || !fContent) {
+      if (file == juce::File()) {
         return;
       }
-      auto str = fContent->toEMF(fAppSetting->getPresentationSetting());
+      auto str = content->toEMF(fAppSetting->getPresentationSetting());
       auto stream = file.createOutputStream();
       auto title = TRANS("Error");
       auto message = TRANS("Failed to export as EMF");
@@ -1000,27 +1007,31 @@ private:
       }
     });
   }
+#endif
 
 #if defined(JUCE_WINDOWS)
   void copyAsEmf() {
-    if (!fContent) {
+    auto content = fContent.lock();
+    if (!content) {
       return;
     }
-    auto str = fContent->toEMF(fAppSetting->getPresentationSetting());
+    auto str = content->toEMF(fAppSetting->getPresentationSetting());
     writeToClipboard(str, Clipboard::Type::Emf);
   }
 #endif
 
   void copyAsPng(float scale) {
-    auto [widthf, heightf] = fContent->getSize(fAppSetting->getPresentationSetting());
-    int width = (int)ceil(widthf * scale);
-    int height = (int)ceil(heightf * scale);
+    auto content = fContent.lock();
+    if (!content) {
+      return;
+    }
+    auto [width, height] = content->getSizeCeiled(fAppSetting->getPresentationSetting(), scale);
     juce::Image img(juce::Image::PixelFormat::ARGB, width, height, true);
     {
       juce::Graphics g(img);
       g.fillAll(juce::Colours::white);
       g.addTransform(juce::AffineTransform::scale(scale, scale));
-      fContent->draw(g, fAppSetting->getPresentationSetting());
+      content->draw(g, fAppSetting->getPresentationSetting());
     }
     juce::PNGImageFormat format;
     juce::MemoryOutputStream stream;
@@ -1046,8 +1057,7 @@ private:
     fHieroglyph->setSelectedRange(start, end, direction);
   }
 
-  void textEditorComponentDidChangeContentText(std::u32string const &contentText, std::optional<juce::String> typing, int start, int end, Direction direction) override {
-    auto content = std::make_shared<Content>(contentText, fFont);
+  void textEditorComponentDidChangeContent(std::shared_ptr<Content> const &content, std::optional<juce::String> typing, int start, int end, Direction direction) override {
     setContent(content);
     if (typing && fFocusOwner == FocusOwner::textEditor) {
       fSignList->setTyping(*typing);
@@ -1070,7 +1080,6 @@ private:
   void setContent(std::shared_ptr<Content> content) {
     fContent = content;
     fHieroglyph->setContent(content);
-    fTextEditor->setContent(content);
     fMenuModel->menuItemsChanged();
     bool wasDirty = fDirty;
     fDirty = true;
@@ -1099,7 +1108,7 @@ private:
   std::unique_ptr<juce::MenuBarComponent> fMenuComponent;
 #endif
   std::unique_ptr<juce::FileChooser> fExportPdfFileChooser;
-  std::shared_ptr<Content> fContent;
+  std::weak_ptr<Content> fContent;
   std::unique_ptr<juce::FileChooser> fExportPngFileChooser;
   std::unique_ptr<juce::FileChooser> fSaveFileChooser;
   juce::File fSave;

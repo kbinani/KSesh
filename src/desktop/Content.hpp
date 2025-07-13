@@ -503,6 +503,13 @@ public:
     return std::make_pair(width, height);
   }
 
+  std::pair<int, int> getSizeCeiled(PresentationSetting const &setting, float scale) const {
+    auto [width, height] = getSize(setting);
+    int w = (int)ceil(width * scale);
+    int h = (int)ceil(height * scale);
+    return std::make_pair(w, h);
+  }
+
   void draw(juce::Graphics &g, PresentationSetting const &setting) const {
     float const fontSize = setting.fontSize;
     float const padding = setting.padding;
@@ -641,10 +648,10 @@ public:
     }
   }
 
+#if defined(JUCE_WINDOWS)
   std::string toEMF(PresentationSetting const &setting) const {
     using namespace std;
     string out;
-#if defined(JUCE_WINDOWS)
     auto font = this->font.lock();
     if (!font) {
       return out;
@@ -824,9 +831,8 @@ public:
     }
     s.swap(out);
     return out;
-#endif
-    return out;
   }
+#endif
 
   std::vector<std::shared_ptr<Line>> lines;
   std::weak_ptr<FontAdapter> font;
