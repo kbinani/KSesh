@@ -111,6 +111,8 @@ list(APPEND ksesh_files
   src/desktop/CursorLocation.hpp
   src/desktop/Cursor.hpp
   src/desktop/CaretLocation.hpp
+  src/desktop/juce_TextEditor.cpp
+  src/desktop/juce_TextEditor.h
 )
 if (APPLE)
   list(APPEND ksesh_files src/desktop/Application.mm)
