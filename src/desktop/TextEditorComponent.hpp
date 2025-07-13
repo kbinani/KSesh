@@ -242,6 +242,7 @@ public:
         fDelegate->textEditorComponentDidChangeContent(content, std::nullopt, nextCaret, nextCaret, fDirection);
       }
       fContent = content;
+      fDirty = true;
       bind();
     } else {
       auto str = s;
@@ -266,6 +267,7 @@ public:
         fDelegate->textEditorComponentDidChangeContent(content, std::nullopt, nextCaret, nextCaret, fDirection);
       }
       fContent = content;
+      fDirty = true;
       bind();
     }
   }
@@ -303,6 +305,7 @@ public:
       fDelegate->textEditorComponentDidChangeContent(content, std::nullopt, nextCaret, nextCaret, fDirection);
     }
     fContent = content;
+    fDirty = false;
     bind();
   }
 
@@ -324,6 +327,14 @@ public:
       auto typing = GetTypingAtCaret(text, range.getStart(), range.getEnd());
       fDelegate->textEditorComponentDidChangeContent(content, typing, range.getStart(), range.getEnd(), fDirection);
     }
+  }
+
+  bool isDirty() const {
+    return fDirty;
+  }
+
+  void clearDirty() {
+    fDirty = false;
   }
 
 private:
@@ -430,6 +441,7 @@ private:
     auto range = getSelectedRange();
     auto content = std::make_shared<Content>(U32StringFromJuceString(text), fFont);
     auto typing = GetTypingAtCaret(text, range.getStart(), range.getEnd());
+    fDirty = true;
     fEditor->setContent(content);
     fEditor->setSelectedRange(range, fDirection);
     if (fDelegate) {
@@ -449,6 +461,7 @@ private:
   std::shared_ptr<AppSetting> fSetting;
   std::shared_ptr<FontAdapter> fFont;
   std::shared_ptr<Content> fContent;
+  bool fDirty = false;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TextEditorComponent)
 };

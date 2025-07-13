@@ -694,7 +694,7 @@ private:
     if (!then) {
       return;
     }
-    if (!fDirty) {
+    if (!fTextEditor->isDirty()) {
       then();
       return;
     }
@@ -724,9 +724,6 @@ private:
 
   void newDocument() {
     fSave = juce::File();
-    fDirty = false;
-    auto c = std::make_shared<Content>(U"", fFont);
-    setContent(c);
     fHieroglyph->setSelectedRange(0, 0, Direction::Forward);
     fTextEditor->resetText("");
     if (onSaveFilePathChanged) {
@@ -788,7 +785,6 @@ private:
     auto c = std::make_shared<Content>(U32StringFromJuceString(str), fFont);
     setContent(c);
     fSave = file;
-    fDirty = false;
     fHieroglyph->setSelectedRange(str.length(), str.length(), Direction::Forward);
     fTextEditor->resetText(str);
     if (onSaveFilePathChanged) {
@@ -810,7 +806,7 @@ private:
         return;
       }
       if (saveDocumentTo(file)) {
-        fDirty = false;
+        fTextEditor->clearDirty();
         fSave = file;
         if (onSaveFilePathChanged) {
           onSaveFilePathChanged(file, false);
@@ -840,7 +836,7 @@ private:
   void saveDocument(std::function<void()> then = nullptr) {
     if (fSave != juce::File()) {
       if (saveDocumentTo(fSave)) {
-        fDirty = false;
+        fTextEditor->clearDirty();
         if (onSaveFilePathChanged) {
           onSaveFilePathChanged(fSave, false);
         }
@@ -1084,10 +1080,8 @@ private:
     fContent = content;
     fHieroglyph->setContent(content);
     fMenuModel->menuItemsChanged();
-    bool wasDirty = fDirty;
-    fDirty = true;
-    if (!wasDirty && fSave != juce::File() && onSaveFilePathChanged) {
-      onSaveFilePathChanged(fSave, fDirty);
+    if (onSaveFilePathChanged) {
+      onSaveFilePathChanged(fSave, fTextEditor->isDirty());
     }
   }
 
@@ -1115,7 +1109,6 @@ private:
   std::unique_ptr<juce::FileChooser> fExportPngFileChooser;
   std::unique_ptr<juce::FileChooser> fSaveFileChooser;
   juce::File fSave;
-  bool fDirty = false;
   std::unique_ptr<juce::FileChooser> fOpenFileChooser;
   std::unique_ptr<juce::FileChooser> fExportEmfFileChooser;
   std::shared_ptr<AppSetting> fAppSetting;

@@ -16,8 +16,7 @@ public:
     setUsingNativeTitleBar(true);
     fMain = std::make_unique<MainComponent>(commandManager, appSetting, fontSet);
     fMain->onSaveFilePathChanged = [this](juce::File const &file, bool modified) {
-      auto name = file == juce::File() ? TRANS("Unnamed") : file.getFullPathName();
-      setName(JUCE_APPLICATION_NAME_STRING + juce::String(" - ") + name + (modified ? " *" : ""));
+      updateWindowTitle(file, modified);
     };
     setContentNonOwned(fMain.get(), true);
 
@@ -28,6 +27,7 @@ public:
     centreWithSize(getWidth(), getHeight());
 #endif
     setResizeLimits(400, 300, std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
+    updateWindowTitle({}, false);
 
     setVisible(true);
   }
@@ -46,6 +46,12 @@ public:
 
   void closeAbout() {
     fMain->closeAbout();
+  }
+
+private:
+  void updateWindowTitle(juce::File const &file, bool modified) {
+    auto name = file == juce::File() ? TRANS("Unnamed") : file.getFullPathName();
+    setName(JUCE_APPLICATION_NAME_STRING + juce::String(" - ") + name + (modified ? " *" : ""));
   }
 
 private:
