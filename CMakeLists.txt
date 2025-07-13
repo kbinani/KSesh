@@ -94,7 +94,7 @@ list(APPEND ksesh_files
   src/desktop/ExampleComponent.hpp
   src/desktop/defer.hpp
   src/desktop/FontFamily.hpp
-  src/desktop/SplashScreen.hpp
+  src/desktop/FontLoaderComponent.hpp
   src/desktop/FontSet.hpp
   src/desktop/FontAdapter.hpp
   src/desktop/CharBase.hpp

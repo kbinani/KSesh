@@ -42,14 +42,14 @@
 #include "MainComponent.hpp"
 #include "MainWindow.hpp"
 #include "LookAndFeel.hpp"
-#include "SplashScreen.hpp"
+#include "FontLoaderComponent.hpp"
 // clang-format on
 
 using namespace std::literals::string_literals;
 
 namespace ksesh {
 
-class Application : public juce::JUCEApplication, public juce::DarkModeSettingListener, public SplashScreen::Delegate {
+class Application : public juce::JUCEApplication, public juce::DarkModeSettingListener, public FontLoaderComponent::Delegate {
 public:
   Application() {}
 
@@ -75,7 +75,7 @@ public:
     juce::LookAndFeel::setDefaultLookAndFeel(fLaf.get());
     juce::Desktop::getInstance().addDarkModeSettingListener(this);
 
-    fSplash = std::make_unique<SplashScreen>(this);
+    fFontLoader = std::make_unique<FontLoaderComponent>(this);
 
     fCommandManager = std::make_unique<juce::ApplicationCommandManager>();
     fCommandManager->registerAllCommandsForTarget(this);
@@ -169,9 +169,9 @@ public:
     fLaf.swap(laf);
   }
 
-  void splashScreenDidFinishLoadingFont(FontSet const &fontSet) override {
-    fSplash->deleteAfterDelay(juce::RelativeTime::seconds(1), false);
-    fSplash.release();
+  void fontLoaderComponentDidFinishLoadingFont(FontSet const &fontSet) override {
+    fFontLoader->deleteAfterDelay(juce::RelativeTime::seconds(1), false);
+    fFontLoader.release();
 
     fMainWindow = std::make_unique<MainWindow>(getApplicationName(), fCommandManager, fSetting, fontSet);
   }
@@ -213,7 +213,7 @@ private:
   std::unique_ptr<LookAndFeel> fLaf;
   std::shared_ptr<AppSetting> fSetting;
   std::unique_ptr<juce::ApplicationCommandManager> fCommandManager;
-  std::unique_ptr<SplashScreen> fSplash;
+  std::unique_ptr<FontLoaderComponent> fFontLoader;
 };
 
 std::vector<std::u32string> const SignList::enclosureBeginning = {

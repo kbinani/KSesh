@@ -2,31 +2,31 @@
 
 namespace ksesh {
 
-class SplashScreen : public juce::SplashScreen, public juce::AsyncUpdater {
+class FontLoaderComponent : public juce::SplashScreen, public juce::AsyncUpdater {
 public:
   class Delegate {
   public:
     virtual ~Delegate() {}
-    virtual void splashScreenDidFinishLoadingFont(FontSet const &fontSet) = 0;
+    virtual void fontLoaderComponentDidFinishLoadingFont(FontSet const &fontSet) = 0;
   };
 
-  explicit SplashScreen(Delegate *delegate) : juce::SplashScreen("KSesh", 640, 360, true), fDelegate(delegate) {
+  explicit FontLoaderComponent(Delegate *delegate) : juce::SplashScreen("KSesh", 640, 360, true), fDelegate(delegate) {
     std::promise<std::shared_ptr<FontAdapter>> promiseEgyptianText;
     fFontFutureEgyptianText = promiseEgyptianText.get_future();
     std::thread(LoadEgyptianTextFont, std::move(promiseEgyptianText)).detach();
 
     std::promise<std::shared_ptr<FontAdapter>> promiseNewGardiner;
     fFontFutureNewGardiner = promiseNewGardiner.get_future();
-    std::thread(&SplashScreen::transformFont, this, std::move(promiseNewGardiner), FontFamily::NewGardiner).detach();
+    std::thread(&FontLoaderComponent::transformFont, this, std::move(promiseNewGardiner), FontFamily::NewGardiner).detach();
 
     std::promise<std::shared_ptr<FontAdapter>> promiseNotoSans;
     fFontFutureNotoSans = promiseNotoSans.get_future();
-    std::thread(&SplashScreen::transformFont, this, std::move(promiseNotoSans), FontFamily::NotoSans).detach();
+    std::thread(&FontLoaderComponent::transformFont, this, std::move(promiseNotoSans), FontFamily::NotoSans).detach();
 
     fAppIcon = juce::ImageFileFormat::loadFrom(BinaryData::icon_512x512_png, BinaryData::icon_512x512_pngSize);
   }
 
-  ~SplashScreen() {
+  ~FontLoaderComponent() {
     if (fFontFutureNewGardiner.valid()) {
       fFontFutureNewGardiner.get();
     }
@@ -76,8 +76,10 @@ public:
         }
       }
     }
-    if (!fFontFutureEgyptianText.valid() && !fFontFutureNewGardiner.valid() && !fFontFutureNotoSans.valid() && fFontSet.fEgyptianText) {
-      fDelegate->splashScreenDidFinishLoadingFont(fFontSet);
+    if (!fFontFutureEgyptianText.valid() && !fFontFutureNewGardiner.valid() && !fFontFutureNotoSans.valid() && fDelegate) {
+      if (fFontSet.fEgyptianText) {
+        fDelegate->fontLoaderComponentDidFinishLoadingFont(fFontSet);
+      }
     }
   }
 
@@ -142,7 +144,7 @@ private:
   FontSet fFontSet;
   juce::Image fAppIcon;
 
-  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SplashScreen)
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(FontLoaderComponent)
 };
 
 } // namespace ksesh
