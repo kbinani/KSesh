@@ -58,6 +58,11 @@ juce_add_gui_app(ksesh
         <false/>
         <key>LSMinimumSystemVersion</key>
         <string>${ksesh_macos_deployment_target}</string>
+        <key>CFBundleLocalizations</key>
+        <array>
+          <string>en</string>
+          <string>ja</string>
+        </array>
       </dict>
     </plist>"
   COMPANY_COPYRIGHT "Copyright © 2024 kbinani"
