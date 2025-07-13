@@ -762,6 +762,7 @@ public:
       ::SelectObject(hdc, brush);
 
       float const fontSize = setting.fontSize;
+      float const padding = setting.padding;
       float dy = 0;
 
       ::ModifyWorldTransform(hdc, nullptr, MWT_IDENTITY);
@@ -770,8 +771,8 @@ public:
       mtx.eM12 = 0;
       mtx.eM21 = 0;
       mtx.eM22 = font->fScale * fontSize;
-      mtx.eDx = setting.padding;
-      mtx.eDy = setting.padding - font->fDy / (font->fScale * fontSize);
+      mtx.eDx = padding;
+      mtx.eDy = padding;
       ::SetWorldTransform(hdc, &mtx);
 
       for (int lineIndex = 0; lineIndex < (int)lines.size(); lineIndex++) {
@@ -788,7 +789,7 @@ public:
           auto xAdvance = glyphPos[i].x_advance;
           auto yAdvance = glyphPos[i].y_advance;
           float x = cursorX + xOffset;
-          float y = -(cursorY + yOffset);
+          float y = -(cursorY + yOffset - font->fDy);
 
           Data data;
           data.hdc = hdc;
@@ -803,7 +804,7 @@ public:
           cursorX += xAdvance;
           cursorY += yAdvance;
         }
-        dy += setting.lineSpacing() + setting.fontSize;
+        dy += (setting.lineSpacing() + fontSize) / (font->fScale * fontSize);
       }
     }
 
