@@ -239,7 +239,7 @@ public:
       return ret;
     }
 
-    auto mtx = juce::AffineTransform::translation(0, -font->fDy).scaled(font->fScale * fontSize);
+    auto mtx = juce::AffineTransform::translation(0, -font->fY).scaled(font->fScale * fontSize);
     if (selectionStart == selectionEnd) {
       auto location = cursorLocation(selectionStart, direction);
       if (!location) {
@@ -466,7 +466,7 @@ public:
         data.scale = fontSize * font->fScale;
         data.tx = x;
         // https://gyazo.com/1aae4ad48ead791b3daeaf1e4c7146d1
-        data.ty = y + 1 / font->fScale + font->fDy;
+        data.ty = y + 1 / font->fScale + font->fY;
         data.dx = padding;
         data.dy = height - lineIndex * (fontSize + setting.lineSpacing()) - padding - fontSize;
         data.buffer.push_back({.op = 'm', .x1 = 0, .y1 = 0});
@@ -517,7 +517,7 @@ public:
     g.setColour(juce::Colours::black);
     for (auto const &line : lines) {
       for (auto const &glyph : line->glyphs) {
-        auto path = Harfbuzz::CreatePath(glyph.glyphId, font->fFont.get(), juce::AffineTransform::translation(glyph.x, glyph.y - font->fDy).scaled(font->fScale * fontSize).translated(dx, dy));
+        auto path = Harfbuzz::CreatePath(glyph.glyphId, font->fFont.get(), juce::AffineTransform::translation(glyph.x, glyph.y - font->fY).scaled(font->fScale * fontSize).translated(dx, dy));
         if (path.getBounds().isEmpty()) {
           continue;
         }
@@ -594,7 +594,7 @@ public:
       for (auto const &glyph : line->glyphs) {
         auto path = Harfbuzz::CreatePath(glyph.glyphId,
                                          font->fFont.get(),
-                                         juce::AffineTransform::translation(glyph.x, glyph.y - font->fDy)
+                                         juce::AffineTransform::translation(glyph.x, glyph.y - font->fY)
                                              .scaled(font->fScale * fontSize)
                                              .translated(dx, dy));
         if (path.getBounds().isEmpty()) {

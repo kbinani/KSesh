@@ -363,7 +363,8 @@ private:
     auto s = std::make_shared<Sign>();
     s->name = JuceStringFromU32String(name);
     s->path = std::make_shared<juce::Path>();
-    *s->path = font->path(sign, 1);
+    *s->path = Harfbuzz::CreatePath(sign, font->fFont.get());
+    s->path->applyTransform(juce::AffineTransform::translation(0, -font->fY).scaled(font->fScale));
 
     auto found = SignList::MapReverse(sign);
     std::vector<juce::String> mdc;

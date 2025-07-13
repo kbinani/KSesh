@@ -308,7 +308,8 @@ private:
 
   static Category MakeCategory(std::shared_ptr<FontAdapter> const &font, juce::String const &name, std::u32string const &sign) {
     auto path = std::make_shared<juce::Path>();
-    *path = font->path(sign, 1);
+    *path = Harfbuzz::CreatePath(sign, font->fFont.get());
+    path->applyTransform(juce::AffineTransform::translation(0, -font->fY).scaled(font->fScale));
     return Category(name, path);
   }
 
