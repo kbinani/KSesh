@@ -102,6 +102,8 @@ private:
   std::unique_ptr<juce::ShapeButton> fClose;
   std::unique_ptr<juce::ComboBox> fSelector;
   std::vector<Example> fExamples;
+
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ExampleComponent)
 };
 
 } // namespace ksesh

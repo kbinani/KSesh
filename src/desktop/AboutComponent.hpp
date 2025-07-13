@@ -117,6 +117,8 @@ private:
   std::unique_ptr<juce::Viewport> fContainer;
   std::unique_ptr<AttributedStringComponent> fContent;
   std::unique_ptr<juce::ShapeButton> fCloseButton;
+
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AboutComponent)
 };
 
 } // namespace ksesh

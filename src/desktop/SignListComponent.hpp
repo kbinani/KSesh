@@ -1,7 +1,5 @@
 #pragma once
 
-#pragma GCC diagnostic ignored "-Wunused-variable"
-
 namespace ksesh {
 
 class SignListComponent : public juce::Component {

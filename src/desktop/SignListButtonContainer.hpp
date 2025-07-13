@@ -1,7 +1,5 @@
 #pragma once
 
-#pragma GCC diagnostic ignored "-Wunused-variable"
-
 namespace ksesh {
 
 class SignListButtonContainer : public juce::Component {
@@ -429,6 +427,8 @@ private:
   int fSelectedSign = -1;
   int fNumColumns = 1;
   std::unordered_map<juce::String, std::shared_ptr<Sign>> fAllSigns;
+
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SignListButtonContainer)
 };
 
 } // namespace ksesh

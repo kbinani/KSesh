@@ -1,7 +1,5 @@
 #pragma once
 
-#pragma GCC diagnostic ignored "-Wunused-private-field"
-
 namespace ksesh {
 
 class MenuBarModel : public juce::MenuBarModel {
@@ -152,6 +150,8 @@ private:
   juce::ApplicationCommandManager *const fManager;
   std::shared_ptr<AppSetting> fSetting;
   std::vector<juce::File> fRecentFiles;
+
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MenuBarModel)
 };
 
 } // namespace ksesh
