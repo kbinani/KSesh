@@ -1,5 +1,6 @@
 // clang-format off
 #include <juce_gui_extra/juce_gui_extra.h>
+#include "juce_TextEditor.h"
 #include "PDFGen.hpp"
 #include <iostream>
 #include "defer.hpp"

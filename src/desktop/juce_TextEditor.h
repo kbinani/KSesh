@@ -46,9 +46,9 @@ namespace ksesh
 
     @tags{GUI}
 */
-class JUCE_API  TextEditor  : public TextInputTarget,
-                              public Component,
-                              public SettableTooltipClient
+class JUCE_API  TextEditor  : public juce::TextInputTarget,
+                              public juce::Component,
+                              public juce::SettableTooltipClient
 {
 public:
     //==============================================================================
@@ -62,8 +62,8 @@ public:
                                     for a black splodge (not all fonts include this, though), or 0x2022,
                                     which is a bullet (probably the best choice for linux).
     */
-    explicit TextEditor (const String& componentName = String(),
-                         juce_wchar passwordCharacter = 0);
+    explicit TextEditor (const juce::String& componentName = juce::String(),
+                         juce::juce_wchar passwordCharacter = 0);
 
     /** Destructor. */
     ~TextEditor() override;
@@ -181,12 +181,12 @@ public:
                                     for a black splodge (not all fonts include this, though), or 0x2022,
                                     which is a bullet (probably the best choice for linux).
     */
-    void setPasswordCharacter (juce_wchar passwordCharacter);
+    void setPasswordCharacter (juce::juce_wchar passwordCharacter);
 
     /** Returns the current password character.
         @see setPasswordCharacter
     */
-    juce_wchar getPasswordCharacter() const noexcept                { return passwordCharacter; }
+    juce::juce_wchar getPasswordCharacter() const noexcept                { return passwordCharacter; }
 
     //==============================================================================
     /** Allows a right-click menu to appear for the editor.
@@ -251,7 +251,7 @@ public:
 
         @see applyFontToAllText
     */
-    void setFont (const Font& newFont);
+    void setFont (const juce::Font& newFont);
 
     /** Applies a font to all the text in the editor.
 
@@ -260,20 +260,20 @@ public:
 
         @see setFont
     */
-    void applyFontToAllText (const Font& newFont, bool changeCurrentFont = true);
+    void applyFontToAllText (const juce::Font& newFont, bool changeCurrentFont = true);
 
     /** Returns the font that's currently being used for new text.
 
         @see setFont
     */
-    const Font& getFont() const noexcept  { return currentFont; }
+    const juce::Font& getFont() const noexcept  { return currentFont; }
 
     /** Applies a colour to all the text in the editor.
 
         If the changeCurrentTextColour argument is true then this will also set the
         new colour as the colour to be used for any new text that's added.
     */
-    void applyColourToAllText (const Colour& newColour, bool changeCurrentTextColour = true);
+    void applyColourToAllText (const juce::Colour& newColour, bool changeCurrentTextColour = true);
 
     /** Sets whether whitespace should be underlined when the editor font is underlined.
 
@@ -303,13 +303,13 @@ public:
         string is only displayed, it's not taken to actually be the contents of
         the editor.
     */
-    void setTextToShowWhenEmpty (const String& text, Colour colourToUse);
+    void setTextToShowWhenEmpty (const juce::String& text, juce::Colour colourToUse);
 
     /** Returns the text that will be shown when the text editor is empty.
 
         @see setTextToShowWhenEmpty
     */
-    String getTextToShowWhenEmpty() const noexcept    { return textToShowWhenEmpty; }
+    juce::String getTextToShowWhenEmpty() const noexcept    { return textToShowWhenEmpty; }
 
     //==============================================================================
     /** Changes the size of the scrollbars that are used.
@@ -371,10 +371,10 @@ public:
 
     //==============================================================================
     /** Returns the entire contents of the editor. */
-    String getText() const;
+    juce::String getText() const;
 
     /** Returns a section of the contents of the editor. */
-    String getTextInRange (const Range<int>& textRange) const override;
+    juce::String getTextInRange (const juce::Range<int>& textRange) const override;
 
     /** Returns true if there are no characters in the editor.
         This is far more efficient than calling getText().isEmpty().
@@ -393,7 +393,7 @@ public:
                                         be sent to all the listeners.
         @see insertTextAtCaret
     */
-    void setText (const String& newText,
+    void setText (const juce::String& newText,
                   bool sendTextChangeMessage = true);
 
     /** Returns a Value object that can be used to get or set the text.
@@ -402,7 +402,7 @@ public:
         amounts of text, as it needs to dynamically build the string that's involved.
         It's best used for small text boxes.
     */
-    Value& getTextValue();
+    juce::Value& getTextValue();
 
     /** Inserts some text at the current caret position.
 
@@ -414,7 +414,7 @@ public:
 
         @see setCaretPosition, getCaretPosition, setHighlightedRegion
     */
-    void insertTextAtCaret (const String& textToInsert) override;
+    void insertTextAtCaret (const juce::String& textToInsert) override;
 
     /** Deletes all the text from the editor. */
     void clear();
@@ -463,19 +463,19 @@ public:
 
         The rectangle returned is relative to the component's top-left corner.
     */
-    Rectangle<int> getCaretRectangleForCharIndex (int index) const override;
+    juce::Rectangle<int> getCaretRectangleForCharIndex (int index) const override;
 
     /** Selects a section of the text. */
-    void setHighlightedRegion (const Range<int>& newSelection) override;
+    void setHighlightedRegion (const juce::Range<int>& newSelection) override;
 
     /** Returns the range of characters that are selected.
         If nothing is selected, this will return an empty range.
         @see setHighlightedRegion
     */
-    Range<int> getHighlightedRegion() const override            { return selection; }
+    juce::Range<int> getHighlightedRegion() const override            { return selection; }
 
     /** Returns the section of text that is currently selected. */
-    String getHighlightedText() const;
+    juce::String getHighlightedText() const;
 
     /** Finds the index of the character at a given position.
         The coordinates are relative to the component's top-left.
@@ -485,12 +485,12 @@ public:
     /** Finds the index of the character at a given position.
         The coordinates are relative to the component's top-left.
     */
-    int getTextIndexAt (Point<int>) const;
+    int getTextIndexAt (juce::Point<int>) const;
 
     /** Like getTextIndexAt, but doesn't snap to the beginning/end of the range for
         points vertically outside the text.
     */
-    int getCharIndexForPoint (Point<int> point) const override;
+    int getCharIndexForPoint (juce::Point<int> point) const override;
 
     /** Counts the number of characters in the text.
 
@@ -531,12 +531,12 @@ public:
     /** Changes the size of border left around the edge of the component.
         @see getBorder
     */
-    void setBorder (BorderSize<int> border);
+    void setBorder (juce::BorderSize<int> border);
 
     /** Returns the size of border around the edge of the component.
         @see setBorder
     */
-    BorderSize<int> getBorder() const;
+    juce::BorderSize<int> getBorder() const;
 
     /** Used to disable the auto-scrolling which keeps the caret visible.
 
@@ -546,16 +546,16 @@ public:
     void setScrollToShowCursor (bool shouldScrollToShowCaret);
 
     /** Modifies the justification of the text within the editor window. */
-    void setJustification (Justification newJustification);
+    void setJustification (juce::Justification newJustification);
 
     /** Returns the type of justification, as set in setJustification(). */
-    Justification getJustificationType() const noexcept             { return justification; }
+    juce::Justification getJustificationType() const noexcept             { return justification; }
 
     /** Sets the line spacing of the TextEditor.
         The default (and minimum) value is 1.0 and values > 1.0 will increase the line spacing as a
         multiple of the line height e.g. for double-spacing call this method with an argument of 2.0.
     */
-    void setLineSpacing (float newLineSpacing) noexcept             { lineSpacing = jmax (1.0f, newLineSpacing); }
+    void setLineSpacing (float newLineSpacing) noexcept             { lineSpacing = juce::jmax (1.0f, newLineSpacing); }
 
     /** Returns the current line spacing of the TextEditor. */
     float getLineSpacing() const noexcept                           { return lineSpacing; }
@@ -566,7 +566,7 @@ public:
         The bounds are relative to the component's top-left and may extend beyond the bounds
         of the component if the text is long and word wrapping is disabled.
     */
-    RectangleList<int> getTextBounds (Range<int> textRange) const override;
+    juce::RectangleList<int> getTextBounds (juce::Range<int> textRange) const override;
 
     //==============================================================================
     void moveCaretToEnd();
@@ -612,8 +612,8 @@ public:
 
         @see performPopupMenuAction, setPopupMenuEnabled, isPopupMenuEnabled
     */
-    virtual void addPopupMenuItems (PopupMenu& menuToAddTo,
-                                    const MouseEvent* mouseClickEvent);
+    virtual void addPopupMenuItems (juce::PopupMenu& menuToAddTo,
+                                    const juce::MouseEvent* mouseClickEvent);
 
     /** This is called to perform one of the items that was shown on the popup menu.
 
@@ -642,7 +642,7 @@ public:
             An implementation of this class should check the input string,
             and return an edited version of it that should be used.
         */
-        virtual String filterNewText (TextEditor&, const String& newInput) = 0;
+        virtual juce::String filterNewText (TextEditor&, const juce::String& newInput) = 0;
     };
 
     /** An input filter for a TextEditor that limits the length of text and/or the
@@ -657,12 +657,12 @@ public:
             @param allowedCharacters    if this is non-empty, then only characters that occur in
                                         this string are allowed to be entered into the editor.
         */
-        LengthAndCharacterRestriction (int maxNumChars, const String& allowedCharacters);
+        LengthAndCharacterRestriction (int maxNumChars, const juce::String& allowedCharacters);
 
-        String filterNewText (TextEditor&, const String&) override;
+        juce::String filterNewText (TextEditor&, const juce::String&) override;
 
     private:
-        String allowedCharacters;
+        juce::String allowedCharacters;
         int maxLength;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LengthAndCharacterRestriction)
@@ -688,7 +688,7 @@ public:
                                     this string are allowed to be entered into the editor.
     */
     void setInputRestrictions (int maxTextLength,
-                               const String& allowedCharacters = String());
+                               const juce::String& allowedCharacters = juce::String());
 
     /** Sets the type of virtual keyboard that should be displayed when this editor has
         focus.
@@ -716,29 +716,29 @@ public:
     {
         virtual ~LookAndFeelMethods() = default;
 
-        virtual void fillTextEditorBackground (Graphics&, int width, int height, TextEditor&) = 0;
-        virtual void drawTextEditorOutline (Graphics&, int width, int height, TextEditor&) = 0;
+        virtual void fillTextEditorBackground (juce::Graphics&, int width, int height, TextEditor&) = 0;
+        virtual void drawTextEditorOutline (juce::Graphics&, int width, int height, TextEditor&) = 0;
 
-        virtual CaretComponent* createCaretComponent (Component* keyFocusOwner) = 0;
+        virtual juce::CaretComponent* createCaretComponent (juce::Component* keyFocusOwner) = 0;
     };
 
     //==============================================================================
     /** @internal */
-    void paint (Graphics&) override;
+    void paint (juce::Graphics&) override;
     /** @internal */
-    void paintOverChildren (Graphics&) override;
+    void paintOverChildren (juce::Graphics&) override;
     /** @internal */
-    void mouseDown (const MouseEvent&) override;
+    void mouseDown (const juce::MouseEvent&) override;
     /** @internal */
-    void mouseUp (const MouseEvent&) override;
+    void mouseUp (const juce::MouseEvent&) override;
     /** @internal */
-    void mouseDrag (const MouseEvent&) override;
+    void mouseDrag (const juce::MouseEvent&) override;
     /** @internal */
-    void mouseDoubleClick (const MouseEvent&) override;
+    void mouseDoubleClick (const juce::MouseEvent&) override;
     /** @internal */
-    void mouseWheelMove (const MouseEvent&, const MouseWheelDetails&) override;
+    void mouseWheelMove (const juce::MouseEvent&, const juce::MouseWheelDetails&) override;
     /** @internal */
-    bool keyPressed (const KeyPress&) override;
+    bool keyPressed (const juce::KeyPress&) override;
     /** @internal */
     bool keyStateChanged (bool) override;
     /** @internal */
@@ -756,11 +756,11 @@ public:
     /** @internal */
     bool isTextInputActive() const override;
     /** @internal */
-    void setTemporaryUnderlining (const Array<Range<int>>&) override;
+    void setTemporaryUnderlining (const juce::Array<juce::Range<int>>&) override;
     /** @internal */
     VirtualKeyboardType getKeyboardType() override;
     /** @internal */
-    std::unique_ptr<AccessibilityHandler> createAccessibilityHandler() override;
+    std::unique_ptr<juce::AccessibilityHandler> createAccessibilityHandler() override;
 
 protected:
     //==============================================================================
@@ -779,7 +779,7 @@ protected:
     /** Can be overridden to intercept escape key presses directly */
     virtual void escapePressed();
 
-    Point<int> getViewPosition() const;
+    juce::Point<int> getViewPosition() const;
 
     virtual int indexAtPosition (float x, float y) const;
 
@@ -796,22 +796,22 @@ private:
     class GlobalMouseListener : private MouseListener
     {
     public:
-        explicit GlobalMouseListener (Component& e) : editor (e) { Desktop::getInstance().addGlobalMouseListener    (this); }
-        ~GlobalMouseListener() override                          { Desktop::getInstance().removeGlobalMouseListener (this); }
+        explicit GlobalMouseListener (Component& e) : editor (e) { juce::Desktop::getInstance().addGlobalMouseListener    (this); }
+        ~GlobalMouseListener() override                          { juce::Desktop::getInstance().removeGlobalMouseListener (this); }
 
         bool lastMouseDownInEditor() const { return mouseDownInEditor; }
 
     private:
-        void mouseDown (const MouseEvent& event) override { mouseDownInEditor = event.originalComponent == &editor; }
+        void mouseDown (const juce::MouseEvent& event) override { mouseDownInEditor = event.originalComponent == &editor; }
 
         Component& editor;
         bool mouseDownInEditor = false;
     };
 
-    std::unique_ptr<Viewport> viewport;
+    std::unique_ptr<juce::Viewport> viewport;
     TextHolderComponent* textHolder;
-    BorderSize<int> borderSize { 1, 1, 1, 3 };
-    Justification justification { Justification::topLeft };
+    juce::BorderSize<int> borderSize { 1, 1, 1, 3 };
+    juce::Justification justification { juce::Justification::topLeft };
     const GlobalMouseListener globalMouseListener { *this };
 
     bool readOnly = false;
@@ -831,20 +831,20 @@ private:
     bool underlineWhitespace = true;
     bool clicksOutsideDismissVirtualKeyboard = false;
 
-    UndoManager undoManager;
-    std::unique_ptr<CaretComponent> caret;
-    Range<int> selection;
+    juce::UndoManager undoManager;
+    std::unique_ptr<juce::CaretComponent> caret;
+    juce::Range<int> selection;
     int leftIndent = 4, topIndent = 4;
     unsigned int lastTransactionTime = 0;
-    Font currentFont { withDefaultMetrics (FontOptions { 14.0f }) };
+    juce::Font currentFont { withDefaultMetrics (juce::FontOptions { 14.0f }) };
     mutable int totalNumChars = 0;
     int caretPosition = 0;
-    OwnedArray<UniformTextSection> sections;
-    String textToShowWhenEmpty;
-    Colour colourForTextWhenEmpty;
-    juce_wchar passwordCharacter;
-    OptionalScopedPointer<InputFilter> inputFilter;
-    Value textValue;
+    juce::OwnedArray<UniformTextSection> sections;
+    juce::String textToShowWhenEmpty;
+    juce::Colour colourForTextWhenEmpty;
+    juce::juce_wchar passwordCharacter;
+    juce::OptionalScopedPointer<InputFilter> inputFilter;
+    juce::Value textValue;
     VirtualKeyboardType keyboardType = TextInputTarget::textKeyboard;
     float lineSpacing = 1.0f;
 
@@ -857,8 +857,8 @@ private:
 
     DragType dragType = notDragging;
 
-    ListenerList<Listener> listeners;
-    Array<Range<int>> underlinedSections;
+    juce::ListenerList<Listener> listeners;
+    juce::Array<juce::Range<int>> underlinedSections;
 
     void moveCaret (int newCaretPos);
     void moveCaretTo (int newPosition, bool isSelecting);
@@ -866,30 +866,30 @@ private:
     void handleCommandMessage (int) override;
     void coalesceSimilarSections();
     void splitSection (int sectionIndex, int charToSplitAt);
-    void clearInternal (UndoManager*);
-    void insert (const String&, int insertIndex, const Font&, Colour, UndoManager*, int newCaretPos);
-    void reinsert (int insertIndex, const OwnedArray<UniformTextSection>&);
-    void remove (Range<int>, UndoManager*, int caretPositionToMoveTo);
-    void getCharPosition (int index, Point<float>&, float& lineHeight) const;
+    void clearInternal (juce::UndoManager*);
+    void insert (const juce::String&, int insertIndex, const juce::Font&, juce::Colour, juce::UndoManager*, int newCaretPos);
+    void reinsert (int insertIndex, const juce::OwnedArray<UniformTextSection>&);
+    void remove (juce::Range<int>, juce::UndoManager*, int caretPositionToMoveTo);
+    void getCharPosition (int index, juce::Point<float>&, float& lineHeight) const;
     void updateCaretPosition();
     void updateValueFromText();
     void textWasChangedByValue();
     int findWordBreakAfter (int position) const;
     int findWordBreakBefore (int position) const;
     bool moveCaretWithTransaction (int newPos, bool selecting);
-    void drawContent (Graphics&);
+    void drawContent (juce::Graphics&);
     void checkLayout();
     int getWordWrapWidth() const;
     int getMaximumTextWidth() const;
     int getMaximumTextHeight() const;
     void timerCallbackInt();
     void checkFocus();
-    void repaintText (Range<int>);
+    void repaintText (juce::Range<int>);
     void scrollByLines (int deltaLines);
     bool undoOrRedo (bool shouldUndo);
-    UndoManager* getUndoManager() noexcept;
-    void setSelection (Range<int>) noexcept;
-    Point<int> getTextOffset() const noexcept;
+    juce::UndoManager* getUndoManager() noexcept;
+    void setSelection (juce::Range<int>) noexcept;
+    juce::Point<int> getTextOffset() const noexcept;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TextEditor)
 };

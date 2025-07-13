@@ -32,6 +32,11 @@
   ==============================================================================
 */
 
+#include <juce_gui_basics/juce_gui_basics.h>
+#include "juce_TextEditor.h"
+
+using namespace juce;
+
 namespace ksesh
 {
 
@@ -1805,7 +1810,22 @@ void TextEditor::drawContent (Graphics& g)
 
 void TextEditor::paint (Graphics& g)
 {
-    getLookAndFeel().fillTextEditorBackground (g, getWidth(), getHeight(), *this);
+    // getLookAndFeel().fillTextEditorBackground (g, getWidth(), getHeight(), *this);
+    auto width = getWidth();
+    auto height = getHeight();
+    if (dynamic_cast<AlertWindow*> (getParentComponent()) != nullptr)
+    {
+        g.setColour (findColour (TextEditor::backgroundColourId));
+        g.fillRect (0, 0, width, height);
+
+        g.setColour (findColour (TextEditor::outlineColourId));
+        g.drawHorizontalLine (height - 1, 0.0f, static_cast<float> (width));
+    }
+    else
+    {
+        // LookAndFeel_V2::fillTextEditorBackground (g, width, height, textEditor);
+        g.fillAll (findColour (TextEditor::backgroundColourId));
+    }
 }
 
 void TextEditor::paintOverChildren (Graphics& g)
@@ -1826,7 +1846,25 @@ void TextEditor::paintOverChildren (Graphics& g)
             g.drawText (textToShowWhenEmpty, textBounds, justification, true);
     }
 
-    getLookAndFeel().drawTextEditorOutline (g, getWidth(), getHeight(), *this);
+    // getLookAndFeel().drawTextEditorOutline (g, getWidth(), getHeight(), *this);
+    auto width = getWidth();
+    auto height = getHeight();
+    if (dynamic_cast<AlertWindow*> (getParentComponent()) == nullptr)
+    {
+        if (isEnabled())
+        {
+            if (hasKeyboardFocus (true) && ! isReadOnly())
+            {
+                g.setColour (findColour (TextEditor::focusedOutlineColourId));
+                g.drawRect (0, 0, width, height, 2);
+            }
+            else
+            {
+                g.setColour (findColour (TextEditor::outlineColourId));
+                g.drawRect (0, 0, width, height);
+            }
+        }
+    }
 }
 
 //==============================================================================
