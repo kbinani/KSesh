@@ -124,18 +124,11 @@ public:
   }
 
   static void CreateGlyphInformations(HbBufferUniquePtr const &buffer, hb_font_t *font, std::vector<GlyphInformation> &out) {
-    out.clear();
-
-    hb_font_extents_t extents{};
-    hb_font_get_h_extents(font, &extents);
-    auto descender = extents.descender;
-    int unitsPerEm = hb_face_get_upem(hb_font_get_face(font));
-
-    unsigned int numGlyphs = hb_buffer_get_length(buffer.get());
+    unsigned int const numGlyphs = hb_buffer_get_length(buffer.get());
     hb_glyph_info_t *glyphInfo = hb_buffer_get_glyph_infos(buffer.get(), nullptr);
     hb_glyph_position_t *glyphPos = hb_buffer_get_glyph_positions(buffer.get(), nullptr);
     hb_position_t cursorX = 0;
-    hb_position_t cursorY = -(unitsPerEm + descender);
+    hb_position_t cursorY = 0;
     for (unsigned int i = 0; i < numGlyphs; i++) {
       GlyphInformation info;
       info.glyphId = glyphInfo[i].codepoint;
