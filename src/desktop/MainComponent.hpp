@@ -567,6 +567,9 @@ private:
     auto next = fFontSet.select(fontFamily);
     fSignList->setFont(next);
     fTextEditor->changeFont(next);
+    if (fExample) {
+      fExample->changeFont(next);
+    }
     fAppSetting->setFontFamily(fontFamily);
     fFont = next;
   }

@@ -16,7 +16,7 @@ class ExampleComponent : public juce::Component {
   };
 
 public:
-  ExampleComponent(std::shared_ptr<FontAdapter> const &font, std::shared_ptr<AppSetting> const &setting) : fFont(font) {
+  ExampleComponent(std::shared_ptr<FontAdapter> const &font, std::shared_ptr<AppSetting> const &setting) {
     fEditor = std::make_unique<TextEditorComponent>(font, setting);
     fEditor->fOnEscapeKey = []() {
       juce::JUCEApplication::getInstance()->invoke(CommandID::commandHelpExampleClose, true);
@@ -83,12 +83,12 @@ mAa\r3 xrw)"}};
     g.fillRoundedRectangle(bounds.toFloat(), 8);
   }
 
+  void changeFont(std::shared_ptr<FontAdapter> const &font) {
+    fEditor->changeFont(font);
+  }
+
 private:
   void onSelectorChange() {
-    auto font = fFont.lock();
-    if (!font) {
-      return;
-    }
     int index = fSelector->getSelectedId() - 1;
     if (0 <= index && index < (int)fExamples.size()) {
       auto e = fExamples[index];
@@ -100,7 +100,6 @@ private:
 private:
   std::unique_ptr<TextEditorComponent> fEditor;
   std::unique_ptr<juce::ShapeButton> fClose;
-  std::weak_ptr<FontAdapter> fFont;
   std::unique_ptr<juce::ComboBox> fSelector;
   std::vector<Example> fExamples;
 };
