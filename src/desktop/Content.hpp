@@ -465,9 +465,10 @@ public:
         Data data;
         data.scale = fontSize * font->fScale;
         data.tx = x;
-        data.ty = y - (1 / font->fScale - font->fDy);
+        // https://gyazo.com/1aae4ad48ead791b3daeaf1e4c7146d1
+        data.ty = y + 1 / font->fScale + font->fDy;
         data.dx = padding;
-        data.dy = height + padding - lineIndex * (fontSize + setting.lineSpacing());
+        data.dy = height - lineIndex * (fontSize + setting.lineSpacing()) - padding - fontSize;
         data.buffer.push_back({.op = 'm', .x1 = 0, .y1 = 0});
         hb_font_draw_glyph(font->fFont.get(), glyphId, funcs.get(), &data);
         if (data.buffer.size() > 1) {
