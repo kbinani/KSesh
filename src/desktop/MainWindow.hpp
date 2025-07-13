@@ -26,7 +26,7 @@ public:
     setResizable(true, true);
     centreWithSize(getWidth(), getHeight());
 #endif
-    setResizeLimits(400, 300, std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
+    setResizeLimits(400, 300, std::numeric_limits<int>::max() / 2, std::numeric_limits<int>::max() / 2);
     updateWindowTitle({}, false);
 
     setVisible(true);
