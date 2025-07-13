@@ -790,7 +790,7 @@ public:
           auto xAdvance = glyphPos[i].x_advance;
           auto yAdvance = glyphPos[i].y_advance;
           float x = cursorX + xOffset;
-          float y = -(cursorY + yOffset - font->fDy);
+          float y = -(cursorY + yOffset - font->fY);
 
           Data data;
           data.hdc = hdc;
