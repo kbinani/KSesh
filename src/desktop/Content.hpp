@@ -346,26 +346,12 @@ public:
   std::string toPDF(PresentationSetting const &setting) const {
     using namespace std;
     float const fontSize = setting.fontSize;
+    float const padding = setting.padding;
     auto font = this->font.lock();
     if (!font) {
       return {};
     }
-    optional<float> right;
-    float dy = setting.padding;
-    for (auto const &line : lines) {
-      float xMax = line->width * font->fScale * fontSize;
-      if (right) {
-        right = std::max(*right, xMax);
-      } else {
-        right = xMax;
-      }
-      dy += setting.lineSpacing() + setting.fontSize;
-    }
-    if (!right) {
-      return {};
-    }
-    int width = (int)ceil(*right) + setting.padding;
-    int height = (int)ceil(dy) + setting.padding;
+    auto [width, height] = getSize(setting);
     struct Data {
       float scale;
       float dx;
@@ -457,11 +443,8 @@ public:
         },
         nullptr, nullptr);
 
-    hb_font_extents_t extents{};
-    hb_font_get_h_extents(font->fFont.get(), &extents);
-
     unique_ptr<pdf_doc, juce::FunctionPointerDestructor<pdf_destroy>> doc(pdf_create(width, height, nullptr));
-    pdf_append_page(doc.get());
+    pdf_object *page = pdf_append_page(doc.get());
 
     int lineIndex = 0;
     for (auto const &line : lines) {
@@ -476,22 +459,22 @@ public:
         auto yOffset = glyphPos[i].y_offset;
         auto xAdvance = glyphPos[i].x_advance;
         auto yAdvance = glyphPos[i].y_advance;
-        float x = cursorX + xOffset * font->fScale;
-        float y = cursorY + yOffset * font->fScale;
+        float x = cursorX + xOffset;
+        float y = cursorY + yOffset;
 
         Data data;
         data.scale = fontSize * font->fScale;
         data.tx = x;
-        data.ty = y - font->fDy;
-        data.dx = setting.padding;
-        data.dy = height - lineIndex * (setting.fontSize + setting.lineSpacing()) - setting.padding - setting.fontSize;
+        data.ty = y - (1 / font->fScale - font->fDy);
+        data.dx = padding;
+        data.dy = height + padding - lineIndex * (fontSize + setting.lineSpacing());
         data.buffer.push_back({.op = 'm', .x1 = 0, .y1 = 0});
         hb_font_draw_glyph(font->fFont.get(), glyphId, funcs.get(), &data);
         if (data.buffer.size() > 1) {
-          pdf_add_custom_path(doc.get(), nullptr, data.buffer.data(), data.buffer.size(), 0, 0, PDF_BLACK);
+          pdf_add_custom_path(doc.get(), page, data.buffer.data(), data.buffer.size(), 0, 0, PDF_BLACK);
         }
-        cursorX += xAdvance * font->fScale;
-        cursorY += yAdvance * font->fScale;
+        cursorX += xAdvance;
+        cursorY += yAdvance;
       }
       lineIndex++;
     }
@@ -510,11 +493,11 @@ public:
     if (!font) {
       return std::make_pair<float>(2 * padding, 2 * padding);
     }
-    float height = padding * 2 + fontSize * lines.size() + setting.lineSpacing() * (lines.size() - 1);
+    float const height = padding * 2 + fontSize * lines.size() + setting.lineSpacing() * (lines.size() - 1);
     float width = padding * 2;
     for (auto const &line : lines) {
-      float w = line->width * font->fScale * fontSize;
-      width = std::max(width, w + 2 * padding);
+      float const lineWidth = line->width * font->fScale * fontSize;
+      width = std::max(width, lineWidth + 2 * padding);
     }
     return std::make_pair(width, height);
   }
