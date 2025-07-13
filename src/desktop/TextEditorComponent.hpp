@@ -8,8 +8,8 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
     clipExpand = 1,
   };
 
-  class Editor : public juce::TextEditor, public juce::ChangeListener {
-    using super = juce::TextEditor;
+  class Editor : public TextEditor, public juce::ChangeListener {
+    using Super = TextEditor;
 
   public:
     explicit Editor(std::shared_ptr<AppSetting> const &setting) : fSetting(setting) {
@@ -103,14 +103,14 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
 
     juce::RectangleList<int> getTextBounds(juce::Range<int> textRange) const override {
       juce::RectangleList<int> ret;
-      for (auto const &range : juce::TextEditor::getTextBounds(textRange)) {
+      for (auto const &range : Super::getTextBounds(textRange)) {
         ret.addWithoutMerging(range.withHeight(fSetting->getEditorFontSize()));
       }
       return ret;
     }
 
     int indexAtPosition(float x, float y) const override {
-      auto ret = super::indexAtPosition(x, y);
+      auto ret = Super::indexAtPosition(x, y);
       auto content = fContent.lock();
       if (!content) {
         return ret;
