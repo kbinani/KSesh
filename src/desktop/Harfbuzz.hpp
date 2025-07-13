@@ -1,7 +1,11 @@
 #pragma once
 
+#pragma GCC diagnostic push
+
 #include <juce_graphics/fonts/harfbuzz/hb.hh>
 #include <juce_graphics/fonts/juce_FunctionPointerDestructor.h>
+
+#pragma GCC diagnostic pop
 
 namespace ksesh {
 
