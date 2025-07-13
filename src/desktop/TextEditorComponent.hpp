@@ -8,11 +8,11 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
     clipExpand = 1,
   };
 
-  class TextEditor : public juce::TextEditor, public juce::ChangeListener {
+  class Editor : public juce::TextEditor, public juce::ChangeListener {
     using super = juce::TextEditor;
 
   public:
-    explicit TextEditor(std::shared_ptr<AppSetting> const &setting) : fSetting(setting) {
+    explicit Editor(std::shared_ptr<AppSetting> const &setting) : fSetting(setting) {
       setting->addChangeListener(this);
       (void)NEEDS_TRANS("Cut");
       (void)NEEDS_TRANS("Copy");
@@ -23,7 +23,7 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
       (void)NEEDS_TRANS("Redo");
     }
 
-    ~TextEditor() {
+    ~Editor() {
       fSetting->removeChangeListener(this);
     }
 
@@ -181,7 +181,7 @@ public:
   };
 
   explicit TextEditorComponent(std::shared_ptr<AppSetting> const &setting) : fSetting(setting) {
-    fEditor = std::make_unique<TextEditor>(setting);
+    fEditor = std::make_unique<Editor>(setting);
     fEditor->setMultiLine(true, false);
     fEditor->setReturnKeyStartsNewLine(true);
     bind();
@@ -425,7 +425,7 @@ public:
   std::function<void()> fOnEscapeKey;
 
 private:
-  std::unique_ptr<TextEditor> fEditor;
+  std::unique_ptr<Editor> fEditor;
   int fPrev = 0;
   Direction fDirection = Direction::Forward;
   std::shared_ptr<AppSetting> fSetting;
