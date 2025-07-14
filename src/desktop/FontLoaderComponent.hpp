@@ -3,6 +3,8 @@
 namespace ksesh {
 
 class FontLoaderComponent : public juce::SplashScreen, public juce::AsyncUpdater {
+  using Self = FontLoaderComponent;
+
 public:
   class Delegate {
   public:
@@ -13,20 +15,23 @@ public:
   explicit FontLoaderComponent(Delegate *delegate) : juce::SplashScreen("KSesh", 640, 360, true), fDelegate(delegate) {
     std::promise<std::shared_ptr<FontAdapter>> promiseEgyptianText;
     fFontFutureEgyptianText = promiseEgyptianText.get_future();
-    std::thread(LoadEgyptianTextFont, std::move(promiseEgyptianText)).detach();
+    std::thread(&Self::loadEgyptianTextFont, this, std::move(promiseEgyptianText)).detach();
 
     std::promise<std::shared_ptr<FontAdapter>> promiseNewGardiner;
     fFontFutureNewGardiner = promiseNewGardiner.get_future();
-    std::thread(&FontLoaderComponent::transformFont, this, std::move(promiseNewGardiner), FontFamily::NewGardiner).detach();
+    std::thread(&Self::transformFont, this, std::move(promiseNewGardiner), FontFamily::NewGardiner).detach();
 
     std::promise<std::shared_ptr<FontAdapter>> promiseNotoSans;
     fFontFutureNotoSans = promiseNotoSans.get_future();
-    std::thread(&FontLoaderComponent::transformFont, this, std::move(promiseNotoSans), FontFamily::NotoSans).detach();
+    std::thread(&Self::transformFont, this, std::move(promiseNotoSans), FontFamily::NotoSans).detach();
 
     fAppIcon = juce::ImageFileFormat::loadFrom(BinaryData::icon_512x512_png, BinaryData::icon_512x512_pngSize);
   }
 
   ~FontLoaderComponent() {
+    if (fFontFutureEgyptianText.valid()) {
+      fFontFutureEgyptianText.get();
+    }
     if (fFontFutureNewGardiner.valid()) {
       fFontFutureNewGardiner.get();
     }
@@ -153,7 +158,7 @@ private:
     promise.set_value(std::make_shared<FontAdapter>(hbFont));
   }
 
-  static void LoadEgyptianTextFont(std::promise<std::shared_ptr<FontAdapter>> promise) {
+  void loadEgyptianTextFont(std::promise<std::shared_ptr<FontAdapter>> promise) {
     HbBlobUniquePtr blob(hb_blob_create(BinaryData::eot_ttf,
                                         BinaryData::eot_ttfSize,
                                         HB_MEMORY_MODE_READONLY,
@@ -163,6 +168,7 @@ private:
     auto hbFont = HbMakeSharedFontPtr(hb_font_create(face.get()));
     auto font = std::make_shared<FontAdapter>(hbFont);
     promise.set_value(font);
+    triggerAsyncUpdate();
   }
 
 private:
