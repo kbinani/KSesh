@@ -5,7 +5,7 @@ An Interactive Hieroglyphic Editor, available on Windows, macOS, and the Web.
 [![Actions Status](https://github.com/kbinani/KSesh/workflows/CI/badge.svg)](https://github.com/kbinani/KSesh/actions)
 [![License](https://img.shields.io/github/license/kbinani/KSesh)](https://www.gnu.org/licenses/agpl-3.0.html)
 
-![screenshot](https://raw.githubusercontent.com/kbinani/KSesh/main/pkg/app-store/screenshot.png)
+![screenshot](https://raw.githubusercontent.com/kbinani/KSesh/main/pkg/app-store/screenshot-en.png)
 
 # Install
 
