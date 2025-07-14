@@ -173,10 +173,14 @@ public:
   }
 
   void fontLoaderComponentDidFinishLoadingFont(FontSet const &fontSet) override {
-    fFontLoader->deleteAfterDelay(juce::RelativeTime::seconds(1), false);
-    fFontLoader.release();
+    auto loader = fFontLoader.release();
+    if (loader) {
+      loader->deleteAfterDelay(juce::RelativeTime::seconds(1), false);
+    }
 
     fMainWindow = std::make_unique<MainWindow>(getApplicationName(), fCommandManager, fSetting, fontSet);
+    fMainWindow->setVisible(true);
+    fMainWindow->updateWindowTitle({}, false);
   }
 
 private:

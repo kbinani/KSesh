@@ -27,9 +27,6 @@ public:
     centreWithSize(getWidth(), getHeight());
 #endif
     setResizeLimits(400, 300, std::numeric_limits<int>::max() / 2, std::numeric_limits<int>::max() / 2);
-    updateWindowTitle({}, false);
-
-    setVisible(true);
   }
 
   void closeButtonPressed() override {
@@ -48,7 +45,6 @@ public:
     fMain->closeAbout();
   }
 
-private:
   void updateWindowTitle(juce::File const &file, bool modified) {
     auto name = file == juce::File() ? TRANS("Unnamed") : file.getFullPathName();
     setName(JUCE_APPLICATION_NAME_STRING + juce::String(" - ") + name + (modified ? " *" : ""));
