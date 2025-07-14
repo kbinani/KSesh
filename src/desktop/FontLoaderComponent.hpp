@@ -100,6 +100,26 @@ private:
       data = std::string_view(BinaryData::NotoSansEgyptianHieroglyphsRegular_ttf, BinaryData::NotoSansEgyptianHieroglyphsRegular_ttfSize);
       break;
     }
+
+    auto cache = FilePath::FontCacheFilePath(data.data(), data.size());
+    if (cache != juce::File() && cache.existsAsFile()) {
+      juce::FileInputStream fileStream(cache);
+      if (fileStream.openedOk()) {
+        juce::GZIPDecompressorInputStream decompressorStream(&fileStream, false, juce::GZIPDecompressorInputStream::gzipFormat);
+        std::vector<uint8_t> buffer;
+        while (!decompressorStream.isExhausted()) {
+          uint8_t chunk[512];
+          int read = decompressorStream.read(chunk, 512);
+          std::copy_n(chunk, read, std::back_inserter(buffer));
+        }
+        HbBlobUniquePtr blob(hb_blob_create((char const *)buffer.data(), buffer.size(), HB_MEMORY_MODE_DUPLICATE, nullptr, nullptr));
+        HbFaceUniquePtr face(hb_face_create(blob.get(), 0));
+        auto hbFont = HbMakeSharedFontPtr(hb_font_create(face.get()));
+        promise.set_value(std::make_shared<FontAdapter>(hbFont));
+        return;
+      }
+    }
+
     eglyf::ByteInputStream inputStream(data);
     std::shared_ptr<eglyf::Font> font;
     if (auto st = eglyf::Font::Read(inputStream, font); !st.ok()) {
@@ -118,6 +138,15 @@ private:
       return;
     }
     std::string_view transformed = outputStream.view();
+    if (cache != juce::File()) {
+      juce::FileOutputStream fileStream(cache);
+      if (fileStream.openedOk()) {
+        fileStream.setPosition(0);
+        fileStream.truncate();
+        juce::GZIPCompressorOutputStream compressorStream(&fileStream, -1, false, juce::GZIPCompressorOutputStream::windowBitsGZIP);
+        compressorStream.write(transformed.data(), transformed.size());
+      }
+    }
     HbBlobUniquePtr blob(hb_blob_create(transformed.data(), transformed.size(), HB_MEMORY_MODE_DUPLICATE, nullptr, nullptr));
     HbFaceUniquePtr face(hb_face_create(blob.get(), 0));
     auto hbFont = HbMakeSharedFontPtr(hb_font_create(face.get()));

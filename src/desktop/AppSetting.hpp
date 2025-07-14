@@ -109,7 +109,7 @@ private:
   }
 
   void save() {
-    auto file = ConfigFilePath();
+    auto file = FilePath::ConfigFilePath();
     if (file == juce::File()) {
       return;
     }
@@ -181,7 +181,7 @@ private:
   }
 
   void load() {
-    auto file = ConfigFilePath();
+    auto file = FilePath::ConfigFilePath();
     if (file == juce::File()) {
       return;
     }
@@ -272,23 +272,6 @@ private:
     return u.getLocalFile();
   }
 #endif
-
-  juce::File ConfigFilePath() {
-    auto dir = ConfigFileDirectory();
-    if (dir == juce::File()) {
-      return juce::File();
-    }
-    return dir.getChildFile("config.json");
-  }
-
-  juce::File ConfigFileDirectory() {
-#if defined(JUCE_WINDOWS)
-    return juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory).getChildFile(".ksesh");
-#elif defined(JUCE_MAC)
-    return juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory).getChildFile("Application Support").getChildFile(".ksesh");
-#endif
-    return juce::File();
-  }
 
 private:
   ColorScheme fColorScheme = Light;

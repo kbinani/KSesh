@@ -1,12 +1,11 @@
 // clang-format off
 #include <juce_gui_extra/juce_gui_extra.h>
+#include <juce_cryptography/juce_cryptography.h>
 #include "juce_TextEditor.h"
 #include "PDFGen.hpp"
 #include <iostream>
 #include "defer.hpp"
 #include <eglyf.hpp>
-
-#pragma GCC diagnostic ignored "-Wunused-variable"
 
 #include "String.hpp"
 #include "Harfbuzz.hpp"
@@ -26,6 +25,7 @@
 #include "CaretLocation.hpp"
 #include "Content.hpp"
 #include "FontFamily.hpp"
+#include "FilePath.hpp"
 #include "AppSetting.hpp"
 #include "Clipboard.hpp"
 #include "TextEditorComponent.hpp"
@@ -67,6 +67,8 @@ public:
   }
 
   void initialise(juce::String const &) override {
+    FilePath::PrepareApplicationDataDirectory();
+
     fSetting = std::make_shared<AppSetting>();
 
     juce::LocalisedStrings::setCurrentMappings(CurrentLocalisedStrings());

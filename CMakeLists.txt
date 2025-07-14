@@ -113,6 +113,7 @@ list(APPEND ksesh_files
   src/desktop/CaretLocation.hpp
   src/desktop/juce_TextEditor.cpp
   src/desktop/juce_TextEditor.h
+  src/desktop/FilePath.hpp
 )
 if (APPLE)
   list(APPEND ksesh_files src/desktop/Application.mm)
@@ -166,6 +167,7 @@ target_link_libraries(ksesh
   PRIVATE
     ksesh-binary-data
     juce::juce_gui_extra
+    juce::juce_cryptography
   PUBLIC
     juce::juce_recommended_config_flags
     juce::juce_recommended_lto_flags
