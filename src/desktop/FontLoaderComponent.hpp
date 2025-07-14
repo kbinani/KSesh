@@ -12,7 +12,7 @@ public:
     virtual void fontLoaderComponentDidFinishLoadingFont(FontSet const &fontSet) = 0;
   };
 
-  explicit FontLoaderComponent(Delegate *delegate) : juce::SplashScreen("KSesh", 640, 360, true), fDelegate(delegate) {
+  explicit FontLoaderComponent(Delegate *delegate) : juce::SplashScreen(JUCE_APPLICATION_NAME_STRING, 640, 360, true), fDelegate(delegate) {
     std::promise<std::shared_ptr<FontAdapter>> promiseEgyptianText;
     fFontFutureEgyptianText = promiseEgyptianText.get_future();
     std::thread(&Self::loadEgyptianTextFont, this, std::move(promiseEgyptianText)).detach();
