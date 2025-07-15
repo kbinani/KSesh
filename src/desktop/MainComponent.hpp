@@ -934,7 +934,7 @@ private:
       if (file == juce::File()) {
         return;
       }
-      auto str = document->toPDF(fAppSetting->getPresentationSetting());
+      auto str = PDFExporter::ToPDF(*document, fAppSetting->getPresentationSetting());
       auto stream = file.createOutputStream();
       auto title = TRANS("Error");
       auto message = TRANS("Failed to export as PDF");
@@ -963,7 +963,7 @@ private:
     if (!document) {
       return;
     }
-    auto str = document->toPDF(fAppSetting->getPresentationSetting());
+    auto str = PDFExporter::ToPDF(*document, fAppSetting->getPresentationSetting());
     Clipboard::Store(str, Clipboard::Type::Pdf);
   }
 #endif
@@ -982,7 +982,7 @@ private:
       if (file == juce::File()) {
         return;
       }
-      auto str = document->toEMF(fAppSetting->getPresentationSetting());
+      auto str = EMFExporter::ToEMF(*document, fAppSetting->getPresentationSetting());
       auto stream = file.createOutputStream();
       auto title = TRANS("Error");
       auto message = TRANS("Failed to export as EMF");
@@ -1012,7 +1012,7 @@ private:
     if (!document) {
       return;
     }
-    auto str = document->toEMF(fAppSetting->getPresentationSetting());
+    auto str = EMFExporter::ToEMF(*document, fAppSetting->getPresentationSetting());
     writeToClipboard(str, Clipboard::Type::Emf);
   }
 #endif

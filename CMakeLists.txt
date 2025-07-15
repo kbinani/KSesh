@@ -114,6 +114,9 @@ list(APPEND ksesh_files
   src/desktop/juce_TextEditor.cpp
   src/desktop/juce_TextEditor.h
   src/desktop/FilePath.hpp
+  src/desktop/EMFExporter.hpp
+  src/desktop/PDFExporter.hpp
+  src/desktop/ScopedHANDLE.hpp
 )
 if (APPLE)
   list(APPEND ksesh_files src/desktop/Application.mm)
