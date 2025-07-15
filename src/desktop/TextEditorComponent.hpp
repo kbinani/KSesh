@@ -322,10 +322,8 @@ public:
     fContent = content;
     fFont = font;
     if (fDelegate) {
-      auto text = fEditor->getText();
       auto range = getSelectedRange();
-      auto typing = GetTypingAtCaret(text, range.getStart(), range.getEnd());
-      fDelegate->textEditorComponentDidChangeContent(content, typing, range.getStart(), range.getEnd(), fDirection);
+      fDelegate->textEditorComponentDidChangeContent(content, std::nullopt, range.getStart(), range.getEnd(), fDirection);
     }
   }
 
