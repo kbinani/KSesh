@@ -2,7 +2,7 @@
 
 namespace ksesh {
 
-class MainWindow : public juce::DocumentWindow {
+class MainWindow : public juce::DocumentWindow, public juce::ApplicationCommandTarget {
 public:
   MainWindow(
       juce::String name,
@@ -15,6 +15,7 @@ public:
             juce::DocumentWindow::allButtons) {
     setUsingNativeTitleBar(true);
     fMain = std::make_unique<MainComponent>(commandManager, appSetting, fontSet);
+    commandManager->registerAllCommandsForTarget(fMain.get());
     fMain->onSaveFilePathChanged = [this](juce::File const &file, bool modified) {
       updateWindowTitle(file, modified);
     };
@@ -35,6 +36,20 @@ public:
 
   void lookAndFeelChanged() override {
     setBackgroundColour(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
+  }
+
+  ApplicationCommandTarget *getNextCommandTarget() override {
+    return fMain.get();
+  }
+
+  void getAllCommands(juce::Array<juce::CommandID> &commands) override {
+  }
+
+  void getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo &result) override {
+  }
+
+  bool perform(InvocationInfo const &info) override {
+    return false;
   }
 
   void closeExample() {

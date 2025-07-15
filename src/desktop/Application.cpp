@@ -183,6 +183,10 @@ public:
     fMainWindow->updateWindowTitle({}, false);
   }
 
+  ApplicationCommandTarget *getNextCommandTarget() override {
+    return fMainWindow.get();
+  }
+
 private:
   static juce::LocalisedStrings *CurrentLocalisedStrings() {
 #if defined(JUCE_WINDOWS)

@@ -66,7 +66,6 @@ public:
     fBottomToolBar = std::make_unique<BottomToolBar>();
     addAndMakeVisible(*fBottomToolBar);
 
-    commandManager->registerAllCommandsForTarget(this);
     addKeyListener(commandManager->getKeyMappings());
 
     fMenuModel = std::make_unique<MenuBarModel>(commandManager.get(), fAppSetting);
