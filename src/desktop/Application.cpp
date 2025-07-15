@@ -23,7 +23,7 @@
 #include "CursorLocation.hpp"
 #include "Cursor.hpp"
 #include "CaretLocation.hpp"
-#include "Content.hpp"
+#include "Document.hpp"
 #include "FontFamily.hpp"
 #include "FilePath.hpp"
 #include "AppSetting.hpp"

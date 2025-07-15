@@ -15,15 +15,15 @@ public:
 
   void paint(juce::Graphics &g) override {
     g.fillAll(getLookAndFeel().findColour(juce::TextEditor::ColourIds::backgroundColourId));
-    auto content = fContent.lock();
-    if (!content) {
+    auto document = fDocument.lock();
+    if (!document) {
       return;
     }
     auto textColor = getLookAndFeel().findColour(juce::TextEditor::ColourIds::textColourId);
     auto highlightTextColor = getLookAndFeel().findColour(juce::TextEditor::ColourIds::highlightedTextColourId);
     auto caretColor = getLookAndFeel().findColour(juce::CaretComponent::caretColourId);
     auto highlightColor = getLookAndFeel().findColour(juce::TextEditor::highlightColourId);
-    content->draw(
+    document->draw(
         g,
         fStart,
         fEnd,
@@ -41,12 +41,12 @@ public:
   }
 
   void mouseDown(juce::MouseEvent const &e) override {
-    auto content = fContent.lock();
-    if (!content) {
+    auto document = fDocument.lock();
+    if (!document) {
       return;
     }
     if (e.mods.isLeftButtonDown()) {
-      auto position = content->closestPosition(std::nullopt, e.getPosition().toFloat(), fSetting->getPresentationSetting());
+      auto position = document->closestPosition(std::nullopt, e.getPosition().toFloat(), fSetting->getPresentationSetting());
       fDown = position.fLocation;
       setSelectedRange(position.fLocation, position.fLocation, position.fDirection);
       if (onSelectedRangeChange) {
@@ -56,13 +56,13 @@ public:
   }
 
   void mouseDrag(juce::MouseEvent const &e) override {
-    auto content = fContent.lock();
-    if (!content) {
+    auto document = fDocument.lock();
+    if (!document) {
       return;
     }
     if (e.mods.isLeftButtonDown()) {
       if (fDown) {
-        auto position = content->closestPosition(*fDown, e.getPosition().toFloat(), fSetting->getPresentationSetting());
+        auto position = document->closestPosition(*fDown, e.getPosition().toFloat(), fSetting->getPresentationSetting());
         int start = std::min<int>(position.fLocation, *fDown);
         int end = std::max<int>(position.fLocation, *fDown);
         setSelectedRange(start, end, position.fDirection);
@@ -73,9 +73,9 @@ public:
     }
   }
 
-  void setContent(std::shared_ptr<Content> const &c) {
-    fContent = c;
-    if (c) {
+  void setDocument(std::shared_ptr<Document> const &d) {
+    fDocument = d;
+    if (d) {
       repaint();
     }
   }
@@ -84,9 +84,9 @@ public:
     fStart = start;
     fEnd = end;
     fDirection = direction;
-    auto content = fContent.lock();
-    if (content) {
-      fCursor = content->cursor(start, end, direction, fSetting->getPresentationSetting());
+    auto document = fDocument.lock();
+    if (document) {
+      fCursor = document->cursor(start, end, direction, fSetting->getPresentationSetting());
     }
     repaint();
   }
@@ -95,9 +95,9 @@ public:
     if (source != fSetting.get()) {
       return;
     }
-    auto content = fContent.lock();
-    if (content) {
-      fCursor = content->cursor(fStart, fEnd, fDirection, fSetting->getPresentationSetting());
+    auto document = fDocument.lock();
+    if (document) {
+      fCursor = document->cursor(fStart, fEnd, fDirection, fSetting->getPresentationSetting());
       repaint();
     }
   }
@@ -107,7 +107,7 @@ public:
 
 private:
   std::shared_ptr<AppSetting> fSetting;
-  std::weak_ptr<Content> fContent;
+  std::weak_ptr<Document> fDocument;
   Cursor fCursor;
   std::optional<int> fDown;
   int fStart = 0;

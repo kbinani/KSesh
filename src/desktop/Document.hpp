@@ -2,7 +2,7 @@
 
 namespace ksesh {
 
-class Content {
+class Document {
 #if defined(JUCE_WINDOWS)
   template <class Handle, auto *deleter>
   struct ScopedHandle {
@@ -22,7 +22,7 @@ class Content {
 #endif
 
 public:
-  Content(std::u32string const &raw, std::shared_ptr<FontAdapter> const &font) : fFont(font), fRaw(raw) {
+  Document(std::u32string const &raw, std::shared_ptr<FontAdapter> const &font) : fFont(font), fRaw(raw) {
     using namespace std;
     u32string::size_type offset = 0;
     while (offset < raw.size()) {

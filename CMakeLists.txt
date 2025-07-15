@@ -79,7 +79,7 @@ list(APPEND ksesh_files
   src/desktop/TextEditorComponent.hpp
   src/desktop/HieroglyphComponent.hpp
   src/desktop/SplitterComponent.hpp
-  src/desktop/Content.hpp
+  src/desktop/Document.hpp
   src/desktop/SignList.hpp
   src/desktop/Harfbuzz.hpp
   src/desktop/String.hpp
