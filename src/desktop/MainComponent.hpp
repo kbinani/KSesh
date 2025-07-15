@@ -2,7 +2,7 @@
 
 namespace ksesh {
 
-class MainComponent : public juce::Component, public juce::Timer, public juce::ApplicationCommandTarget, public TextEditorComponent::Delegate {
+class MainComponent : public juce::Component, public juce::ApplicationCommandTarget, public TextEditorComponent::Delegate {
   enum : int {
     resizerSize = 8,
     bottomBarHeight = 24,
@@ -85,7 +85,6 @@ public:
     };
 
     setSize(width, height);
-    startTimerHz(1);
     updateOverlayColors();
   }
 
@@ -110,14 +109,6 @@ public:
     }
     if (fExample) {
       fExample->setBounds(getLocalBounds());
-    }
-  }
-
-  void timerCallback() override {
-    if (auto root = getTopLevelComponent(); root && root->isOnDesktop()) {
-      fTextEditor->focus();
-      updateMenuModel();
-      stopTimer();
     }
   }
 
@@ -559,6 +550,14 @@ public:
     fAbout.reset();
     *fNumModalComponents -= 1;
     setFocusOwner(fFocusOwner, true);
+  }
+
+  void assignInitialFocus() {
+    if (fHasInitialFocus) {
+      return;
+    }
+    fHasInitialFocus = true;
+    setFocusOwner(FocusOwner::textEditor, true);
   }
 
 private:
@@ -1117,6 +1116,7 @@ private:
   std::shared_ptr<int> fNumModalComponents;
   ModalFinishDetector fNativeMessageBoxCoroner;
   FontSet fFontSet;
+  bool fHasInitialFocus = false;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };

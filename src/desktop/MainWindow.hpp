@@ -65,6 +65,15 @@ public:
     setName(JUCE_APPLICATION_NAME_STRING + juce::String(" - ") + name + (modified ? " *" : ""));
   }
 
+  void activeWindowStatusChanged() override {
+    if (!isActiveWindow()) {
+      return;
+    }
+    if (fMain) {
+      fMain->assignInitialFocus();
+    }
+  }
+
 private:
   std::unique_ptr<MainComponent> fMain;
 
