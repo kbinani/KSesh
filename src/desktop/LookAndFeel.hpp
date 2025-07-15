@@ -3,7 +3,7 @@
 namespace ksesh {
 
 class LookAndFeel : public juce::LookAndFeel_V4 {
-  using super = juce::LookAndFeel_V4;
+  using Super = juce::LookAndFeel_V4;
 
 public:
   LookAndFeel() {
@@ -22,7 +22,7 @@ public:
 
   void getIdealPopupMenuItemSize(juce::String const &text, const bool isSeparator, int standardMenuItemHeight, int &idealWidth, int &idealHeight) override {
     int w, h;
-    super::getIdealPopupMenuItemSize(text, isSeparator, standardMenuItemHeight, w, h);
+    Super::getIdealPopupMenuItemSize(text, isSeparator, standardMenuItemHeight, w, h);
     idealWidth = w;
     if (isSeparator) {
       idealHeight = h;

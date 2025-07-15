@@ -4,14 +4,14 @@ namespace ksesh {
 
 class SignListButtonContainer : public juce::Component {
   struct SignButton {
-    int x;
-    int y;
-    int width;
-    int height;
-    juce::String name;
-    juce::String mdcFirst;
-    juce::String mdcTrailing;
-    std::shared_ptr<juce::Path> path;
+    int fX;
+    int fY;
+    int fWidth;
+    int fHeight;
+    juce::String fName;
+    juce::String fMdcFirst;
+    juce::String fMdcTrailing;
+    std::shared_ptr<juce::Path> fPath;
   };
 
   enum : int {
@@ -48,10 +48,10 @@ public:
       auto const &sb = fSignButtons[i];
       if (i == fMouseDownSign) {
         g.setColour(activeColor);
-        g.fillRect(sb.x, sb.y, sb.width, sb.height);
+        g.fillRect(sb.fX, sb.fY, sb.fWidth, sb.fHeight);
       } else if (i == fHitSignButton) {
         g.setColour(highlightColor);
-        g.fillRect(sb.x, sb.y, sb.width, sb.height);
+        g.fillRect(sb.fX, sb.fY, sb.fWidth, sb.fHeight);
       }
       g.setFont(signButtonFontSize);
       if (i == fMouseDownSign) {
@@ -60,26 +60,26 @@ public:
         g.setColour(textColor);
       }
       if (i == fSelectedSign) {
-        g.drawRect(sb.x, sb.y, sb.width, sb.height);
+        g.drawRect(sb.fX, sb.fY, sb.fWidth, sb.fHeight);
       }
-      g.drawText(sb.name, juce::Rectangle<float>(sb.x, sb.y, sb.width, signButtonHeaderHeight).reduced(1), juce::Justification::centred);
-      if (sb.mdcFirst.isNotEmpty()) {
+      g.drawText(sb.fName, juce::Rectangle<float>(sb.fX, sb.fY, sb.fWidth, signButtonHeaderHeight).reduced(1), juce::Justification::centred);
+      if (sb.fMdcFirst.isNotEmpty()) {
         g.setColour(textColor);
         g.setFont(signButtonMdCFontSize);
-        auto base = juce::Rectangle<float>(sb.x, sb.y + signButtonHeaderHeight + signButtonSignHeight, sb.width, signButtonMdCHeight).reduced(1);
-        if (sb.mdcTrailing.isEmpty()) {
-          g.drawText(sb.mdcFirst, juce::Rectangle<float>(base.getCentreX() - signButtonWidth, base.getY(), 2 * signButtonWidth, base.getHeight()), juce::Justification::centred);
+        auto base = juce::Rectangle<float>(sb.fX, sb.fY + signButtonHeaderHeight + signButtonSignHeight, sb.fWidth, signButtonMdCHeight).reduced(1);
+        if (sb.fMdcTrailing.isEmpty()) {
+          g.drawText(sb.fMdcFirst, juce::Rectangle<float>(base.getCentreX() - signButtonWidth, base.getY(), 2 * signButtonWidth, base.getHeight()), juce::Justification::centred);
         } else {
-          g.drawText(sb.mdcFirst, juce::Rectangle<float>(base.getCentreX() - signButtonWidth, signButtonMdCMultipleLinesOffset + base.getY() - signButtonMdCFontSize, 2 * signButtonWidth, base.getHeight()), juce::Justification::centred);
-          g.drawText(sb.mdcTrailing, juce::Rectangle<float>(base.getCentreX() - signButtonWidth, signButtonMdCMultipleLinesOffset + base.getY(), 2 * signButtonWidth, base.getHeight()), juce::Justification::centred);
+          g.drawText(sb.fMdcFirst, juce::Rectangle<float>(base.getCentreX() - signButtonWidth, signButtonMdCMultipleLinesOffset + base.getY() - signButtonMdCFontSize, 2 * signButtonWidth, base.getHeight()), juce::Justification::centred);
+          g.drawText(sb.fMdcTrailing, juce::Rectangle<float>(base.getCentreX() - signButtonWidth, signButtonMdCMultipleLinesOffset + base.getY(), 2 * signButtonWidth, base.getHeight()), juce::Justification::centred);
         }
       }
       g.saveState();
-      auto bounds = sb.path->getBoundsTransformed(juce::AffineTransform::scale(signButtonSignSize, signButtonSignSize));
-      float x = sb.x + sb.width * 0.5f - bounds.getWidth() * 0.5f - bounds.getX();
-      float y = sb.y + signButtonHeaderHeight + signButtonSignHeight * 0.5f - bounds.getHeight() * 0.5f - bounds.getY();
+      auto bounds = sb.fPath->getBoundsTransformed(juce::AffineTransform::scale(signButtonSignSize, signButtonSignSize));
+      float x = sb.fX + sb.fWidth * 0.5f - bounds.getWidth() * 0.5f - bounds.getX();
+      float y = sb.fY + signButtonHeaderHeight + signButtonSignHeight * 0.5f - bounds.getHeight() * 0.5f - bounds.getY();
       g.addTransform(juce::AffineTransform(signButtonSignSize, 0, x, 0, signButtonSignSize, y));
-      g.fillPath(*sb.path);
+      g.fillPath(*sb.fPath);
       g.restoreState();
     }
   }
@@ -103,7 +103,7 @@ public:
   void mouseDown(juce::MouseEvent const &e) override {
     for (int i = 0; i < (int)fSignButtons.size(); i++) {
       auto const &sb = fSignButtons[i];
-      if (juce::Rectangle<float>(sb.x, sb.y, sb.width, sb.height).contains(e.getPosition().toFloat())) {
+      if (juce::Rectangle<float>(sb.fX, sb.fY, sb.fWidth, sb.fHeight).contains(e.getPosition().toFloat())) {
         fMouseDownSign = i;
         updateCursor();
         repaint();
@@ -116,7 +116,7 @@ public:
     if (e.mods.isLeftButtonDown() && 0 <= fMouseDownSign && fMouseDownSign < (int)fSignButtons.size() && fMouseDownSign < (int)fSigns.size()) {
       auto const &sb = fSignButtons[fMouseDownSign];
       auto const &sign = fSigns[fMouseDownSign];
-      if (juce::Rectangle<float>(sb.x, sb.y, sb.width, sb.height).contains(e.getPosition().toFloat()) && onClickSign) {
+      if (juce::Rectangle<float>(sb.fX, sb.fY, sb.fWidth, sb.fHeight).contains(e.getPosition().toFloat()) && onClickSign) {
         onClickSign(*sign);
       }
     }
@@ -139,7 +139,7 @@ public:
     int maxNumColumns = 1;
     int columns = 0;
     for (auto const &it : fSigns) {
-      auto bounds = it->path->getBoundsTransformed(juce::AffineTransform::scale(scale, scale));
+      auto bounds = it->fPath->getBoundsTransformed(juce::AffineTransform::scale(scale, scale));
       int buttonWidth = signButtonWidth;
       if (bounds.getWidth() + signButtonMinMargin * 2 > signButtonWidth) {
         buttonWidth = (int)ceil(bounds.getWidth() + signButtonMinMargin * 2);
@@ -152,14 +152,14 @@ public:
       }
       maxNumColumns = std::max(maxNumColumns, columns);
       SignButton sb;
-      sb.x = x;
-      sb.y = y;
-      sb.width = buttonWidth;
-      sb.height = rowHeight;
-      sb.name = it->name;
-      sb.path = it->path;
-      sb.mdcFirst = it->mdcFirst;
-      sb.mdcTrailing = it->mdcTrailing;
+      sb.fX = x;
+      sb.fY = y;
+      sb.fWidth = buttonWidth;
+      sb.fHeight = rowHeight;
+      sb.fName = it->fName;
+      sb.fPath = it->fPath;
+      sb.fMdcFirst = it->fMdcFirst;
+      sb.fMdcTrailing = it->fMdcTrailing;
       fSignButtons.push_back(sb);
       x += buttonWidth + 1;
       maxY = y + rowHeight;
@@ -338,12 +338,12 @@ public:
     fAllSigns.clear();
     std::vector<juce::String> signNames;
     for (auto const &sign : fSigns) {
-      signNames.push_back(sign->name);
+      signNames.push_back(sign->fName);
     }
     std::vector<std::shared_ptr<Sign>> signs;
     for (auto const &it : SignList::Signs()) {
       auto s = makeSign(font, it.first, it.second);
-      fAllSigns[s->name] = s;
+      fAllSigns[s->fName] = s;
     }
     for (auto const &name : signNames) {
       auto found = fAllSigns.find(name);
@@ -359,10 +359,10 @@ public:
 private:
   std::shared_ptr<Sign> makeSign(std::shared_ptr<FontAdapter> const &font, std::u32string const &name, std::u32string const &sign) {
     auto s = std::make_shared<Sign>();
-    s->name = JuceStringFromU32String(name);
-    s->path = std::make_shared<juce::Path>();
-    *s->path = Harfbuzz::CreatePath(sign, font->fFont.get());
-    s->path->applyTransform(juce::AffineTransform::translation(0, -font->fY).scaled(font->fScale));
+    s->fName = JuceStringFromU32String(name);
+    s->fPath = std::make_shared<juce::Path>();
+    *s->fPath = Harfbuzz::CreatePath(sign, font->fFont.get());
+    s->fPath->applyTransform(juce::AffineTransform::translation(0, -font->fY).scaled(font->fScale));
 
     auto found = SignList::MapReverse(sign);
     std::vector<juce::String> mdc;
@@ -371,19 +371,19 @@ private:
       mdc.push_back(JuceStringFromU32String(found[i]));
     }
     if (mdc.size() == 1) {
-      s->mdcFirst = mdc[0];
+      s->fMdcFirst = mdc[0];
     } else if (mdc.size() > 1) {
       for (int i = 0; i < (int)mdc.size(); i++) {
         if (i < 2) {
           if (i > 0) {
-            s->mdcFirst += ",";
+            s->fMdcFirst += ",";
           }
-          s->mdcFirst += mdc[i];
+          s->fMdcFirst += mdc[i];
         } else {
           if (i > 2) {
-            s->mdcTrailing += ",";
+            s->fMdcTrailing += ",";
           }
-          s->mdcTrailing += mdc[i];
+          s->fMdcTrailing += mdc[i];
         }
       }
     }
@@ -395,7 +395,7 @@ private:
     int hitSignButton = -1;
     for (int i = 0; i < (int)fSignButtons.size(); i++) {
       auto const &sb = fSignButtons[i];
-      if (juce::Rectangle<float>(sb.x, sb.y, sb.width, sb.height).contains(p.toFloat())) {
+      if (juce::Rectangle<float>(sb.fX, sb.fY, sb.fWidth, sb.fHeight).contains(p.toFloat())) {
         hitSignButton = i;
         break;
       }

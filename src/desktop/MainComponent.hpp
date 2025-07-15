@@ -38,7 +38,7 @@ public:
     fHieroglyph = std::make_unique<HieroglyphComponent>(appSetting);
     fHieroglyph->setBounds(width / 2 + resizerSize / 2, 0, width / 2 - resizerSize / 2, height / 2 - resizerSize / 2);
     fHieroglyph->onSelectedRangeChange = [this](int start, int end, Direction direction) {
-      this->hieroglyphDidChangeSelectedRange(start, end, direction);
+      hieroglyphDidChangeSelectedRange(start, end, direction);
     };
 
     fVerticalSplitter = std::make_unique<SplitterComponent>(fTextEditor.get(), fHieroglyph.get(), true);
@@ -621,9 +621,9 @@ private:
     }
 
     juce::String s;
-    for (auto const &line : c->lines) {
+    for (auto const &line : c->fLines) {
       std::u32string l;
-      for (char32_t ch : line->result) {
+      for (char32_t ch : line->fResult) {
         if (0x13430 <= ch && ch <= 0x13455) {
           continue;
         }
@@ -650,11 +650,11 @@ private:
     }
 
     juce::String s;
-    for (auto const &line : c->lines) {
+    for (auto const &line : c->fLines) {
       if (s.isNotEmpty()) {
         s += "\n";
       }
-      s += JuceStringFromU32String(line->result);
+      s += JuceStringFromU32String(line->fResult);
     }
     juce::SystemClipboard::copyTextToClipboard(s);
   }
@@ -858,11 +858,11 @@ private:
       return false;
     }
     std::u32string ret;
-    for (auto const &line : content->lines) {
+    for (auto const &line : content->fLines) {
       if (!ret.empty()) {
         ret += U"\n";
       }
-      ret += line->raw;
+      ret += line->fRaw;
     }
     auto stream = file.createOutputStream();
     if (!stream || stream->failedToOpen()) {
@@ -1084,7 +1084,7 @@ private:
   }
 
   void onClickSign(Sign const &sign) {
-    fTextEditor->onClickSign(sign.name);
+    fTextEditor->onClickSign(sign.fName);
   }
 
 public:

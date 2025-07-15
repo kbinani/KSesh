@@ -7,13 +7,13 @@ struct CursorLocationLeft : public LineAndCluster {
 };
 
 struct CursorLocationRight : public LineAndCluster {
-  bool block;
-  CursorLocationRight(int lineIndex, int clusterIndex, bool block) : LineAndCluster(lineIndex, clusterIndex), block(block) {}
+  bool fBlock;
+  CursorLocationRight(int lineIndex, int clusterIndex, bool block) : LineAndCluster(lineIndex, clusterIndex), fBlock(block) {}
 };
 
 struct CursorLocationEnd {
-  int lineIndex;
-  explicit CursorLocationEnd(int lineIndex) : lineIndex(lineIndex) {}
+  int fLineIndex;
+  explicit CursorLocationEnd(int lineIndex) : fLineIndex(lineIndex) {}
 };
 
 using CursorLocation = std::variant<CursorLocationLeft, CursorLocationRight, CursorLocationEnd>;

@@ -20,19 +20,19 @@ inline std::shared_ptr<hb_font_t> HbMakeSharedFontPtr(hb_font_t *ptr) {
 }
 
 struct GlyphInformation {
-  hb_codepoint_t glyphId;
-  hb_position_t x;
-  hb_position_t y;
-  uint32_t cluster;
+  hb_codepoint_t fGlyphId;
+  hb_position_t fX;
+  hb_position_t fY;
+  uint32_t fCluster;
 };
 
 class Harfbuzz {
   Harfbuzz() = delete;
 
   struct Data {
-    juce::Path path;
-    int dx;
-    int dy;
+    juce::Path fPath;
+    int fDx;
+    int fDy;
   };
 
   static hb_draw_funcs_t *CreateDrawFuncs() {
@@ -41,35 +41,35 @@ class Harfbuzz {
         funcs,
         [](auto *, void *data, auto *, float x, float y, auto *) {
           auto &d = *static_cast<Data *>(data);
-          d.path.startNewSubPath({x + d.dx, -y + d.dy});
+          d.fPath.startNewSubPath({x + d.fDx, -y + d.fDy});
         },
         nullptr, nullptr);
     hb_draw_funcs_set_line_to_func(
         funcs,
         [](auto *, void *data, auto *, float x, float y, auto *) {
           auto &d = *static_cast<Data *>(data);
-          d.path.lineTo({x + d.dx, -y + d.dy});
+          d.fPath.lineTo({x + d.fDx, -y + d.fDy});
         },
         nullptr, nullptr);
     hb_draw_funcs_set_quadratic_to_func(
         funcs,
         [](auto *, void *data, auto *, float ctlX, float ctlY, float toX, float toY, auto *) {
           auto &d = *static_cast<Data *>(data);
-          d.path.quadraticTo({ctlX + d.dx, -ctlY + d.dy}, {toX + d.dx, -toY + d.dy});
+          d.fPath.quadraticTo({ctlX + d.fDx, -ctlY + d.fDy}, {toX + d.fDx, -toY + d.fDy});
         },
         nullptr, nullptr);
     hb_draw_funcs_set_cubic_to_func(
         funcs,
         [](auto *, void *data, auto *, float ctlX1, float ctlY1, float ctlX2, float ctlY2, float toX, float toY, auto *) {
           auto &d = *static_cast<Data *>(data);
-          d.path.cubicTo({ctlX1 + d.dx, -ctlY1 + d.dy}, {ctlX2 + d.dx, -ctlY2 + d.dy}, {toX + d.dx, -toY + d.dy});
+          d.fPath.cubicTo({ctlX1 + d.fDx, -ctlY1 + d.fDy}, {ctlX2 + d.fDx, -ctlY2 + d.fDy}, {toX + d.fDx, -toY + d.fDy});
         },
         nullptr, nullptr);
     hb_draw_funcs_set_close_path_func(
         funcs,
         [](auto *, void *data, auto *, auto *) {
           auto &d = *static_cast<Data *>(data);
-          d.path.closeSubPath();
+          d.fPath.closeSubPath();
         },
         nullptr, nullptr);
     return funcs;
@@ -83,19 +83,19 @@ class Harfbuzz {
 public:
   static juce::Path CreatePath(int glyphId, hb_font_t *font, juce::AffineTransform const &tx) {
     Data data;
-    data.dx = 0;
-    data.dy = 0;
+    data.fDx = 0;
+    data.fDy = 0;
     hb_font_draw_glyph(font, glyphId, GetDrawFuncs(), &data);
-    data.path.applyTransform(tx);
-    return data.path;
+    data.fPath.applyTransform(tx);
+    return data.fPath;
   }
 
   static juce::Path CreatePath(int glyphId, hb_font_t *font, int dx = 0, int dy = 0) {
     Data data;
-    data.dx = dx;
-    data.dy = dy;
+    data.fDx = dx;
+    data.fDy = dy;
     hb_font_draw_glyph(font, glyphId, GetDrawFuncs(), &data);
-    return data.path;
+    return data.fPath;
   }
 
   static juce::Path CreatePath(std::u32string const &t, hb_font_t *font) {
@@ -104,7 +104,7 @@ public:
     std::vector<GlyphInformation> glyphs;
     CreateGlyphInformations(buffer, font, glyphs);
     for (auto const &glyph : glyphs) {
-      auto p = CreatePath(glyph.glyphId, font, glyph.x, glyph.y);
+      auto p = CreatePath(glyph.fGlyphId, font, glyph.fX, glyph.fY);
       if (!p.isEmpty()) {
         ret.addPath(p);
       }
@@ -131,14 +131,14 @@ public:
     hb_position_t cursorY = 0;
     for (unsigned int i = 0; i < numGlyphs; i++) {
       GlyphInformation info;
-      info.glyphId = glyphInfo[i].codepoint;
-      info.cluster = glyphInfo[i].cluster;
+      info.fGlyphId = glyphInfo[i].codepoint;
+      info.fCluster = glyphInfo[i].cluster;
       auto xOffset = glyphPos[i].x_offset;
       auto yOffset = glyphPos[i].y_offset;
       auto xAdvance = glyphPos[i].x_advance;
       auto yAdvance = glyphPos[i].y_advance;
-      info.x = cursorX + xOffset;
-      info.y = -(cursorY + yOffset);
+      info.fX = cursorX + xOffset;
+      info.fY = -(cursorY + yOffset);
       out.push_back(info);
       cursorX += xAdvance;
       cursorY += yAdvance;

@@ -4,11 +4,11 @@ namespace ksesh {
 
 struct Cursor {
   struct SelectionRect {
-    int lineIndex;
-    juce::Rectangle<float> rect;
+    int fLineIndex;
+    juce::Rectangle<float> fRect;
   };
-  std::optional<SelectionRect> rect;
-  std::vector<SelectionRect> selectionRects;
+  std::optional<SelectionRect> fRect;
+  std::vector<SelectionRect> fSelectionRects;
 };
 
 } // namespace ksesh

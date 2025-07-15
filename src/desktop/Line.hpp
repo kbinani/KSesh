@@ -4,7 +4,7 @@ namespace ksesh {
 
 class Line {
 public:
-  Line(int rawOffset, std::u32string const &raw, std::shared_ptr<FontAdapter> const &font) : rawOffset(rawOffset), raw(raw) {
+  Line(int rawOffset, std::u32string const &raw, std::shared_ptr<FontAdapter> const &font) : fRawOffset(rawOffset), fRaw(raw) {
     using namespace std;
     using namespace std::literals::string_literals;
     vector<CharBase> chars;
@@ -33,20 +33,20 @@ public:
       }
     }
     for (size_t i = 0; i < chars.size(); i++) {
-      if (chars[i].ch.starts_with(U"𓊈"s)) {
+      if (chars[i].fCh.starts_with(U"𓊈"s)) {
         for (size_t j = i + 1; j < chars.size(); j++) {
           auto &ch = chars[j];
           auto found = find_if(SignList::enclosureBeginning.begin(), SignList::enclosureBeginning.end(), [&](u32string const &c) {
-            return ch.ch.starts_with(c);
+            return ch.fCh.starts_with(c);
           });
           if (found != SignList::enclosureBeginning.end()) {
             break;
           }
           found = find_if(SignList::enclosureTerminal.begin(), SignList::enclosureTerminal.end(), [&](u32string const &c) {
-            return ch.ch.ends_with(c);
+            return ch.fCh.ends_with(c);
           });
           if (found != SignList::enclosureTerminal.end()) {
-            ch.ch = U"\U0001343d"s;
+            ch.fCh = U"\U0001343d"s;
             break;
           }
         }
@@ -54,24 +54,24 @@ public:
     }
     for (size_t i = 1; i + 1 < chars.size(); i++) {
       auto center = chars[i];
-      if (center.ch != U"&") {
+      if (center.fCh != U"&") {
         continue;
       }
       auto left = chars[i - 1];
       auto right = chars[i + 1];
       CharBase leftCh = left;
       optional<u32string> glue;
-      if (left.raw == U")") {
+      if (left.fRaw == U")") {
         int count = 1;
         for (int j = (int)i - 2; j >= 2; j--) {
-          auto raw = chars[j].raw;
+          auto raw = chars[j].fRaw;
           if (raw == U")") {
             count++;
           } else if (raw == U"(") {
             count--;
             if (count == 0) {
-              if (chars[j - 1].raw == U"&" && chars[j - 2].sign) {
-                glue = chars[j - 1].ch;
+              if (chars[j - 1].fRaw == U"&" && chars[j - 2].fSign) {
+                glue = chars[j - 1].fCh;
                 leftCh = chars[j - 2];
               }
               break;
@@ -79,47 +79,47 @@ public:
           }
         }
       }
-      if (left.sign && right.sign) {
-        auto type = SignList::InsertionType(left.ch, right.ch);
+      if (left.fSign && right.fSign) {
+        auto type = SignList::InsertionType(left.fCh, right.fCh);
         if (type == Insertions::Type::TopStart) {
-          chars[i - 1] = CharBase(right.ch, left.raw, left.rawOffset, left.resultOffset, left.ctrl, left.sign, left.ch);
-          chars[i] = CharBase(SignList::topStartInsertion, center.raw, center.rawOffset, center.resultOffset, center.ctrl, center.sign, U"");
-          chars[i + 1] = CharBase(left.ch, right.raw, right.rawOffset, right.resultOffset, right.ctrl, right.sign, right.ch);
+          chars[i - 1] = CharBase(right.fCh, left.fRaw, left.fRawOffset, left.fResultOffset, left.fCtrl, left.fSign, left.fCh);
+          chars[i] = CharBase(SignList::topStartInsertion, center.fRaw, center.fRawOffset, center.fResultOffset, center.fCtrl, center.fSign, U"");
+          chars[i + 1] = CharBase(left.fCh, right.fRaw, right.fRawOffset, right.fResultOffset, right.fCtrl, right.fSign, right.fCh);
         } else if (type == Insertions::Type::BottomStart) {
-          chars[i - 1] = CharBase(right.ch, left.raw, left.rawOffset, left.resultOffset, left.ctrl, left.sign, left.ch);
-          chars[i] = CharBase(SignList::bottomStartInsertion, center.raw, center.rawOffset, center.resultOffset, center.ctrl, center.sign, U"");
-          chars[i + 1] = CharBase(left.ch, right.raw, right.rawOffset, right.resultOffset, right.ctrl, right.sign, right.ch);
+          chars[i - 1] = CharBase(right.fCh, left.fRaw, left.fRawOffset, left.fResultOffset, left.fCtrl, left.fSign, left.fCh);
+          chars[i] = CharBase(SignList::bottomStartInsertion, center.fRaw, center.fRawOffset, center.fResultOffset, center.fCtrl, center.fSign, U"");
+          chars[i + 1] = CharBase(left.fCh, right.fRaw, right.fRawOffset, right.fResultOffset, right.fCtrl, right.fSign, right.fCh);
         } else if (type == Insertions::Type::TopEnd) {
-          chars[i] = CharBase(SignList::topEndInsertion, center.raw, center.rawOffset, center.resultOffset, center.ctrl, center.sign, U"");
+          chars[i] = CharBase(SignList::topEndInsertion, center.fRaw, center.fRawOffset, center.fResultOffset, center.fCtrl, center.fSign, U"");
         } else if (type == Insertions::Type::BottomEnd) {
-          chars[i] = CharBase(SignList::bottomEndInsertion, center.raw, center.rawOffset, center.resultOffset, center.ctrl, center.sign, U"");
+          chars[i] = CharBase(SignList::bottomEndInsertion, center.fRaw, center.fRawOffset, center.fResultOffset, center.fCtrl, center.fSign, U"");
         }
         if (type == Insertions::Type::TopStart || type == Insertions::Type::BottomStart) {
-          if (i + 3 < chars.size() && chars[i + 2].ch == U"&" && chars[i + 3].sign) {
+          if (i + 3 < chars.size() && chars[i + 2].fCh == U"&" && chars[i + 3].fSign) {
             auto o = chars[i + 2];
-            auto t = SignList::InsertionType(right.ch, chars[i + 3].ch);
+            auto t = SignList::InsertionType(right.fCh, chars[i + 3].fCh);
             if (t == Insertions::Type::TopEnd) {
-              chars[i + 2] = CharBase(SignList::topEndInsertion, o.raw, o.rawOffset, o.resultOffset, o.ctrl, o.sign, U"");
+              chars[i + 2] = CharBase(SignList::topEndInsertion, o.fRaw, o.fRawOffset, o.fResultOffset, o.fCtrl, o.fSign, U"");
             } else if (t == Insertions::Type::BottomEnd) {
-              chars[i + 2] = CharBase(SignList::bottomEndInsertion, o.raw, o.rawOffset, o.resultOffset, o.ctrl, o.sign, U"");
+              chars[i + 2] = CharBase(SignList::bottomEndInsertion, o.fRaw, o.fRawOffset, o.fResultOffset, o.fCtrl, o.fSign, U"");
             }
             i += 3;
           }
         }
-      } else if (leftCh.sign && glue) {
+      } else if (leftCh.fSign && glue) {
         // (d:d)&D&(t)
         if (glue == SignList::topStartInsertion || glue == SignList::bottomStartInsertion) {
-          if (SignList::HasInsertion(leftCh.ch, Insertions::Type::TopEnd)) {
-            chars[i] = CharBase(SignList::topEndInsertion, center.raw, center.rawOffset, center.resultOffset, true, false, U"");
-          } else if (SignList::HasInsertion(leftCh.ch, Insertions::Type::BottomEnd)) {
-            chars[i] = CharBase(SignList::bottomEndInsertion, center.raw, center.rawOffset, center.resultOffset, true, false, U"");
+          if (SignList::HasInsertion(leftCh.fCh, Insertions::Type::TopEnd)) {
+            chars[i] = CharBase(SignList::topEndInsertion, center.fRaw, center.fRawOffset, center.fResultOffset, true, false, U"");
+          } else if (SignList::HasInsertion(leftCh.fCh, Insertions::Type::BottomEnd)) {
+            chars[i] = CharBase(SignList::bottomEndInsertion, center.fRaw, center.fRawOffset, center.fResultOffset, true, false, U"");
           }
         }
-      } else if (left.sign && right.raw == U"(") {
+      } else if (left.fSign && right.fRaw == U"(") {
         int count = 1;
         optional<size_t> term;
         for (size_t j = i + 2; j < chars.size(); j++) {
-          auto raw = chars[j].raw;
+          auto raw = chars[j].fRaw;
           if (raw == U"(") {
             count++;
           } else if (raw == U")") {
@@ -131,17 +131,17 @@ public:
           }
         }
         if (term) {
-          if (SignList::HasInsertion(left.ch, Insertions::Type::BottomEnd)) {
-            chars[i] = CharBase(SignList::bottomEndInsertion, center.raw, center.rawOffset, center.resultOffset, true, false, U"");
-          } else if (SignList::HasInsertion(left.ch, Insertions::Type::TopEnd)) {
-            chars[i] = CharBase(SignList::topEndInsertion, center.raw, center.rawOffset, center.resultOffset, true, false, U"");
+          if (SignList::HasInsertion(left.fCh, Insertions::Type::BottomEnd)) {
+            chars[i] = CharBase(SignList::bottomEndInsertion, center.fRaw, center.fRawOffset, center.fResultOffset, true, false, U"");
+          } else if (SignList::HasInsertion(left.fCh, Insertions::Type::TopEnd)) {
+            chars[i] = CharBase(SignList::topEndInsertion, center.fRaw, center.fRawOffset, center.fResultOffset, true, false, U"");
           }
         }
-      } else if (left.raw == U")" && right.sign) {
+      } else if (left.fRaw == U")" && right.fSign) {
         int count = 1;
         optional<int> term;
         for (int j = (int)i - 2; j >= 0; j--) {
-          auto raw = chars[j].raw;
+          auto raw = chars[j].fRaw;
           if (raw == U")") {
             count++;
           } else if (raw == U"(") {
@@ -154,9 +154,9 @@ public:
         }
         if (term) {
           optional<u32string> insertion;
-          if (SignList::HasInsertion(right.ch, Insertions::Type::BottomStart)) {
+          if (SignList::HasInsertion(right.fCh, Insertions::Type::BottomStart)) {
             insertion = SignList::bottomStartInsertion;
-          } else if (SignList::HasInsertion(right.ch, Insertions::Type::TopStart)) {
+          } else if (SignList::HasInsertion(right.fCh, Insertions::Type::TopStart)) {
             insertion = SignList::topStartInsertion;
           }
           if (insertion) {
@@ -164,29 +164,29 @@ public:
               chars[j] = chars[j - 2];
             }
             chars[*term] = right;
-            chars[*term + 1] = CharBase(*insertion, center.raw, center.rawOffset, center.resultOffset, true, false, U"");
+            chars[*term + 1] = CharBase(*insertion, center.fRaw, center.fRawOffset, center.fResultOffset, true, false, U"");
           }
         }
       }
     }
     for (auto const &it : chars) {
-      result += it.ch;
+      fResult += it.fCh;
     }
 
-    HbBufferUniquePtr buffer(Harfbuzz::CreateBuffer(result, font->fFont.get()));
-    Harfbuzz::CreateGlyphInformations(buffer, font->fFont.get(), glyphs);
+    HbBufferUniquePtr buffer(Harfbuzz::CreateBuffer(fResult, font->fFont.get()));
+    Harfbuzz::CreateGlyphInformations(buffer, font->fFont.get(), fGlyphs);
 
     uint32_t lastCluster = 0;
     int index = 0;
     optional<juce::Rectangle<float>> bb;
     float maxX = 0;
-    for (auto const &info : glyphs) {
-      juce::Path path = Harfbuzz::CreatePath(info.glyphId, font->fFont.get(), info.x, info.y);
-      if (info.cluster != lastCluster) {
-        auto sub = result.substr(lastCluster, info.cluster - lastCluster);
-        clusters.push_back(Cluster(index, bb, lastCluster));
+    for (auto const &info : fGlyphs) {
+      juce::Path path = Harfbuzz::CreatePath(info.fGlyphId, font->fFont.get(), info.fX, info.fY);
+      if (info.fCluster != lastCluster) {
+        auto sub = fResult.substr(lastCluster, info.fCluster - lastCluster);
+        fClusters.push_back(Cluster(index, bb, lastCluster));
         index += sub.size();
-        lastCluster = info.cluster;
+        lastCluster = info.fCluster;
         bb = nullopt;
       }
       if (!path.isEmpty()) {
@@ -199,36 +199,36 @@ public:
         }
       }
     }
-    this->buffer.swap(buffer);
-    if (lastCluster < result.size()) {
-      clusters.push_back(Cluster(index, bb, lastCluster));
+    fBuffer.swap(buffer);
+    if (lastCluster < fResult.size()) {
+      fClusters.push_back(Cluster(index, bb, lastCluster));
     }
-    for (size_t i = 0; i < clusters.size(); i++) {
-      int from = clusters[i].resultOffset;
+    for (size_t i = 0; i < fClusters.size(); i++) {
+      int from = fClusters[i].fResultOffset;
       int to =
-          i + 1 < clusters.size()
-              ? clusters[i + 1].resultOffset
-              : this->result.size();
-      int cluster = clusters[i].cluster;
+          i + 1 < fClusters.size()
+              ? fClusters[i + 1].fResultOffset
+              : fResult.size();
+      int cluster = fClusters[i].fCluster;
       for (CharBase const &ch : chars) {
-        if (from <= ch.resultOffset && ch.resultOffset < to) {
-          this->chars.push_back(Char(ch, i, cluster));
+        if (from <= ch.fResultOffset && ch.fResultOffset < to) {
+          fChars.push_back(Char(ch, i, cluster));
         }
       }
     }
 
-    width = maxX;
+    fWidth = maxX;
   }
 
 public:
-  std::u32string result;
-  std::vector<Cluster> clusters;
-  float width;
-  std::vector<Char> chars;
-  HbBufferUniquePtr buffer;
-  std::vector<GlyphInformation> glyphs;
-  int rawOffset;
-  std::u32string const raw;
+  std::u32string fResult;
+  std::vector<Cluster> fClusters;
+  float fWidth;
+  std::vector<Char> fChars;
+  HbBufferUniquePtr fBuffer;
+  std::vector<GlyphInformation> fGlyphs;
+  int fRawOffset;
+  std::u32string const fRaw;
 
 private:
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Line)

@@ -11,8 +11,8 @@ class ExampleComponent : public juce::Component {
   };
 
   struct Example {
-    juce::String description;
-    juce::String content;
+    juce::String fDescription;
+    juce::String fContent;
   };
 
 public:
@@ -37,11 +37,11 @@ mAa\r2 xrw
 mAa\r3 xrw)"}};
     fSelector = std::make_unique<juce::ComboBox>();
     for (int i = 0; i < (int)fExamples.size(); i++) {
-      fSelector->addItem(fExamples[i].description, i + 1);
+      fSelector->addItem(fExamples[i].fDescription, i + 1);
     }
     addAndMakeVisible(*fSelector);
     auto e = fExamples[0];
-    fEditor->resetText(e.content);
+    fEditor->resetText(e.fContent);
     fSelector->setSelectedId(1);
     fSelector->onChange = [this]() {
       onSelectorChange();
@@ -92,7 +92,7 @@ private:
     int index = fSelector->getSelectedId() - 1;
     if (0 <= index && index < (int)fExamples.size()) {
       auto e = fExamples[index];
-      fEditor->resetText(e.content);
+      fEditor->resetText(e.fContent);
       fEditor->focus();
     }
   }

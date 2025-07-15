@@ -3,9 +3,9 @@
 namespace ksesh {
 
 struct CaretLocation {
-  int location;
-  Direction direction;
-  CaretLocation(int location, Direction direction) : location(location), direction(direction) {}
+  int fLocation;
+  Direction fDirection;
+  CaretLocation(int location, Direction direction) : fLocation(location), fDirection(direction) {}
 };
 
 } // namespace ksesh

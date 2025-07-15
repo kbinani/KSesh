@@ -30,7 +30,7 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
     void paintOverChildren(juce::Graphics &g) override {
       PresentationSetting setting = getRenderSetting();
       auto borderColor = getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId);
-      float lineHeight = setting.fontSize + setting.lineSpacing();
+      float lineHeight = setting.fFontSize + setting.lineSpacing();
       float dy = fSetting->getPresentationSetting().lineSpacing() * 0.5f;
       float textWidth = getTextWidth();
       int lines = (int)ceil(std::max<int>(getHeight(), getTextHeight()) / lineHeight);
@@ -49,7 +49,7 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
 
       g.setColour(borderColor);
       for (int i = 0; i < lines; i++) {
-        float y = setting.padding + (i + 1) * lineHeight;
+        float y = setting.fPadding + (i + 1) * lineHeight;
         g.drawHorizontalLine(y - vp.getY() - dy, defaultIndent - vp.getX(), textWidth - defaultIndent - vp.getX());
       }
 
@@ -115,31 +115,31 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
       if (!content) {
         return ret;
       }
-      if (content->lines.empty()) {
+      if (content->fLines.empty()) {
         return ret;
       }
-      auto font = content->font.lock();
+      auto font = content->fFont.lock();
       if (!font) {
         return ret;
       }
       auto p = fSetting->getPresentationSetting();
       float tx = x;
-      float ty = y + p.fontSize;
-      float lineHeight = p.fontSize + p.lineSpacing() + fSetting->getEditorFontSize();
-      int lineIndex = std::clamp<int>((int)floor(ty / lineHeight), 0, (int)content->lines.size() - 1);
+      float ty = y + p.fFontSize;
+      float lineHeight = p.fFontSize + p.lineSpacing() + fSetting->getEditorFontSize();
+      int lineIndex = std::clamp<int>((int)floor(ty / lineHeight), 0, (int)content->fLines.size() - 1);
       float offset = ty - lineIndex * lineHeight;
-      if (0 <= offset && offset <= p.fontSize) {
+      if (0 <= offset && offset <= p.fFontSize) {
         auto setting = getRenderSetting();
         auto maxWidth = getMaxWidth();
-        float const fontSize = setting.fontSize;
-        auto line = content->lines[lineIndex];
-        float xMax = line->width * font->fScale * fontSize;
+        float const fontSize = setting.fFontSize;
+        auto line = content->fLines[lineIndex];
+        float xMax = line->fWidth * font->fScale * fontSize;
         float drawScale = 1;
         if (xMax > maxWidth) {
           drawScale = maxWidth / xMax;
         }
         auto pos = content->closestPosition(getCaretPosition(), {tx / drawScale, ty}, setting);
-        return pos.location;
+        return pos.fLocation;
       } else {
         return ret;
       }
@@ -154,9 +154,9 @@ class TextEditorComponent : public juce::Component, public juce::ChangeListener 
     PresentationSetting getRenderSetting() const {
       PresentationSetting base = fSetting->getPresentationSetting();
       PresentationSetting setting;
-      setting.padding = defaultIndent;
-      setting.fontSize = base.fontSize;
-      setting.lineSpacingRatio = (fSetting->getEditorFontSize() + base.lineSpacing()) / base.fontSize;
+      setting.fPadding = defaultIndent;
+      setting.fFontSize = base.fFontSize;
+      setting.fLineSpacingRatio = (fSetting->getEditorFontSize() + base.lineSpacing()) / base.fFontSize;
       return setting;
     }
 
@@ -317,7 +317,7 @@ public:
   }
 
   void changeFont(std::shared_ptr<FontAdapter> const &font) {
-    auto content = std::make_shared<Content>(fContent->raw, font);
+    auto content = std::make_shared<Content>(fContent->fRaw, font);
     fEditor->setContent(content);
     fContent = content;
     fFont = font;
@@ -339,7 +339,7 @@ private:
   void applySetting() {
     auto presentation = fSetting->getPresentationSetting();
     float editorFontSize = fSetting->getEditorFontSize();
-    auto fontSize = presentation.fontSize;
+    auto fontSize = presentation.fFontSize;
     fEditor->setIndents(defaultIndent, fontSize + defaultIndent);
     fEditor->setLineSpacing((editorFontSize + fontSize + presentation.lineSpacing()) / editorFontSize);
     fEditor->setFont(juce::Font(juce::FontOptions(editorFontSize)));
@@ -375,27 +375,27 @@ private:
 
   void bind() {
     fEditor->onTextChange = [this]() {
-      this->_onTextChange();
+      _onTextChange();
     };
     fEditor->onCaretPositionChange = [this]() {
-      this->_onCaretPositionChange();
+      _onCaretPositionChange();
     };
     fEditor->onSelectionChange = [this]() {
-      this->_onCaretPositionChange();
+      _onCaretPositionChange();
     };
     fEditor->fOnFocusGained = [this]() {
-      if (this->fDelegate) {
-        this->fDelegate->textEditorComponentDidGainFocus();
+      if (fDelegate) {
+        fDelegate->textEditorComponentDidGainFocus();
       }
     };
     fEditor->onFocusLost = [this]() {
-      if (this->fDelegate) {
-        this->fDelegate->textEditorComponentDidLostFocus();
+      if (fDelegate) {
+        fDelegate->textEditorComponentDidLostFocus();
       }
     };
     fEditor->onEscapeKey = [this]() {
-      if (this->fOnEscapeKey) {
-        this->fOnEscapeKey();
+      if (fOnEscapeKey) {
+        fOnEscapeKey();
       }
     };
   }

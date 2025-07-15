@@ -47,10 +47,10 @@ public:
     }
     if (e.mods.isLeftButtonDown()) {
       auto position = content->closestPosition(std::nullopt, e.getPosition().toFloat(), fSetting->getPresentationSetting());
-      fDown = position.location;
-      setSelectedRange(position.location, position.location, position.direction);
+      fDown = position.fLocation;
+      setSelectedRange(position.fLocation, position.fLocation, position.fDirection);
       if (onSelectedRangeChange) {
-        onSelectedRangeChange(position.location, position.location, position.direction);
+        onSelectedRangeChange(position.fLocation, position.fLocation, position.fDirection);
       }
     }
   }
@@ -63,11 +63,11 @@ public:
     if (e.mods.isLeftButtonDown()) {
       if (fDown) {
         auto position = content->closestPosition(*fDown, e.getPosition().toFloat(), fSetting->getPresentationSetting());
-        int start = std::min<int>(position.location, *fDown);
-        int end = std::max<int>(position.location, *fDown);
-        setSelectedRange(start, end, position.direction);
+        int start = std::min<int>(position.fLocation, *fDown);
+        int end = std::max<int>(position.fLocation, *fDown);
+        setSelectedRange(start, end, position.fDirection);
         if (onSelectedRangeChange) {
-          onSelectedRangeChange(start, end, position.direction);
+          onSelectedRangeChange(start, end, position.fDirection);
         }
       }
     }

@@ -3,10 +3,10 @@
 namespace ksesh {
 
 struct Cluster {
-  int resultOffset;
-  int cluster;
-  std::optional<juce::Rectangle<float>> bounds;
-  Cluster(int resultOffset, std::optional<juce::Rectangle<float>> bounds, int cluster) : resultOffset(resultOffset), cluster(cluster), bounds(bounds) {}
+  int fResultOffset;
+  int fCluster;
+  std::optional<juce::Rectangle<float>> fBounds;
+  Cluster(int resultOffset, std::optional<juce::Rectangle<float>> bounds, int cluster) : fResultOffset(resultOffset), fCluster(cluster), fBounds(bounds) {}
 };
 
 } // namespace ksesh

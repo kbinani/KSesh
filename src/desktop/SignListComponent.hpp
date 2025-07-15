@@ -4,20 +4,20 @@ namespace ksesh {
 
 class SignListComponent : public juce::Component {
   struct Category {
-    explicit Category(juce::String const &name, std::shared_ptr<juce::Path> path = nullptr) : name(name), path(path) {
+    explicit Category(juce::String const &name, std::shared_ptr<juce::Path> path = nullptr) : fName(name), fPath(path) {
     }
 
-    juce::String name;
-    std::shared_ptr<juce::Path> path;
+    juce::String fName;
+    std::shared_ptr<juce::Path> fPath;
   };
 
   struct TabButton {
-    int x;
-    int y;
-    int width;
-    int height;
-    juce::String name;
-    std::shared_ptr<juce::Path> path;
+    int fX;
+    int fY;
+    int fWidth;
+    int fHeight;
+    juce::String fName;
+    std::shared_ptr<juce::Path> fPath;
   };
 
   enum : int {
@@ -76,13 +76,13 @@ public:
       auto const &tb = fTabButtons[i];
       if (i == fMouseDownCategory) {
         g.setColour(activeColor);
-        g.fillRect(tb.x, tb.y, tb.width, tb.height);
+        g.fillRect(tb.fX, tb.fY, tb.fWidth, tb.fHeight);
       } else if (i == fActiveCategory) {
         g.setColour(activeColor);
-        g.fillRect(tb.x, tb.y, tb.width, tb.height);
+        g.fillRect(tb.fX, tb.fY, tb.fWidth, tb.fHeight);
       } else if (i == fHitTabButton) {
         g.setColour(highlightColor);
-        g.fillRect(tb.x, tb.y, tb.width, tb.height);
+        g.fillRect(tb.fX, tb.fY, tb.fWidth, tb.fHeight);
       }
       g.setFont(tabButtonTextSize);
       if (i == fActiveCategory || i == fMouseDownCategory) {
@@ -90,24 +90,24 @@ public:
       } else {
         g.setColour(textColor);
       }
-      if (tb.path) {
-        float textWidth = juce::GlyphArrangement::getStringWidth(g.getCurrentFont(), tb.name);
+      if (tb.fPath) {
+        float textWidth = juce::GlyphArrangement::getStringWidth(g.getCurrentFont(), tb.fName);
 
-        auto bounds = tb.path->getBoundsTransformed(juce::AffineTransform::scale(tabButtonSignSize, tabButtonSignSize));
+        auto bounds = tb.fPath->getBoundsTransformed(juce::AffineTransform::scale(tabButtonSignSize, tabButtonSignSize));
         float totalWidth = textWidth + bounds.getWidth();
-        float x0 = tb.x + tb.width * 0.5f - totalWidth * 0.5f;
-        g.drawText(tb.name, juce::Rectangle<float>(x0 + textWidth - textWidth * 2 - space, tb.y, textWidth * 2, tabButtonHeight), juce::Justification::centredRight);
+        float x0 = tb.fX + tb.fWidth * 0.5f - totalWidth * 0.5f;
+        g.drawText(tb.fName, juce::Rectangle<float>(x0 + textWidth - textWidth * 2 - space, tb.fY, textWidth * 2, tabButtonHeight), juce::Justification::centredRight);
         g.saveState();
         float x = x0 + textWidth - bounds.getX() + space;
-        float y = tb.y + tb.height * 0.5f - bounds.getHeight() * 0.5f - bounds.getY();
+        float y = tb.fY + tb.fHeight * 0.5f - bounds.getHeight() * 0.5f - bounds.getY();
         g.addTransform(juce::AffineTransform(tabButtonSignSize, 0, x, 0, tabButtonSignSize, y));
-        g.fillPath(*tb.path);
+        g.fillPath(*tb.fPath);
         g.restoreState();
       } else {
-        g.drawFittedText(tb.name, tb.x, tb.y, tb.width, tb.height, juce::Justification::centred, 1);
+        g.drawFittedText(tb.fName, tb.fX, tb.fY, tb.fWidth, tb.fHeight, juce::Justification::centred, 1);
       }
       g.setColour(borderColor);
-      g.drawLine(tb.x + tb.width + 1, tb.y, tb.x + tb.width + 1, tb.y + tb.height, 1);
+      g.drawLine(tb.fX + tb.fWidth + 1, tb.fY, tb.fX + tb.fWidth + 1, tb.fY + tb.fHeight, 1);
     }
     g.setColour(borderColor);
     for (int i = 0; i < fRows; i++) {
@@ -155,7 +155,7 @@ public:
     bool hit = false;
     for (int i = 0; i < (int)fTabButtons.size(); i++) {
       auto const &tb = fTabButtons[i];
-      if (juce::Rectangle<float>(tb.x, tb.y, tb.width, tb.height).contains(e.getPosition().toFloat())) {
+      if (juce::Rectangle<float>(tb.fX, tb.fY, tb.fWidth, tb.fHeight).contains(e.getPosition().toFloat())) {
         fMouseDownCategory = i;
         updateCursor();
         repaint();
@@ -169,7 +169,7 @@ public:
     bool hit = false;
     if (0 <= fMouseDownCategory && fMouseDownCategory < (int)fTabButtons.size()) {
       auto tb = fTabButtons[fMouseDownCategory];
-      if (juce::Rectangle<float>(tb.x, tb.y, tb.width, tb.height).contains(e.getPosition().toFloat())) {
+      if (juce::Rectangle<float>(tb.fX, tb.fY, tb.fWidth, tb.fHeight).contains(e.getPosition().toFloat())) {
         hit = true;
         setActiveCategory(fMouseDownCategory);
         if (onClickCategory) {
@@ -202,7 +202,7 @@ public:
         fTyping.clear();
       }
       if (0 <= index && index < (int)fCategories.size()) {
-        fContainer->updateFilter(fCategories[index].name, fTyping);
+        fContainer->updateFilter(fCategories[index].fName, fTyping);
       }
       layout();
       fContainer->resetSignSelection();
@@ -284,7 +284,7 @@ private:
     int hitTabButton = -1;
     for (int i = 0; i < (int)fTabButtons.size(); i++) {
       auto const &tb = fTabButtons[i];
-      if (juce::Rectangle<float>(tb.x, tb.y, tb.width, tb.height).contains(p.toFloat())) {
+      if (juce::Rectangle<float>(tb.fX, tb.fY, tb.fWidth, tb.fHeight).contains(p.toFloat())) {
         hitTabButton = i;
         break;
       }
@@ -329,12 +329,12 @@ private:
         fRows++;
       }
       TabButton tb;
-      tb.x = x;
-      tb.y = y;
-      tb.width = tabButtonWidth;
-      tb.height = tabButtonHeight;
-      tb.name = cat.name;
-      tb.path = cat.path;
+      tb.fX = x;
+      tb.fY = y;
+      tb.fWidth = tabButtonWidth;
+      tb.fHeight = tabButtonHeight;
+      tb.fName = cat.fName;
+      tb.fPath = cat.fPath;
       fTabButtons.push_back(tb);
       x += tabButtonWidth + 1;
     }

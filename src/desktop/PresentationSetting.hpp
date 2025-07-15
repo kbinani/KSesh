@@ -3,13 +3,13 @@
 namespace ksesh {
 
 struct PresentationSetting {
-  float fontSize = 48;
-  float lineSpacingRatio = 0.25f;
-  float padding = 8;
-  float caretExpand = 2;
+  float fFontSize = 48;
+  float fLineSpacingRatio = 0.25f;
+  float fPadding = 8;
+  float fCaretExpand = 2;
 
   float lineSpacing() const {
-    return fontSize * lineSpacingRatio;
+    return fFontSize * fLineSpacingRatio;
   }
 };
 

@@ -3,10 +3,10 @@
 namespace ksesh {
 
 struct Sign {
-  juce::String name;
-  juce::String mdcFirst;
-  juce::String mdcTrailing;
-  std::shared_ptr<juce::Path> path;
+  juce::String fName;
+  juce::String fMdcFirst;
+  juce::String fMdcTrailing;
+  std::shared_ptr<juce::Path> fPath;
 };
 
 } // namespace ksesh

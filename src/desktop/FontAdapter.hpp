@@ -3,12 +3,6 @@
 namespace ksesh {
 
 class FontAdapter {
-  struct Data {
-    juce::Path path;
-    int dx;
-    int dy;
-  };
-
 public:
   explicit FontAdapter(std::shared_ptr<hb_font_t> const &font) : fFont(font) {
     juce::Path path = Harfbuzz::CreatePath(U"𓍹𓐼𓀀𓍹𓐼𓀀𓐽𓍺𓐽𓍺", font.get());
