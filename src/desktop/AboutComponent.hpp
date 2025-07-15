@@ -66,6 +66,10 @@ public:
                  "https://github.com/kbinani/KSesh",
                  juce::String::fromUTF8(BinaryData::KSesh_txt, BinaryData::KSesh_txtSize),
                  fContent->fString);
+    addParagraph("PVS-Studio",
+                 "https://pvs-studio.com/en/pvs-studio",
+                 "This app has been strengthened by PVS-Studio - static analyzer for C, C++, C#, and Java code.\n",
+                 fContent->fString);
     addParagraph("Egyptian Text Font",
                  "https://github.com/microsoft/font-tools/tree/main/EgyptianOpenType/font",
                  juce::String::fromUTF8(BinaryData::Egyptian_Text_Font_txt, BinaryData::Egyptian_Text_Font_txtSize),
