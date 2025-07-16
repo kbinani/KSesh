@@ -346,8 +346,9 @@ public:
     }
     std::vector<std::shared_ptr<Sign>> signs;
     for (auto const &it : SignList::Signs()) {
-      auto s = makeSign(font, it.first, it.second);
-      fAllSigns[s->fName] = s;
+      if (auto s = makeSign(font, it.first, it.second); s) {
+        fAllSigns[s->fName] = s;
+      }
     }
     for (auto const &name : signNames) {
       auto found = fAllSigns.find(name);
@@ -362,6 +363,13 @@ public:
 
 private:
   std::shared_ptr<Sign> makeSign(std::shared_ptr<FontAdapter> const &font, std::u32string const &name, std::u32string const &sign) {
+    if (sign.size() != 1) {
+      return nullptr;
+    }
+    char32_t codepoint = sign[0];
+    if (!font->fFont->has_glyph(codepoint)) {
+      return nullptr;
+    }
     auto s = std::make_shared<Sign>();
     s->fName = JuceStringFromU32String(name);
     s->fPath = std::make_shared<juce::Path>();
