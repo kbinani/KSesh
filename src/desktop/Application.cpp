@@ -1,11 +1,17 @@
 // clang-format off
 #include <juce_gui_extra/juce_gui_extra.h>
 #include <juce_cryptography/juce_cryptography.h>
+#include <juce_graphics/fonts/juce_FunctionPointerDestructor.h>
 #include "juce_TextEditor.h"
 #include "PDFGen.hpp"
 #include <iostream>
 #include "defer.hpp"
 #include <eglyf.hpp>
+
+#pragma GCC diagnostic push
+#include <juce_graphics/fonts/harfbuzz/hb.hh>
+#include <juce_graphics/fonts/harfbuzz/hb-font.hh>
+#pragma GCC diagnostic pop
 
 #include "String.hpp"
 #include "Harfbuzz.hpp"

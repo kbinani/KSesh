@@ -247,37 +247,37 @@ private:
   static void CreateCategories(std::shared_ptr<FontAdapter> const &font, std::vector<Category> &categories) {
     using namespace std::literals::string_literals;
     categories.push_back(Category("typing"));
-    categories.push_back(MakeCategory(font, "A", U"𓀀"s));
-    categories.push_back(MakeCategory(font, "B", U"𓁐"s));
-    categories.push_back(MakeCategory(font, "C", U"𓁚"s));
-    categories.push_back(MakeCategory(font, "D", U"𓁶"s));
-    categories.push_back(MakeCategory(font, "E", U"𓃒"s));
-    categories.push_back(MakeCategory(font, "F", U"𓃾"s));
-    categories.push_back(MakeCategory(font, "G", U"𓄿"s));
-    categories.push_back(MakeCategory(font, "H", U"𓅿"s));
-    categories.push_back(MakeCategory(font, "I", U"𓆈"s));
-    categories.push_back(MakeCategory(font, "K", U"𓆛"s));
-    categories.push_back(MakeCategory(font, "L", U"𓆣"s));
-    categories.push_back(MakeCategory(font, "M", U"𓆭"s));
-    categories.push_back(MakeCategory(font, "N", U"𓇯"s));
-    categories.push_back(MakeCategory(font, "O", U"𓉐"s));
-    categories.push_back(MakeCategory(font, "P", U"𓊛"s));
-    categories.push_back(MakeCategory(font, "Q", U"𓊨"s));
-    categories.push_back(MakeCategory(font, "R", U"𓊯"s));
-    categories.push_back(MakeCategory(font, "S", U"𓋑"s));
-    categories.push_back(MakeCategory(font, "T", U"𓌇"s));
-    categories.push_back(MakeCategory(font, "U", U"𓌳"s));
-    categories.push_back(MakeCategory(font, "V", U"𓍢"s));
-    categories.push_back(MakeCategory(font, "W", U"𓎯"s));
-    categories.push_back(MakeCategory(font, "X", U"𓏏"s));
-    categories.push_back(MakeCategory(font, "Y", U"𓏛"s));
-    categories.push_back(MakeCategory(font, "Z", U"𓏤"s));
-    categories.push_back(MakeCategory(font, "Aa", U"𓐍"s));
+    AppendCategory(font, "A", categories);
+    AppendCategory(font, "B", categories);
+    AppendCategory(font, "C", categories);
+    AppendCategory(font, "D", categories);
+    AppendCategory(font, "E", categories);
+    AppendCategory(font, "F", categories);
+    AppendCategory(font, "G", categories);
+    AppendCategory(font, "H", categories);
+    AppendCategory(font, "I", categories);
+    AppendCategory(font, "K", categories);
+    AppendCategory(font, "L", categories);
+    AppendCategory(font, "M", categories);
+    AppendCategory(font, "N", categories);
+    AppendCategory(font, "O", categories);
+    AppendCategory(font, "P", categories);
+    AppendCategory(font, "Q", categories);
+    AppendCategory(font, "R", categories);
+    AppendCategory(font, "S", categories);
+    AppendCategory(font, "T", categories);
+    AppendCategory(font, "U", categories);
+    AppendCategory(font, "V", categories);
+    AppendCategory(font, "W", categories);
+    AppendCategory(font, "X", categories);
+    AppendCategory(font, "Y", categories);
+    AppendCategory(font, "Z", categories);
+    AppendCategory(font, "Aa", categories);
     categories.push_back(Category("tall"));
     categories.push_back(Category("wide"));
     categories.push_back(Category("small"));
-    // categories.push_back(MakeCategory(font, "NL", U"𓈠");
-    // categories.push_back(MakeCategory(font, "NU", U"𓈶");
+    AppendCategory(font, "NL", categories);
+    AppendCategory(font, "NU", categories);
   }
 
   void updateButtonHit(juce::Point<int> const &p) {
@@ -304,11 +304,33 @@ private:
     }
   }
 
-  static Category MakeCategory(std::shared_ptr<FontAdapter> const &font, juce::String const &name, std::u32string const &sign) {
-    auto path = std::make_shared<juce::Path>();
-    *path = Harfbuzz::CreatePath(sign, font->fFont.get());
-    path->applyTransform(juce::AffineTransform::translation(0, -font->fY).scaled(font->fScale));
-    return Category(name, path);
+  static void AppendCategory(std::shared_ptr<FontAdapter> const &font, juce::String const &name, std::vector<Category> &categories) {
+    for (auto [mdc, codepoint] : SignList::Signs()) {
+      if (codepoint.size() != 1) {
+        continue;
+      }
+      auto m = JuceStringFromU32String(mdc);
+      if (!m.startsWith(name)) {
+        continue;
+      }
+      if (m.length() <= name.length()) {
+        continue;
+      }
+      auto first = m.substring(name.length(), name.length() + 1);
+      if (!first.containsAnyOf("0123456789")) {
+        continue;
+      }
+      char32_t cp = codepoint[0];
+      if (!font->fFont->has_glyph(cp)) {
+        continue;
+      }
+      auto path = std::make_shared<juce::Path>();
+      *path = Harfbuzz::CreatePath(codepoint, font->fFont.get());
+      path->applyTransform(juce::AffineTransform::translation(0, -font->fY).scaled(font->fScale));
+      Category category(name, path);
+      categories.push_back(category);
+      break;
+    }
   }
 
   void layout() {

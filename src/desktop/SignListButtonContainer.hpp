@@ -196,8 +196,8 @@ public:
       }
     } else if (activeCategory == "tall" || activeCategory == "wide" || activeCategory == "small") {
       std::vector<juce::String> list;
-      // clang-format off
       if (activeCategory == "tall") {
+        // clang-format off
         list = {
           "M40", "Aa28", "Aa29", "P11", "D16", "T34", "T35", "U28", "U29", "U32", "U33", "S43", "U36", "T8",
           "T8A", "M13", "M17", "H6", "H6A", "M4", "M12", "S29", "M29", "M30", "S37", "R14", "R15", "R16", "R17", "P6", "S40",
@@ -207,7 +207,9 @@ public:
           "F31", "M32", "L7", "V17", "V18", "S34", "V39", "Q7", "T18", "T19", "T20", "R21", "R11", "O28", "O11", "O36", "Aa32",
           "V28", "V29",
         };
+        // clang-format on
       } else if (activeCategory == "wide") {
+        // clang-format off
         list = {
           "N1", "N37", "N38", "N39", "S32", "N18", "X4", "X5", "N17", "N16", "N20",
           "Aa10", "Aa11", "Aa12", "Aa13", "Aa14", "Aa15", "N35", "Aa8", "Aa9", "V26", "V27", "R24", "W8", "V32",
@@ -218,7 +220,9 @@ public:
           "O31", "N36", "D14", "D21", "D22", "T30", "T31", "T33", "D48", "V30", "V31", "V31A", "W3", "S12",
           "N30", "O42", "O43", "V16"
         };
+        // clang-format on
       } else if (activeCategory == "small") {
+        // clang-format off
         list = {
           "Q3", "O39", "Z8", "O47", "N22", "N21", "N23", "N29", "X7", "O45", "O46", "Y6", "M35", "X3", "X2",
           "X1", "N28", "Aa17", "I6", "W10", "W10A", "Aa4", "R7", "M39", "M36", "F43", "F41", "N34", "U30", "W11", "W12",
@@ -227,8 +231,8 @@ public:
           "D12", "S21", "N5", "N9", "N10", "Aa1", "O50", "O49", "O48", "X6", "V9", "S10", "N6", "N8", "S11", "N15", "M42",
           "F38", "V1", "Z7", "Aa16", "Z9", "Z10",
         };
+        // clang-format on
       }
-      // clang-format on
       for (auto const &key : list) {
         auto sign = fAllSigns.find(key);
         if (sign == fAllSigns.end()) {

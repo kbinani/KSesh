@@ -1,12 +1,5 @@
 #pragma once
 
-#pragma GCC diagnostic push
-
-#include <juce_graphics/fonts/harfbuzz/hb.hh>
-#include <juce_graphics/fonts/juce_FunctionPointerDestructor.h>
-
-#pragma GCC diagnostic pop
-
 namespace ksesh {
 
 using HbBlobUniquePtr = std::unique_ptr<hb_blob_t, juce::FunctionPointerDestructor<hb_blob_destroy>>;
