@@ -25,7 +25,15 @@ public:
     fFontFutureNotoSans = promiseNotoSans.get_future();
     std::thread(&Self::transformFont, this, std::move(promiseNotoSans), FontFamily::NotoSans).detach();
 
+    auto base = juce::Colour::fromRGB(0x50, 0x9B, 0xEA);
+    fForegroundColor = base.darker().darker().darker();
+    fBackgroundColor = base.brighter();
+
     fAppIcon = juce::ImageFileFormat::loadFrom(BinaryData::icon_512x512_png, BinaryData::icon_512x512_pngSize);
+    fStart = std::chrono::steady_clock::now();
+    appendLog("Loading EgyptianText font...");
+    appendLog("Loading NewGardiner font...");
+    appendLog("Loading Noto Sans Egyptian Hieroglyphs font...");
   }
 
   ~FontLoaderComponent() {
@@ -41,12 +49,12 @@ public:
   }
 
   void paint(juce::Graphics &g) override {
-    g.fillAll(juce::Colours::white.darker());
+    g.fillAll(fBackgroundColor);
     if (fAppIcon.isValid()) {
       g.setOpacity(1.0f);
       g.drawImageWithin(fAppIcon, 30, 30, 120, 120, {});
     }
-    g.setColour(juce::Colours::black.brighter());
+    g.setColour(fForegroundColor);
     g.setFont(50);
     float x = 170;
     float baseline = 140;
@@ -56,13 +64,30 @@ public:
     g.drawSingleLineText(" " JUCE_APPLICATION_VERSION_STRING, x, baseline);
   }
 
+  void paintOverChildren(juce::Graphics &g) override {
+    float size = 12;
+    float x = 30;
+    float y = getHeight() - 30 - size * (fLogLines.size() - 1);
+    g.setColour(fForegroundColor);
+    auto font = juce::Font(juce::FontOptions(juce::Font::getDefaultMonospacedFontName(), size, juce::Font::plain));
+    g.setFont(font);
+    for (auto const &line : fLogLines) {
+      g.drawSingleLineText(line, x, y);
+      y += size;
+    }
+  }
+
   void handleAsyncUpdate() override {
     if (!fFontSet.fEgyptianText && fFontFutureEgyptianText.valid()) {
       if (fFontFutureEgyptianText.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {
         auto font = fFontFutureEgyptianText.get();
         if (font) {
           fFontSet.fEgyptianText = font;
+          appendLog("Successfully loaded EgyptianText font.");
+        } else {
+          appendLog("Failed to load EgyptianText font.");
         }
+        repaint();
       }
     }
     if (!fFontSet.fNewGardiner && fFontFutureNewGardiner.valid()) {
@@ -70,7 +95,11 @@ public:
         auto font = fFontFutureNewGardiner.get();
         if (font) {
           fFontSet.fNewGardiner = font;
+          appendLog("Successfully loaded NewGardiner font.");
+        } else {
+          appendLog("Failed to load NewGardiner font.");
         }
+        repaint();
       }
     }
     if (!fFontSet.fNotoSans && fFontFutureNotoSans.valid()) {
@@ -78,17 +107,30 @@ public:
         auto font = fFontFutureNotoSans.get();
         if (font) {
           fFontSet.fNotoSans = font;
+          appendLog("Successfully loaded Noto Sans Egyptian Hieroglyphs font.");
+        } else {
+          appendLog("Failed to load Noto Sans Egyptian Hieroglyphs font.");
         }
+        repaint();
       }
     }
     if (!fFontFutureEgyptianText.valid() && !fFontFutureNewGardiner.valid() && !fFontFutureNotoSans.valid() && fDelegate) {
       if (fFontSet.fEgyptianText) {
         fDelegate->fontLoaderComponentDidFinishLoadingFont(fFontSet);
+        appendLog("Font loading completed.");
+      } else {
+        appendLog("Font loading failed.");
       }
     }
   }
 
 private:
+  void appendLog(juce::String const &m) {
+    float elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - fStart).count() / 1000.0f;
+    auto prefix = std::format("[{0:7.3f}]", elapsed);
+    fLogLines.push_back(juce::String(prefix) + " " + m);
+  }
+
   void transformFont(std::promise<std::shared_ptr<FontAdapter>> promise, FontFamily fontFamily) {
     defer {
       triggerAsyncUpdate();
@@ -178,6 +220,10 @@ private:
   std::future<std::shared_ptr<FontAdapter>> fFontFutureNotoSans;
   FontSet fFontSet;
   juce::Image fAppIcon;
+  std::vector<juce::String> fLogLines;
+  juce::Colour fForegroundColor;
+  juce::Colour fBackgroundColor;
+  std::chrono::steady_clock::time_point fStart;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(FontLoaderComponent)
 };
