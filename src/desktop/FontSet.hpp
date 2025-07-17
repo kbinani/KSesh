@@ -16,6 +16,10 @@ struct FontSet {
       return fEgyptianText;
     }
   }
+
+  bool ok() const {
+    return fEgyptianText && fNewGardiner && fNotoSans;
+  }
 };
 
 } // namespace ksesh

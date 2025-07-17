@@ -27,6 +27,9 @@ class FilePath {
 public:
   static void PrepareApplicationDataDirectory() {
     auto dir = FontCacheDirectory();
+#if JUCE_DEBUG
+    juce::Logger::outputDebugString("application data directory: " + ApplicationDataDirectory().getFullPathName());
+#endif
     dir.createDirectory();
   }
 

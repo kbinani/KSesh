@@ -13,6 +13,7 @@
 #include <juce_graphics/fonts/harfbuzz/hb-font.hh>
 #pragma GCC diagnostic pop
 
+#include "Status.hpp"
 #include "String.hpp"
 #include "Harfbuzz.hpp"
 #include "FontAdapter.hpp"
@@ -181,10 +182,10 @@ public:
     fLaf.swap(laf);
   }
 
-  void fontLoaderComponentDidFinishLoadingFont(FontSet const &fontSet) override {
+  void fontLoaderComponentDidFinishLoadingFont(FontSet const &fontSet, bool error) override {
     auto loader = fFontLoader.release();
     if (loader) {
-      loader->deleteAfterDelay(juce::RelativeTime::seconds(1), false);
+      loader->deleteAfterDelay(juce::RelativeTime::seconds(error ? 31556926 : 3), true);
     }
 
     fMainWindow = std::make_unique<MainWindow>(getApplicationName(), fCommandManager, fSetting, fontSet);

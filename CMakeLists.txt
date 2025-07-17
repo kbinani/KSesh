@@ -22,6 +22,7 @@ if (MSVC)
     $<$<CONFIG:RelWithDebInfo>:/MT>
     $<$<CONFIG:MinSizeRel>:/MT>
     /MP
+    /d1trimfile:${CMAKE_SOURCE_DIR}/
   )
   set(ksesh_icon_small "res/app-icon/windows/icon_512x512.png")
   set(ksesh_icon_big "res/app-icon/windows/icon_512x512@2x.png")
@@ -117,6 +118,7 @@ list(APPEND ksesh_files
   src/desktop/EMFExporter.hpp
   src/desktop/PDFExporter.hpp
   src/desktop/ScopedHANDLE.hpp
+  src/desktop/Status.hpp
 )
 if (APPLE)
   list(APPEND ksesh_files src/desktop/Application.mm)
@@ -165,7 +167,7 @@ elseif (APPLE)
   endforeach()
 endif()
 
-target_include_directories(ksesh PRIVATE deps/PDFGen deps/eglyf/include deps/eglyf/src)
+target_include_directories(ksesh PRIVATE deps/PDFGen deps/eglyf/include)
 target_link_libraries(ksesh
   PRIVATE
     ksesh-binary-data
