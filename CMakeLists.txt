@@ -162,6 +162,12 @@ if (MSVC)
   target_compile_options(ksesh PRIVATE $<$<CONFIG:Release>:/Zi>)
   target_link_options(ksesh PRIVATE $<$<CONFIG:Release>:/DEBUG>)
 elseif (APPLE)
+  set_target_properties(ksesh
+    PROPERTIES
+      XCODE_ATTRIBUTE_GCC_GENERATE_DEBUGGING_SYMBOLS[variant=Release] "YES"
+      XCODE_ATTRIBUTE_DEBUG_INFORMATION_FORMAT "dwarf-with-dsym"
+      XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "$(inherited)"
+  )
   foreach (target IN ITEMS ksesh ksesh-binary-data)
     set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH $<IF:$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>,YES,NO>)
   endforeach()
