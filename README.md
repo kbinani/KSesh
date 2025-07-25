@@ -20,20 +20,23 @@ An Interactive Hieroglyphic Editor, available on Windows, macOS, and the Web.
 
 - Windows
   ```
-  mkdir build
-  cd build
-  cmake ..
-  cmake --build . --target ksesh --config Release --parallel
-  ksesh_artifacts/Release/KSesh.exe
+  cmake -B build
+  cmake --build ./build --target ksesh --config Release --parallel
+  ./build/ksesh_artifacts/Release/KSesh.exe
   ```
 
 - macOS
   ```
-  mkdir build
-  cd build
-  cmake .. -GXcode
-  cmake --build . --target ksesh --config Release --parallel
-  open ./ksesh_artefacts/Release/KSesh.app
+  cmake -B build -G Xcode
+  cmake --build ./build --target ksesh --config Release --parallel
+  open ./build/ksesh_artefacts/Release/KSesh.app
+  ```
+
+- iOS
+  ```
+  cmake -B build -G Xcode -DCMAKE_SYSTEM_NAME=iOS
+  open build/KSesh.xcodeproj
+  # Choose the target "ksesh" then run on the simulator or on your device.
   ```
 
 - Web
