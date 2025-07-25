@@ -1,12 +1,18 @@
 cmake_minimum_required(VERSION 3.16)
-project(KSesh VERSION 2.0.1)
+project(KSesh VERSION 2.0.1 LANGUAGES CXX Swift)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(ksesh_macos_deployment_target "13.3")
-set(ksesh_apple_development_team_id "XM695N4A7T")
+if (APPLE)
+  if ("${CMAKE_SYSTEM_NAME}" STREQUAL "iOS")
+    set(ksesh_deployment_target "16.3")
+  else()
+    set(ksesh_deployment_target "13.3")
+  endif()
+  set(ksesh_apple_development_team_id "XM695N4A7T")
+endif()
 
 if (MSVC)
   add_definitions(
@@ -27,10 +33,9 @@ if (MSVC)
   set(ksesh_icon_small "res/app-icon/windows/icon_512x512.png")
   set(ksesh_icon_big "res/app-icon/windows/icon_512x512@2x.png")
 elseif (APPLE)
-  set(CMAKE_OSX_DEPLOYMENT_TARGET "${ksesh_macos_deployment_target}")
+  set(CMAKE_OSX_DEPLOYMENT_TARGET "${ksesh_deployment_target}")
   set(CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "${ksesh_apple_development_team_id}")
   set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
-  add_compile_options(-Wno-shorten-64-to-32)
   set(ksesh_icon_small "res/app-icon/macos/icon_512x512.png")
   set(ksesh_icon_big "res/app-icon/macos/icon_512x512@2x.png")
 endif()
@@ -203,6 +208,27 @@ if (MSVC)
     PRIVATE
       NOMINMAX
       WIN32_LEAN_AND_MEAN
+  )
+endif()
+
+if ("${CMAKE_SYSTEM_NAME}" STREQUAL "iOS")
+  add_library(ksesh-keyboard
+    MODULE
+      src/keyboard/ios/KeyboardViewController.swift
+      src/keyboard/ios/Info.plist
+  )
+  set_target_properties(ksesh-keyboard
+    PROPERTIES
+      BUNDLE "YES"
+      XCODE_PRODUCT_TYPE "com.apple.product-type.app-extension"
+      XCODE_ATTRIBUTE_INFOPLIST_FILE "${CMAKE_CURRENT_SOURCE_DIR}/src/keyboard/ios/Info.plist"
+      XCODE_ATTRIBUTE_PRODUCT_NAME "\$(TARGET_NAME)"
+      XCODE_ATTRIBUTE_LD_RUNPATH_SEARCH_PATHS "\$(inherited)\n@executable_path/Frameworks\n@executable_path/../../Frameworks"
+      XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.github.kbinani.ksesh.keyboard"
+  )
+  set_target_properties(ksesh
+    PROPERTIES
+      XCODE_EMBED_APP_EXTENSIONS ksesh-keyboard
   )
 endif()
 

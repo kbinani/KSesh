@@ -17,7 +17,7 @@ node_modules
 *.exe
 *.mp4
 *.gly
-/xcode
+/xcode*
 /build
 /pkg/windows-store/AppPackages
 /pkg/windows-store/BundleArtifacts
