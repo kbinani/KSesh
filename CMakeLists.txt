@@ -219,14 +219,14 @@ endif()
 if ("${CMAKE_SYSTEM_NAME}" STREQUAL "iOS")
   add_library(ksesh-keyboard
     MODULE
-      src/keyboard/ios/KeyboardViewController.swift
-      src/keyboard/ios/Info.plist
+      src/ime/ios/KeyboardViewController.swift
+      src/ime/ios/Info.plist
   )
   set_target_properties(ksesh-keyboard
     PROPERTIES
       BUNDLE "YES"
       XCODE_PRODUCT_TYPE "com.apple.product-type.app-extension"
-      XCODE_ATTRIBUTE_INFOPLIST_FILE "${CMAKE_CURRENT_SOURCE_DIR}/src/keyboard/ios/Info.plist"
+      XCODE_ATTRIBUTE_INFOPLIST_FILE "${CMAKE_CURRENT_SOURCE_DIR}/src/ime/ios/Info.plist"
       XCODE_ATTRIBUTE_PRODUCT_NAME "\$(TARGET_NAME)"
       XCODE_ATTRIBUTE_LD_RUNPATH_SEARCH_PATHS "\$(inherited)\n@executable_path/Frameworks\n@executable_path/../../Frameworks"
       XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.github.kbinani.ksesh.keyboard"
