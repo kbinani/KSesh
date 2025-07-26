@@ -6,4 +6,5 @@
   npm run fmt
 
   git ls-files . | grep -e '\.cpp$' -e '\.hpp$' -e '\.mm$' | grep -v 'juce_TextEditor' | xargs -P$(nproc) -n1 clang-format -i
+  git ls-files . | grep -e '\.swift$' | xargs -P$(nproc) -n1 swift format -i
 )
