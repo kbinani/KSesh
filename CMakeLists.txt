@@ -225,6 +225,8 @@ if ("${CMAKE_SYSTEM_NAME}" STREQUAL "iOS")
       XCODE_ATTRIBUTE_PRODUCT_NAME "\$(TARGET_NAME)"
       XCODE_ATTRIBUTE_LD_RUNPATH_SEARCH_PATHS "\$(inherited)\n@executable_path/Frameworks\n@executable_path/../../Frameworks"
       XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.github.kbinani.ksesh.keyboard"
+      XCODE_ATTRIBUTE_MACH_O_TYPE "mh_execute"
+      XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2"
   )
   set_target_properties(ksesh
     PROPERTIES
