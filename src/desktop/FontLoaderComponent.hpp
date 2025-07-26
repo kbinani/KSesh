@@ -22,7 +22,13 @@ public:
     virtual void fontLoaderComponentDidFinishLoadingFont(FontSet const &fontSet, bool error) = 0;
   };
 
-  explicit FontLoaderComponent(Delegate *delegate) : juce::SplashScreen(JUCE_APPLICATION_NAME_STRING, 640, 360, true), fDelegate(delegate) {
+  explicit FontLoaderComponent(Delegate *delegate) :
+#if JUCE_IOS || JUCE_ANDROID
+                                                     juce::SplashScreen(JUCE_APPLICATION_NAME_STRING, juce::Image(juce::Image::PixelFormat::RGB, 640, 360, true), true),
+#else
+                                                     juce::SplashScreen(JUCE_APPLICATION_NAME_STRING, 640, 360, true),
+#endif
+                                                     fDelegate(delegate) {
     std::promise<LoadResult> promiseEgyptianText;
     fFontFutureEgyptianText = promiseEgyptianText.get_future();
     std::thread(&Self::loadEgyptianTextFont, this, std::move(promiseEgyptianText)).detach();
