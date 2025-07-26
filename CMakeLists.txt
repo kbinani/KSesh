@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.16)
-project(KSesh VERSION 2.0.1 LANGUAGES CXX Swift)
+project(KSesh VERSION 2.0.1 LANGUAGES CXX)
+
+if (APPLE)
+  enable_language(Swift)
+endif()
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -35,10 +39,15 @@ if (MSVC)
 elseif (APPLE)
   set(CMAKE_OSX_DEPLOYMENT_TARGET "${ksesh_deployment_target}")
   set(CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "${ksesh_apple_development_team_id}")
+  set(CMAKE_XCODE_ATTRIBUTE_SWIFT_VERSION "6.0")
+  set(CMAKE_XCODE_ATTRIBUTE_DEBUG_INFORMATION_FORMAT "dwarf-with-dsym")
+  set(CMAKE_XCODE_ATTRIBUTE_GCC_GENERATE_DEBUGGING_SYMBOLS[variant=Release] "YES")
+  set(CMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH $<IF:$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>,YES,NO>)
   set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
   if ("${CMAKE_SYSTEM_NAME}" STREQUAL "iOS")
     set(ksesh_icon_small "res/app-icon/windows/icon_512x512.png")
     set(ksesh_icon_big "res/app-icon/windows/icon_512x512@2x.png")
+    set(CMAKE_XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2")
   else()
     set(ksesh_icon_small "res/app-icon/macos/icon_512x512.png")
     set(ksesh_icon_big "res/app-icon/macos/icon_512x512@2x.png")
@@ -174,13 +183,8 @@ if (MSVC)
 elseif (APPLE)
   set_target_properties(ksesh
     PROPERTIES
-      XCODE_ATTRIBUTE_GCC_GENERATE_DEBUGGING_SYMBOLS[variant=Release] "YES"
-      XCODE_ATTRIBUTE_DEBUG_INFORMATION_FORMAT "dwarf-with-dsym"
       XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "$(inherited)"
   )
-  foreach (target IN ITEMS ksesh ksesh-binary-data)
-    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH $<IF:$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>,YES,NO>)
-  endforeach()
 endif()
 
 target_include_directories(ksesh PRIVATE deps/PDFGen deps/eglyf/include)
@@ -224,14 +228,12 @@ if ("${CMAKE_SYSTEM_NAME}" STREQUAL "iOS")
   )
   set_target_properties(ksesh-keyboard
     PROPERTIES
-      BUNDLE "YES"
       XCODE_PRODUCT_TYPE "com.apple.product-type.app-extension"
       XCODE_ATTRIBUTE_INFOPLIST_FILE "${CMAKE_CURRENT_SOURCE_DIR}/src/ime/ios/Info.plist"
       XCODE_ATTRIBUTE_PRODUCT_NAME "\$(TARGET_NAME)"
       XCODE_ATTRIBUTE_LD_RUNPATH_SEARCH_PATHS "\$(inherited)\n@executable_path/Frameworks\n@executable_path/../../Frameworks"
       XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.github.kbinani.ksesh.keyboard"
       XCODE_ATTRIBUTE_MACH_O_TYPE "mh_execute"
-      XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2"
   )
   set_target_properties(ksesh
     PROPERTIES
