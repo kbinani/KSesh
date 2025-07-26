@@ -6,9 +6,9 @@ class FilePath {
   FilePath() = delete;
 
   static juce::File ApplicationDataDirectory() {
-#if defined(JUCE_WINDOWS)
+#if JUCE_WINDOWS
     return juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory).getChildFile(".ksesh");
-#elif defined(JUCE_MAC)
+#elif JUCE_MAC || JUCE_IOS
     return juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory).getChildFile("Application Support").getChildFile(".ksesh");
 #endif
     return juce::File();
