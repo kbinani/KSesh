@@ -1225,7 +1225,7 @@ private:
     I(U"rw"s, U"𓃭"s);
     I(U"l"s, U"𓃭"s);
     I(U"Aby"s, U"𓃮"s);
-    I(U"wn"s, U"𓃺"s);
+    I(U"wn"s, U"𓃹"s);
     I(U"HAt"s, U"𓄂"s);
     I(U"SsA"s, U"𓄃"s);
     I(U"wsr"s, U"𓄊"s);
@@ -1270,7 +1270,7 @@ private:
     I(U"bA"s, U"𓅡"s);
     I(U"baHi"s, U"𓅤"s);
     I(U"aq"s, U"𓅧"s);
-    I(U"wr"s, U"𓅩"s);
+    I(U"wr"s, U"𓅨"s);
     I(U"gb"s, U"𓅬"s);
     I(U"zA"s, U"𓅭"s);
     I(U"pA"s, U"𓅮"s);
