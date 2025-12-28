@@ -19,6 +19,7 @@ node_modules
 *.gly
 /xcode*
 /build
+/build-ios
 /pkg/windows-store/AppPackages
 /pkg/windows-store/BundleArtifacts
 /pkg/windows-store/bin
