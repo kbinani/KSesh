@@ -146,6 +146,7 @@ else()
 endif()
 
 target_sources(ksesh PRIVATE ${ksesh_files})
+list(APPEND all_files ${ksesh_files})
 
 juce_add_binary_data(ksesh-binary-data
   NAMESPACE ksesh::BinaryData
@@ -198,11 +199,12 @@ target_link_libraries(ksesh
     juce::juce_recommended_lto_flags
 )
 
+juce_add_console_app(ksesh-test)
 list(APPEND test_files
   test/main.cpp
 )
-juce_add_console_app(ksesh-test)
-target_sources(ksesh-test PRIVATE test/main.cpp ${test_files})
+target_sources(ksesh-test PRIVATE ${test_files})
+list(APPEND all_files ${test_files})
 target_include_directories(ksesh-test PRIVATE deps/doctest/doctest src/desktop)
 target_link_libraries(ksesh-test
   PRIVATE
@@ -220,12 +222,16 @@ if (MSVC)
   )
 endif()
 
-if ("${CMAKE_SYSTEM_NAME}" STREQUAL "iOS")
-  add_library(ksesh-keyboard
-    MODULE
-      src/ime/ios/KeyboardViewController.swift
-      src/ime/ios/Info.plist
+if (IOS)
+  list(APPEND keyboard_files
+    src/ime/ios/KeyboardViewController.swift
+    src/ime/ios/Button.swift
+    src/ime/ios/ContainerView.swift
+    src/ime/ios/Info.plist
   )
+  add_library(ksesh-keyboard MODULE)
+  target_sources(ksesh-keyboard PRIVATE ${keyboard_files})
+  list(APPEND all_files ${keyboard_files})
   set_target_properties(ksesh-keyboard
     PROPERTIES
       XCODE_PRODUCT_TYPE "com.apple.product-type.app-extension"
@@ -241,7 +247,7 @@ if ("${CMAKE_SYSTEM_NAME}" STREQUAL "iOS")
   )
 endif()
 
-source_group(TREE ${CMAKE_CURRENT_LIST_DIR} FILES ${ksesh_files} ${test_files})
+source_group(TREE ${CMAKE_CURRENT_LIST_DIR} FILES ${all_files})
 
 if (MSVC)
   configure_file(
