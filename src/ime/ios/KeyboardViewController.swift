@@ -92,6 +92,7 @@ class KeyboardViewController: UIInputViewController {
     allButtons.append(k)
     let ret = Button(keyCapRole: .right)
     ret.rightIcon = UIImageView(image: UIImage(systemName: "return"))
+    ret.addTarget(self, action: #selector(returnKeyPressed(_:)), for: [.touchUpInside, .touchDownRepeat])
     self.ret = ret
     allButtons.append(ret)
     
@@ -153,6 +154,7 @@ class KeyboardViewController: UIInputViewController {
     self.aa = aa
     allButtons.append(aa)
     let space = Button(keyCapRole: .left)
+    space.addTarget(self, action: #selector(spaceKeyPressed(_:)), for: .touchUpInside)
     self.space = space
     allButtons.append(space)
     let vj = Button(middle: ":")
@@ -194,6 +196,14 @@ class KeyboardViewController: UIInputViewController {
     
     globe.addTarget(self, action: #selector(handleInputModeList(from:with:)), for: .allTouchEvents)
     close.addTarget(self, action: #selector(dismissKeyboard), for: .touchUpInside)
+  }
+  
+  @objc private func returnKeyPressed(_ button: UIView) {
+    textDocumentProxy.insertText("\n")
+  }
+  
+  @objc private func spaceKeyPressed(_ button: UIView) {
+    textDocumentProxy.insertText(" ")
   }
   
   private func updateHeightConstraint() {
