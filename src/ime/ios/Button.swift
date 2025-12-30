@@ -70,6 +70,12 @@ class Button: UIButton {
 
     let bottomLabel = UILabel()
     self.bottomLabel = bottomLabel
+    if keyCapRole != .hieroglyph {
+      let base = UIFont.systemFont(ofSize: UIFont.labelFontSize)
+      bottomLabel.font = base.fontDescriptor.withDesign(.serif).map({ descriptor in
+        UIFont(descriptor: descriptor, size: UIFont.labelFontSize)
+      })
+    }
     self.addSubview(bottomLabel)
     
     topLabel.textAlignment = .left
@@ -154,6 +160,8 @@ class Button: UIButton {
 
     if keyCapRole == .hieroglyph {
       bottomLabel.font = UIFont(name: "EglyfDebugNG-Regular", size: size.height * 0.5)
+    } else {
+      bottomLabel.font = bottomLabel.font.withSize(size.height * 0.3)
     }
     bottomLabel.frame = .init(
       x: hMargin,
