@@ -2,8 +2,30 @@ import UIKit
 
 class Button: UIButton {
   enum KeyCapRole {
-    case regular
-    case special
+    case left
+    case right
+    case hieroglyph
+  }
+  
+  var leftIcon: UIImageView? {
+    didSet {
+      oldValue?.removeFromSuperview()
+      if let leftIcon {
+        leftIcon.tintColor = bottomLabel.textColor
+        addSubview(leftIcon)
+        setNeedsLayout()
+      }
+    }
+  }
+  var rightIcon: UIImageView? {
+    didSet {
+      oldValue?.removeFromSuperview()
+      if let rightIcon {
+        rightIcon.tintColor = bottomLabel.textColor
+        addSubview(rightIcon)
+        setNeedsLayout()
+      }
+    }
   }
   
   private let keyCapRole: KeyCapRole
@@ -22,7 +44,7 @@ class Button: UIButton {
   }
   
   convenience init(top: String? = nil, middle: String? = nil, bottom: String? = nil) {
-    self.init(keyCapRole: .regular)
+    self.init(keyCapRole: .hieroglyph)
     self.topLabel.text = top
     self.middleLabel.text = middle
     self.bottomLabel.text = bottom
@@ -37,22 +59,32 @@ class Button: UIButton {
   private func commonInit() {
     self.autoresizesSubviews = false
     self.translatesAutoresizingMaskIntoConstraints = true
-    
+
     let topLabel = UILabel()
-    let middleLabel = UILabel()
-    let bottomLabel = UILabel()
     self.topLabel = topLabel
-    self.middleLabel = middleLabel
-    self.bottomLabel = bottomLabel
-    self.addSubview(middleLabel)
     self.addSubview(topLabel)
+
+    let middleLabel = UILabel()
+    self.addSubview(middleLabel)
+    self.middleLabel = middleLabel
+
+    let bottomLabel = UILabel()
+    self.bottomLabel = bottomLabel
     self.addSubview(bottomLabel)
     
     topLabel.textAlignment = .left
     topLabel.contentMode = .top
     middleLabel.textAlignment = .center
     middleLabel.contentMode = .center
-    bottomLabel.textAlignment = .right
+    middleLabel.baselineAdjustment = .alignCenters
+    switch keyCapRole {
+    case .left:
+      bottomLabel.textAlignment = .left
+    case .right:
+      bottomLabel.textAlignment = .right
+    case .hieroglyph:
+      bottomLabel.textAlignment = .right
+    }
     bottomLabel.contentMode   = .bottom
     
     self.configuration = UIButton.Configuration.filled()
@@ -72,9 +104,11 @@ class Button: UIButton {
     }
     CATransaction.setDisableActions(true)
     let textColor: UIColor
+    let topTextColor: UIColor
     let baseBackgroundColor: UIColor
     if case .dark = appearance {
       textColor = UIColor.white
+      topTextColor = #colorLiteral(red: 0.4665528536, green: 0.4665527344, blue: 0.4665527344, alpha: 1)
       if isHighlighted {
         baseBackgroundColor = #colorLiteral(red: 0.4863533378, green: 0.4863144159, blue: 0.4910370708, alpha: 1)
       } else {
@@ -82,25 +116,19 @@ class Button: UIButton {
       }
     } else {
       textColor = UIColor.black
-      switch keyCapRole {
-      case .regular:
-        if isHighlighted {
-          baseBackgroundColor = #colorLiteral(red: 0.6213026643, green: 0.6484116316, blue: 0.6926683784, alpha: 1)
-        } else {
-          baseBackgroundColor = .white
-        }
-      case .special:
-        if isHighlighted {
-          baseBackgroundColor = .white
-        } else {
-          baseBackgroundColor = #colorLiteral(red: 0.6235535145, green: 0.6482734084, blue: 0.6943539977, alpha: 1)
-        }
+      topTextColor = #colorLiteral(red: 0.7524755597, green: 0.7555301785, blue: 0.7636918426, alpha: 1)
+      if isHighlighted {
+        baseBackgroundColor = #colorLiteral(red: 0.6213026643, green: 0.6484116316, blue: 0.6926683784, alpha: 1)
+      } else {
+        baseBackgroundColor = .white
       }
     }
     configuration?.baseBackgroundColor = baseBackgroundColor
-    topLabel.textColor = textColor
+    topLabel.textColor = topTextColor
     middleLabel.textColor = textColor
     bottomLabel.textColor = textColor
+    leftIcon?.tintColor = textColor
+    rightIcon?.tintColor = textColor
   }
   
   override func layoutSubviews() {
@@ -108,24 +136,54 @@ class Button: UIButton {
     let hMargin: CGFloat = 8
     let vMargin: CGFloat = 8
     let width = size.width - 2 * hMargin
+    let iconSizeRatio: CGFloat = 0.3
+
     topLabel.frame = .init(
       x: hMargin,
       y: vMargin,
       width: width,
       height: topLabel.font.pointSize
     )
+
     middleLabel.frame = .init(
       x: hMargin,
       y: size.height * 0.5 - middleLabel.font.pointSize * 0.5,
       width: width,
       height: middleLabel.font.pointSize
     )
+
+    if keyCapRole == .hieroglyph {
+      bottomLabel.font = UIFont(name: "EglyfDebugNG-Regular", size: size.height * 0.5)
+    }
     bottomLabel.frame = .init(
       x: hMargin,
       y: size.height - vMargin - bottomLabel.font.pointSize,
       width: width,
       height: bottomLabel.font.pointSize
     )
+    if let leftIcon, let image = leftIcon.image {
+      leftIcon.tintColor = bottomLabel.textColor
+      let iconHeight = size.height * iconSizeRatio
+      let iconWidth = iconHeight * image.size.width / image.size.height
+      leftIcon.frame = .init(
+        x: hMargin,
+        y: size.height - vMargin - iconHeight,
+        width: iconWidth,
+        height: iconHeight
+      )
+    }
+    if let rightIcon, let image = rightIcon.image {
+      rightIcon.tintColor = bottomLabel.textColor
+      let iconHeight = size.height * iconSizeRatio
+      let iconWidth = iconHeight * image.size.width / image.size.height
+      rightIcon.frame = .init(
+        x: size.width - hMargin - iconWidth,
+        y: size.height - vMargin - iconHeight,
+        width: iconWidth,
+        height: iconHeight
+      )
+    }
+
     configuration?.background.cornerRadius = size.height * 0.16
     super.layoutSubviews()
   }

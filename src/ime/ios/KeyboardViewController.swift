@@ -56,7 +56,8 @@ class KeyboardViewController: UIInputViewController {
     let proxy = self.textDocumentProxy
     let appearance = proxy.keyboardAppearance
     
-    let aleph = Button(keyCapRole: .special)
+    let aleph = Button(keyCapRole: .left)
+    aleph.bottomText = "ȝ"
     self.aleph = aleph
     allButtons.append(aleph)
     let a = Button(top: "A", bottom: "𓀀")
@@ -89,13 +90,13 @@ class KeyboardViewController: UIInputViewController {
     let k = Button(top: "K", bottom: "𓆛")
     self.k = k
     allButtons.append(k)
-    let ret = Button(keyCapRole: .special)
-    ret.bottomText = "return"
+    let ret = Button(keyCapRole: .right)
+    ret.rightIcon = UIImageView(image: UIImage(systemName: "return"))
     self.ret = ret
     allButtons.append(ret)
     
-    let shift = Button(keyCapRole: .special)
-    shift.bottomText = "shift"
+    let shift = Button(keyCapRole: .left)
+    shift.leftIcon = UIImageView(image: UIImage(systemName: "shift"))
     self.shift = shift
     allButtons.append(shift)
     let l = Button(top: "L", bottom: "𓆣")
@@ -135,7 +136,8 @@ class KeyboardViewController: UIInputViewController {
     self.w = w
     allButtons.append(w)
     
-    let globe = Button(keyCapRole: .special)
+    let globe = Button(keyCapRole: .left)
+    globe.leftIcon = UIImageView(image: UIImage(systemName: "globe"))
     self.globe = globe
     allButtons.append(globe)
     let x = Button(top: "X", bottom: "𓏏")
@@ -150,7 +152,7 @@ class KeyboardViewController: UIInputViewController {
     let aa = Button(top: "Aa", bottom: "𓐍")
     self.aa = aa
     allButtons.append(aa)
-    let space = Button()
+    let space = Button(keyCapRole: .left)
     self.space = space
     allButtons.append(space)
     let vj = Button(middle: ":")
@@ -165,7 +167,8 @@ class KeyboardViewController: UIInputViewController {
     let endGroup = Button(middle: ")")
     self.endGroup = endGroup
     allButtons.append(endGroup)
-    let close = Button(keyCapRole: .special)
+    let close = Button(keyCapRole: .right)
+    close.rightIcon = UIImageView(image: UIImage(systemName: "keyboard.chevron.compact.down"))
     self.close = close
     allButtons.append(close)
     
@@ -188,8 +191,9 @@ class KeyboardViewController: UIInputViewController {
     heightConstraint.priority = .init(rawValue: UILayoutPriority.required.rawValue - 1)
     heightConstraint.isActive = true
     self.heightConstraint = heightConstraint
-
+    
     globe.addTarget(self, action: #selector(handleInputModeList(from:with:)), for: .allTouchEvents)
+    close.addTarget(self, action: #selector(dismissKeyboard), for: .touchUpInside)
   }
   
   private func updateHeightConstraint() {
@@ -199,12 +203,12 @@ class KeyboardViewController: UIInputViewController {
     let layout = Layout(width: view.bounds.width)
     heightConstraint.constant = layout.preferredHeight
   }
-
+  
   override func viewWillTransition(to size: CGSize, with coordinator: any UIViewControllerTransitionCoordinator) {
     super.viewWillTransition(to: size, with: coordinator)
     updateViewConstraints()
   }
-
+  
   private var appearance: UIKeyboardAppearance? {
     didSet {
       guard appearance != oldValue else {
@@ -215,7 +219,7 @@ class KeyboardViewController: UIInputViewController {
       }
     }
   }
-
+  
   override func viewWillLayoutSubviews() {
     let j = Layout(width: view.bounds.width)
     

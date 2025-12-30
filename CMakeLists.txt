@@ -230,6 +230,7 @@ if (IOS)
     src/ime/ios/Layout.swift
     src/ime/ios/HorizontalViewFlow.swift
     src/ime/ios/Info.plist
+    res/font/EglyfDebugNG-Regular-3.02.ttf
   )
   add_library(ksesh-keyboard MODULE)
   target_sources(ksesh-keyboard PRIVATE ${keyboard_files})
@@ -242,6 +243,7 @@ if (IOS)
       XCODE_ATTRIBUTE_LD_RUNPATH_SEARCH_PATHS "\$(inherited)\n@executable_path/Frameworks\n@executable_path/../../Frameworks"
       XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.github.kbinani.ksesh.keyboard"
       XCODE_ATTRIBUTE_MACH_O_TYPE "mh_execute"
+      RESOURCE res/font/EglyfDebugNG-Regular-3.02.ttf
   )
   set_target_properties(ksesh
     PROPERTIES
