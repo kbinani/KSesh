@@ -27,6 +27,16 @@ class Button: UIButton {
       }
     }
   }
+  var centerIcon: UIImageView? {
+    didSet {
+      oldValue?.removeFromSuperview()
+      if let centerIcon {
+        centerIcon.tintColor = bottomLabel.textColor
+        addSubview(centerIcon)
+        setNeedsLayout()
+      }
+    }
+  }
   
   private let keyCapRole: KeyCapRole
   private var topLabel: UILabel!
@@ -135,6 +145,7 @@ class Button: UIButton {
     bottomLabel.textColor = textColor
     leftIcon?.tintColor = textColor
     rightIcon?.tintColor = textColor
+    centerIcon?.tintColor = textColor
   }
   
   override func layoutSubviews() {
@@ -187,6 +198,17 @@ class Button: UIButton {
       rightIcon.frame = .init(
         x: size.width - hMargin - iconWidth,
         y: size.height - vMargin - iconHeight,
+        width: iconWidth,
+        height: iconHeight
+      )
+    }
+    if let centerIcon, let image = centerIcon.image {
+      centerIcon.tintColor = bottomLabel.textColor
+      let iconHeight = size.height * iconSizeRatio
+      let iconWidth = iconHeight * image.size.width / image.size.height
+      centerIcon.frame = .init(
+        x: size.width * 0.5 - iconWidth * 0.5,
+        y: size.height * 0.5 - iconHeight * 0.5,
         width: iconWidth,
         height: iconHeight
       )

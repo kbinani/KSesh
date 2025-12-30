@@ -1,6 +1,11 @@
 import UIKit
 
 class KeyboardViewController: UIInputViewController {
+  // row 0
+  private var toLeft: Button!
+  private var toRight: Button!
+  private var textView: TextView!
+  private var backspace: Button!
   // row 1
   private var aleph: Button!
   private var a: Button!
@@ -56,6 +61,27 @@ class KeyboardViewController: UIInputViewController {
     let proxy = self.textDocumentProxy
     let appearance = proxy.keyboardAppearance
     
+    // row 0
+    let toLeft = Button()
+    toLeft.centerIcon = UIImageView(image: UIImage(systemName: "arrow.left"))
+    toLeft.addTarget(self, action: #selector(toLeftKeyPressed(_:)), for: .touchUpInside)
+    self.toLeft = toLeft
+    allButtons.append(toLeft)
+    let toRight = Button()
+    toRight.centerIcon = UIImageView(image: UIImage(systemName: "arrow.right"))
+    toRight.addTarget(self, action: #selector(toRightKeyPressed(_:)), for: .touchUpInside)
+    self.toRight = toRight
+    allButtons.append(toRight)
+    let textView = TextView()
+    textView.appearance = appearance
+    self.textView = textView
+    let backspace = Button(keyCapRole: .right)
+    backspace.rightIcon = UIImageView(image: UIImage(systemName: "delete.left"))
+    backspace.addTarget(self, action: #selector(backspaceKeyPressed(_:)), for: .touchUpInside)
+    self.backspace = backspace
+    allButtons.append(backspace)
+    
+    // row 1
     let aleph = Button(keyCapRole: .left)
     aleph.bottomText = "ȝ"
     self.aleph = aleph
@@ -92,10 +118,11 @@ class KeyboardViewController: UIInputViewController {
     allButtons.append(k)
     let ret = Button(keyCapRole: .right)
     ret.rightIcon = UIImageView(image: UIImage(systemName: "return"))
-    ret.addTarget(self, action: #selector(returnKeyPressed(_:)), for: [.touchUpInside, .touchDownRepeat])
+    ret.addTarget(self, action: #selector(returnKeyPressed(_:)), for: .touchUpInside)
     self.ret = ret
     allButtons.append(ret)
     
+    // row 2
     let shift = Button(keyCapRole: .left)
     shift.leftIcon = UIImageView(image: UIImage(systemName: "shift"))
     self.shift = shift
@@ -137,6 +164,7 @@ class KeyboardViewController: UIInputViewController {
     self.w = w
     allButtons.append(w)
     
+    // row 3
     let globe = Button(keyCapRole: .left)
     globe.leftIcon = UIImageView(image: UIImage(systemName: "globe"))
     self.globe = globe
@@ -178,6 +206,8 @@ class KeyboardViewController: UIInputViewController {
     container.translatesAutoresizingMaskIntoConstraints = false
     container.isOpaque = false
     self.container = container
+    
+    container.addSubview(textView)
     allButtons.forEach { button in
       button.appearance = appearance
       container.addSubview(button)
@@ -198,11 +228,28 @@ class KeyboardViewController: UIInputViewController {
     close.addTarget(self, action: #selector(dismissKeyboard), for: .touchUpInside)
   }
   
+  @objc private func backspaceKeyPressed(_ button: UIView) {
+    print(#function)
+    textDocumentProxy.deleteBackward()
+  }
+  
+  @objc private func toLeftKeyPressed(_ button: UIView) {
+    print(#function)
+    textDocumentProxy.adjustTextPosition(byCharacterOffset: -1)
+  }
+  
+  @objc private func toRightKeyPressed(_ button: UIView) {
+    print(#function)
+    textDocumentProxy.adjustTextPosition(byCharacterOffset: 1)
+  }
+  
   @objc private func returnKeyPressed(_ button: UIView) {
+    print(#function)
     textDocumentProxy.insertText("\n")
   }
   
   @objc private func spaceKeyPressed(_ button: UIView) {
+    print(#function)
     textDocumentProxy.insertText(" ")
   }
   
@@ -227,13 +274,20 @@ class KeyboardViewController: UIInputViewController {
       allButtons.forEach { button in
         button.appearance = appearance
       }
+      textView.appearance = appearance
     }
   }
   
   override func viewWillLayoutSubviews() {
     let j = Layout(width: view.bounds.width)
     
-    let flow = HorizontalViewFlow(origin: .init(x: 0, y: j.top(row: 1)), height: j.buttonHeight, gap: j.hGap)
+    let flow = HorizontalViewFlow(origin: .init(x: 0, y: j.top(row: 0)), height: j.buttonHeight, gap: j.hGap)
+    flow.next(width: j.toLeftButtonWidth, button: toLeft)
+    flow.next(width: j.toRightButtonWidth, button: toRight)
+    flow.next(width: j.textViewWidth, button: textView)
+    flow.next(width: j.backspaceButtonWidth, button: backspace)
+    
+    flow.reset(x: 0, y: j.top(row: 1))
     flow.next(width: j.alephButtonWidth, button: aleph)
     flow.next(width: j.regularButtonWidth, button: a)
     flow.next(width: j.regularButtonWidth, button: b)

@@ -10,6 +10,10 @@ struct Layout {
   
   let regularButtonWidth: CGFloat
   let buttonHeight: CGFloat
+  let backspaceButtonWidth: CGFloat
+  let toLeftButtonWidth: CGFloat
+  let toRightButtonWidth: CGFloat
+  let textViewWidth: CGFloat
   let alephButtonWidth: CGFloat
   let returnButtonWidth: CGFloat
   let shiftButtonWidth: CGFloat
@@ -26,6 +30,8 @@ struct Layout {
     let baseReturnButtonWidth: CGFloat = 335
     
     self.regularButtonWidth = (width - sideMargin * 2) / (CGFloat(numMaxButtonsPerRow) + (baseHGap / baseButtonWidth) * CGFloat(numMaxButtonsPerRow - 1))
+    self.toLeftButtonWidth = regularButtonWidth
+    self.toRightButtonWidth = regularButtonWidth
     self.hGap = self.regularButtonWidth * baseHGap / baseButtonWidth
     self.vGap = self.hGap * baseVGap / baseHGap
     self.buttonHeight = regularButtonWidth * baseButtonHeight / baseButtonWidth
@@ -36,6 +42,8 @@ struct Layout {
     self.closeButtonWidth = alephButtonWidth
     self.globeButtonWidth = regularButtonWidth
     self.spaceButtonWidth = width - sideMargin * 2 - globeButtonWidth - regularButtonWidth * 8 - closeButtonWidth - hGap * 10
+    self.backspaceButtonWidth = closeButtonWidth
+    self.textViewWidth = width - sideMargin * 2 - toLeftButtonWidth - toRightButtonWidth - backspaceButtonWidth - hGap * 3
   }
   
   func top(row: Int) -> CGFloat {

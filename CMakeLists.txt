@@ -229,6 +229,7 @@ if (IOS)
     src/ime/ios/ContainerView.swift
     src/ime/ios/Layout.swift
     src/ime/ios/HorizontalViewFlow.swift
+    src/ime/ios/TextView.swift
     src/ime/ios/Info.plist
     res/font/EglyfDebugNG-Regular-3.02.ttf
   )
