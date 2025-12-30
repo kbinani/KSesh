@@ -55,7 +55,6 @@ class Button: UIButton {
     bottomLabel.textAlignment = .right
     bottomLabel.contentMode   = .bottom
     
-    self.layer.cornerRadius = 10
     self.configuration = UIButton.Configuration.filled()
     self.appearance = .light
     self.configurationUpdateHandler = { b in
@@ -127,6 +126,7 @@ class Button: UIButton {
       width: width,
       height: bottomLabel.font.pointSize
     )
+    configuration?.background.cornerRadius = size.height * 0.16
     super.layoutSubviews()
   }
   
