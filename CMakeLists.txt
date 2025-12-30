@@ -10,8 +10,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 if (APPLE)
-  if ("${CMAKE_SYSTEM_NAME}" STREQUAL "iOS")
-    set(ksesh_deployment_target "16.3")
+  if (IOS)
+    set(ksesh_deployment_target "26.0")
   else()
     set(ksesh_deployment_target "13.3")
   endif()
@@ -227,6 +227,8 @@ if (IOS)
     src/ime/ios/KeyboardViewController.swift
     src/ime/ios/Button.swift
     src/ime/ios/ContainerView.swift
+    src/ime/ios/Layout.swift
+    src/ime/ios/HorizontalViewFlow.swift
     src/ime/ios/Info.plist
   )
   add_library(ksesh-keyboard MODULE)

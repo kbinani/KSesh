@@ -1,50 +1,6 @@
 import UIKit
 
 class KeyboardViewController: UIInputViewController {
-  struct Layout {
-    let sideMargin: CGFloat = 15
-    let topMargin: CGFloat = 11
-    let bottomMargin: CGFloat = 11
-    let numMaxButtonsPerRow: Int = 14
-    let hGap: CGFloat = 14
-    let vGap: CGFloat = 12
-    
-    let regularButtonWidth: CGFloat
-    let buttonHeight: CGFloat
-    let alephButtonWidth: CGFloat
-    let returnButtonWidth: CGFloat
-    let shiftButtonWidth: CGFloat
-    let globeButtonWidth: CGFloat
-    let spaceButtonWidth: CGFloat
-    let closeButtonWidth: CGFloat
-    
-    init(width: CGFloat, needsInputModeSwitchKey: Bool) {
-      let maxButtonWidth = (width - sideMargin * 2 - hGap * CGFloat(numMaxButtonsPerRow - 1)) / CGFloat(numMaxButtonsPerRow)
-      self.regularButtonWidth = min(maxButtonWidth, 82)
-      self.buttonHeight = regularButtonWidth * 74 / 82
-      let returnOverAbc: CGFloat = CGFloat(278) / CGFloat(278 + 335)
-      self.alephButtonWidth = (width - sideMargin * 2 - regularButtonWidth * 10 - hGap * 11) * returnOverAbc
-      self.returnButtonWidth = width - sideMargin * 2 - regularButtonWidth * 10 - hGap * 11 - alephButtonWidth
-      self.shiftButtonWidth = width - sideMargin * 2 - regularButtonWidth * 12 - hGap * 12
-      self.closeButtonWidth = alephButtonWidth
-      if needsInputModeSwitchKey {
-        self.globeButtonWidth = regularButtonWidth
-        self.spaceButtonWidth = width - sideMargin * 2 - globeButtonWidth - regularButtonWidth * 8 - closeButtonWidth - hGap * 10
-      } else {
-        self.globeButtonWidth = 0
-        self.spaceButtonWidth = width - sideMargin * 2 - regularButtonWidth * 8 - closeButtonWidth - hGap * 9
-      }
-    }
-    
-    func top(row: Int) -> CGFloat {
-      return topMargin + vGap * CGFloat(row) + buttonHeight * CGFloat(row)
-    }
-    
-    var preferredHeight: CGFloat {
-      return topMargin + buttonHeight * 4 + vGap * 3 + bottomMargin
-    }
-  }
-  
   // row 1
   private var aleph: Button!
   private var a: Button!
@@ -87,28 +43,11 @@ class KeyboardViewController: UIInputViewController {
   private var container: ContainerView!
   
   private var allButtons: [Button] = []
-  private var heightConstraint: NSLayoutConstraint?
+  private var heightConstraint: NSLayoutConstraint!
   
   override func updateViewConstraints() {
     super.updateViewConstraints()
-    
-    let layout = Layout(width: view.bounds.width, needsInputModeSwitchKey: needsInputModeSwitchKey)
-    if let heightConstraint {
-      heightConstraint.constant = layout.preferredHeight
-    } else if let iv = container {
-      let heightConstraint = NSLayoutConstraint(
-        item: iv,
-        attribute: .height,
-        relatedBy: .equal,
-        toItem: nil,
-        attribute: .notAnAttribute,
-        multiplier: 0,
-        constant: layout.preferredHeight
-      )
-      heightConstraint.priority = .init(rawValue: 999)
-      self.heightConstraint = heightConstraint
-      iv.addConstraint(heightConstraint)
-    }
+    updateHeightConstraint()
   }
   
   override func viewDidLoad() {
@@ -230,8 +169,9 @@ class KeyboardViewController: UIInputViewController {
     self.close = close
     allButtons.append(close)
     
-    let container = ContainerView()
+    let container = ContainerView(frame: .init(origin: .zero, size: .init(width: 1210, height: 315)))
     container.translatesAutoresizingMaskIntoConstraints = false
+    container.isOpaque = false
     self.container = container
     allButtons.forEach { button in
       button.appearance = appearance
@@ -243,10 +183,28 @@ class KeyboardViewController: UIInputViewController {
     container.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
     container.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
     
+    let layout = Layout(width: view.bounds.width)
+    let heightConstraint = view.heightAnchor.constraint(equalToConstant: layout.preferredHeight)
+    heightConstraint.priority = .init(rawValue: UILayoutPriority.required.rawValue - 1)
+    heightConstraint.isActive = true
+    self.heightConstraint = heightConstraint
+
     globe.addTarget(self, action: #selector(handleInputModeList(from:with:)), for: .allTouchEvents)
   }
   
-  
+  private func updateHeightConstraint() {
+    guard let view = viewIfLoaded else {
+      return
+    }
+    let layout = Layout(width: view.bounds.width)
+    heightConstraint.constant = layout.preferredHeight
+  }
+
+  override func viewWillTransition(to size: CGSize, with coordinator: any UIViewControllerTransitionCoordinator) {
+    super.viewWillTransition(to: size, with: coordinator)
+    updateViewConstraints()
+  }
+
   private var appearance: UIKeyboardAppearance? {
     didSet {
       guard appearance != oldValue else {
@@ -257,80 +215,51 @@ class KeyboardViewController: UIInputViewController {
       }
     }
   }
-  
+
   override func viewWillLayoutSubviews() {
-    let j = Layout(width: view.bounds.width, needsInputModeSwitchKey: needsInputModeSwitchKey)
-    @MainActor
-    class WidthAdder {
-      private var x: CGFloat
-      private var y: CGFloat
-      private let height: CGFloat
-      private let gap: CGFloat
-      
-      init(origin: CGPoint, height: CGFloat, gap: CGFloat) {
-        self.x = origin.x
-        self.y = origin.y
-        self.height = height
-        self.gap = gap
-      }
-      
-      func next(width: CGFloat, button: UIView) {
-        let n = self.x + gap
-        button.frame = .init(x: n, y: y, width: width, height: height)
-        self.x = n + width
-      }
-      
-      func reset(x: CGFloat, y: CGFloat) {
-        self.x = x
-        self.y = y
-      }
-    }
-    let wa = WidthAdder(origin: .init(x: 0, y: j.top(row: 1)), height: j.buttonHeight, gap: j.hGap)
-    wa.next(width: j.alephButtonWidth, button: aleph)
-    wa.next(width: j.regularButtonWidth, button: a)
-    wa.next(width: j.regularButtonWidth, button: b)
-    wa.next(width: j.regularButtonWidth, button: c)
-    wa.next(width: j.regularButtonWidth, button: d)
-    wa.next(width: j.regularButtonWidth, button: e)
-    wa.next(width: j.regularButtonWidth, button: f)
-    wa.next(width: j.regularButtonWidth, button: g)
-    wa.next(width: j.regularButtonWidth, button: h)
-    wa.next(width: j.regularButtonWidth, button: i)
-    wa.next(width: j.regularButtonWidth, button: k)
-    wa.next(width: j.returnButtonWidth, button: ret)
+    let j = Layout(width: view.bounds.width)
     
-    wa.reset(x: 0, y: j.top(row: 2))
-    wa.next(width: j.shiftButtonWidth, button: shift)
-    wa.next(width: j.regularButtonWidth, button: l)
-    wa.next(width: j.regularButtonWidth, button: m)
-    wa.next(width: j.regularButtonWidth, button: n)
-    wa.next(width: j.regularButtonWidth, button: o)
-    wa.next(width: j.regularButtonWidth, button: p)
-    wa.next(width: j.regularButtonWidth, button: q)
-    wa.next(width: j.regularButtonWidth, button: r)
-    wa.next(width: j.regularButtonWidth, button: s)
-    wa.next(width: j.regularButtonWidth, button: t)
-    wa.next(width: j.regularButtonWidth, button: u)
-    wa.next(width: j.regularButtonWidth, button: v)
-    wa.next(width: j.regularButtonWidth, button: w)
+    let flow = HorizontalViewFlow(origin: .init(x: 0, y: j.top(row: 1)), height: j.buttonHeight, gap: j.hGap)
+    flow.next(width: j.alephButtonWidth, button: aleph)
+    flow.next(width: j.regularButtonWidth, button: a)
+    flow.next(width: j.regularButtonWidth, button: b)
+    flow.next(width: j.regularButtonWidth, button: c)
+    flow.next(width: j.regularButtonWidth, button: d)
+    flow.next(width: j.regularButtonWidth, button: e)
+    flow.next(width: j.regularButtonWidth, button: f)
+    flow.next(width: j.regularButtonWidth, button: g)
+    flow.next(width: j.regularButtonWidth, button: h)
+    flow.next(width: j.regularButtonWidth, button: i)
+    flow.next(width: j.regularButtonWidth, button: k)
+    flow.next(width: j.returnButtonWidth, button: ret)
     
-    wa.reset(x: 0, y: j.top(row: 3))
-    if needsInputModeSwitchKey {
-      wa.next(width: j.globeButtonWidth, button: globe)
-      globe.isHidden = false
-    } else {
-      globe.isHidden = true
-    }
-    wa.next(width: j.regularButtonWidth, button: x)
-    wa.next(width: j.regularButtonWidth, button: y)
-    wa.next(width: j.regularButtonWidth, button: z)
-    wa.next(width: j.regularButtonWidth, button: aa)
-    wa.next(width: j.spaceButtonWidth, button: space)
-    wa.next(width: j.regularButtonWidth, button: vj)
-    wa.next(width: j.regularButtonWidth, button: hj)
-    wa.next(width: j.regularButtonWidth, button: beginGroup)
-    wa.next(width: j.regularButtonWidth, button: endGroup)
-    wa.next(width: j.closeButtonWidth, button: close)
+    flow.reset(x: 0, y: j.top(row: 2))
+    flow.next(width: j.shiftButtonWidth, button: shift)
+    flow.next(width: j.regularButtonWidth, button: l)
+    flow.next(width: j.regularButtonWidth, button: m)
+    flow.next(width: j.regularButtonWidth, button: n)
+    flow.next(width: j.regularButtonWidth, button: o)
+    flow.next(width: j.regularButtonWidth, button: p)
+    flow.next(width: j.regularButtonWidth, button: q)
+    flow.next(width: j.regularButtonWidth, button: r)
+    flow.next(width: j.regularButtonWidth, button: s)
+    flow.next(width: j.regularButtonWidth, button: t)
+    flow.next(width: j.regularButtonWidth, button: u)
+    flow.next(width: j.regularButtonWidth, button: v)
+    flow.next(width: j.regularButtonWidth, button: w)
+    
+    flow.reset(x: 0, y: j.top(row: 3))
+    flow.next(width: j.globeButtonWidth, button: globe)
+    flow.next(width: j.regularButtonWidth, button: x)
+    flow.next(width: j.regularButtonWidth, button: y)
+    flow.next(width: j.regularButtonWidth, button: z)
+    flow.next(width: j.regularButtonWidth, button: aa)
+    flow.next(width: j.spaceButtonWidth, button: space)
+    flow.next(width: j.regularButtonWidth, button: vj)
+    flow.next(width: j.regularButtonWidth, button: hj)
+    flow.next(width: j.regularButtonWidth, button: beginGroup)
+    flow.next(width: j.regularButtonWidth, button: endGroup)
+    flow.next(width: j.closeButtonWidth, button: close)
     super.viewWillLayoutSubviews()
   }
   
@@ -341,6 +270,6 @@ class KeyboardViewController: UIInputViewController {
   override func textDidChange(_ textInput: UITextInput?) {
     // The app has just changed the document's contents, the document context has been updated.
     
-    self.appearance = self.textDocumentProxy.keyboardAppearance
+    appearance = self.textDocumentProxy.keyboardAppearance
   }
 }
