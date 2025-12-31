@@ -1,10 +1,22 @@
 import UIKit
 
 class TextView: UIView {
-  enum Style {
+  struct Content: Equatable {
+    let leading: String
+    let trailing: String
+  }
+
+  private enum Style {
     static let lineHeightRatio: CGFloat = 0.9
   }
+
+  private struct Metrics {
+    let fontSize: CGFloat
+    let ascent: CGFloat
+    let descent: CGFloat
+  }
   
+  private var metrics: Metrics?
   private var line: CTLine?
   
   var appearance: UIKeyboardAppearance? = nil {
@@ -12,23 +24,27 @@ class TextView: UIView {
     }
   }
   
-  var text: String = "" {
+  var content: Content = .init(leading: "", trailing: "") {
     didSet {
-      guard text != oldValue else {
+      guard content != oldValue else {
         return
       }
       update()
+      setNeedsDisplay()
     }
   }
   
   private func update() {
-    let fontSize = bounds.height * Style.lineHeightRatio
-    guard let h = UIFont(name: "EglyfDebugNG-Regular", size: fontSize) else {
+    guard let metrics = ensureMetrics() else {
       self.line = nil
       return
     }
-    let f = UIFont.systemFont(ofSize: fontSize)
-    let s = NSMutableAttributedString(string: text, attributes: [.font: f])
+    guard let h = Font.get(size: metrics.fontSize) else {
+      self.line = nil
+      return
+    }
+    let f = UIFont.systemFont(ofSize: metrics.fontSize)
+    let s = NSMutableAttributedString(string: content.leading + content.trailing, attributes: [.font: f])
     var index: Int = 0
     var last: UnicodeScalar?
     for scalar in s.string.unicodeScalars {
@@ -51,46 +67,35 @@ class TextView: UIView {
   }
   
   override func draw(_ rect: CGRect) {
-    guard let line, let ctx = UIGraphicsGetCurrentContext() else {
+    guard let line, let ctx = UIGraphicsGetCurrentContext(), let metrics = ensureMetrics() else {
       return
     }
     let size = bounds.size
-    var ascent: CGFloat = 0
-    var descent: CGFloat = 0
-    var leading: CGFloat = 0
-    let width = CTLineGetTypographicBounds(line, &ascent, &descent, &leading)
+    let width = CTLineGetTypographicBounds(line, nil, nil, nil)
     ctx.saveGState()
     defer {
       ctx.restoreGState()
     }
     ctx.translateBy(x: 0, y: size.height)
     ctx.scaleBy(x: 1, y: -1)
-    ctx.translateBy(x: size.width * 0.5 - width * 0.5, y: size.height * 0.5 - ascent * 0.5 + descent * 0.5)
+    ctx.translateBy(x: size.width * 0.5 - width * 0.5, y: size.height * 0.5 - metrics.ascent * 0.5 + metrics.descent * 0.5)
     CTLineDraw(line, ctx)
   }
-}
-
-extension UnicodeScalar {
-  var isHieroglyph: Bool {
-    // Egyptian Hieroglyphs
-    // Range: 13000–1342F
-    if 0x13000 <= value && value <= 0x1342F {
-      return true
-    }
-    // Egyptian Hieroglyphs Extended-A
-    // Range: 13460–143FF
-    if 0x13460 <= value && value <= 0x143FF {
-      return true
-    }
-    // Egyptian Hieroglyph Format Controls
-    // Range: 13430–1345F
-    if 0x13430 <= value && value <= 0x1345F {
-      return true
-    }
-    return false
-  }
   
-  var isVariationSelector: Bool {
-    return 0xFE00 <= value && value <= 0xFE0F
+  private func ensureMetrics() -> Metrics? {
+    let fontSize = bounds.height * Style.lineHeightRatio
+    if let metrics, metrics.fontSize == fontSize {
+      return metrics
+    }
+    guard let font = Font.get(size: fontSize) else {
+      return nil
+    }
+    let sample = "𓍹𓐼𓀀𓍹𓐼𓀀𓐽𓍺𓐽𓍺"
+    let str = NSAttributedString(string: sample, attributes: [.font: font])
+    let line = CTLineCreateWithAttributedString(str)
+    let bounds = line.typographicBounds
+    let metrics = Metrics(fontSize: fontSize, ascent: -bounds.minY, descent: bounds.height + bounds.minY)
+    self.metrics = metrics
+    return metrics
   }
 }

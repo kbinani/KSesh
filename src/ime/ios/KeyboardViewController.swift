@@ -348,8 +348,10 @@ class KeyboardViewController: UIInputViewController {
   }
   
   override func textDidChange(_ textInput: UITextInput?) {
-    // The app has just changed the document's contents, the document context has been updated.
-    
     appearance = self.textDocumentProxy.keyboardAppearance
+    textView.content = .init(
+      leading: textDocumentProxy.documentContextBeforeInput ?? "",
+      trailing: textDocumentProxy.documentContextAfterInput ?? ""
+    )
   }
 }

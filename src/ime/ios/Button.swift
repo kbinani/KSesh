@@ -170,7 +170,7 @@ class Button: UIButton {
     )
 
     if keyCapRole == .hieroglyph {
-      bottomLabel.font = UIFont(name: "EglyfDebugNG-Regular", size: size.height * 0.5)
+      bottomLabel.font = Font.get(size: size.height * 0.5)
     } else {
       bottomLabel.font = bottomLabel.font.withSize(size.height * 0.3)
     }
