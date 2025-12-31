@@ -20,14 +20,33 @@ class TextView: UIView {
   private var metrics: Metrics?
   
   private struct Presentation {
+    let string: NSAttributedString
     let line: CTLine
     let width: CGFloat
     let center: CGFloat
+    let centerStringIndex: Int
+    
+    init(string: NSAttributedString, line: CTLine, width: CGFloat, center: CGFloat, centerStringIndex: Int) {
+      self.string = string
+      self.line = line
+      self.width = width
+      self.center = center
+      self.centerStringIndex = centerStringIndex
+    }
   }
   private var presentation: Presentation?
   
   var appearance: UIKeyboardAppearance? = nil {
     didSet {
+      guard appearance != oldValue else {
+        return
+      }
+      if appearance == .dark {
+        textColor = .white
+      } else {
+        textColor = .black
+      }
+      setNeedsDisplay()
     }
   }
   
@@ -40,6 +59,8 @@ class TextView: UIView {
       setNeedsDisplay()
     }
   }
+
+  private var textColor: UIColor = .black
   
   private func update() {
     guard let metrics = ensureMetrics() else {
@@ -64,7 +85,13 @@ class TextView: UIView {
     }
     let line = CTLineCreateWithAttributedString(s)
     let center = CTLineGetOffsetForStringIndex(line, content.leading.utf16.count, nil)
-    self.presentation = .init(line: line, width: line.typographicBounds.width, center: center)
+    self.presentation = .init(
+      string: s,
+      line: line,
+      width: line.typographicBounds.width,
+      center: center,
+      centerStringIndex: content.leading.utf16.count
+    )
   }
   
   override func layoutSubviews() {
@@ -83,7 +110,7 @@ class TextView: UIView {
     defer {
       ctx.restoreGState()
     }
-
+    
     ctx.saveGState()
     ctx.setLineWidth(size.height * Style.caretLineWidthRatio)
     ctx.setStrokeColor(UIColor.systemBlue.cgColor)
@@ -93,12 +120,26 @@ class TextView: UIView {
       .init(x: size.width * 0.5, y: size.height * 0.5 + size.height * Style.lineHeightRatio * 0.5)
     ])
     ctx.restoreGState()
-
+    
     ctx.translateBy(x: 0, y: size.height)
     ctx.scaleBy(x: 1, y: -1)
-    ctx.translateBy(x: size.width * 0.5 - presentation.center, y: size.height * 0.5 - metrics.ascent * 0.5 + metrics.descent * 0.5)
+    ctx.translateBy(
+      x: size.width * 0.5 - presentation.center,
+      y: size.height * 0.5 - metrics.ascent * 0.5 + metrics.descent * 0.5
+    )
     
-    CTLineDraw(presentation.line, ctx)
+    ctx.setFillColor(textColor.cgColor)
+    ctx.textPosition = .zero
+    ctx.textMatrix = .identity
+    presentation.line.runs.forEach { run in
+      run.useGlyphs { glyph, position, stringIndex in
+        guard let font = presentation.string.attribute(.font, at: stringIndex, effectiveRange: nil) as? UIFont else {
+          return true
+        }
+        CTFontDrawGlyphs(font, [glyph], [position], 1, ctx)
+        return true
+      }
+    }
   }
   
   private func ensureMetrics() -> Metrics? {

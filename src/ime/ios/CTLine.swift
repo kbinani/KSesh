@@ -8,4 +8,8 @@ extension CTLine {
     let width = CTLineGetTypographicBounds(self, &ascent, &descent, &leading)
     return .init(x: leading, y: -ascent, width: width, height: ascent + descent)
   }
+  
+  var runs: [CTRun] {
+    return (CTLineGetGlyphRuns(self) as [AnyObject]).map { $0 as! CTRun }
+  }
 }
