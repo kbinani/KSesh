@@ -73,6 +73,7 @@ class KeyboardViewController: UIInputViewController {
     self.toRight = toRight
     allButtons.append(toRight)
     let textView = TextView()
+    textView.backgroundColor = .black.withAlphaComponent(0.1)
     textView.appearance = appearance
     self.textView = textView
     let backspace = Button(keyCapRole: .right)
@@ -229,27 +230,22 @@ class KeyboardViewController: UIInputViewController {
   }
   
   @objc private func backspaceKeyPressed(_ button: UIView) {
-    print(#function)
     textDocumentProxy.deleteBackward()
   }
   
   @objc private func toLeftKeyPressed(_ button: UIView) {
-    print(#function)
     textDocumentProxy.adjustTextPosition(byCharacterOffset: -1)
   }
   
   @objc private func toRightKeyPressed(_ button: UIView) {
-    print(#function)
     textDocumentProxy.adjustTextPosition(byCharacterOffset: 1)
   }
   
   @objc private func returnKeyPressed(_ button: UIView) {
-    print(#function)
     textDocumentProxy.insertText("\n")
   }
   
   @objc private func spaceKeyPressed(_ button: UIView) {
-    print(#function)
     textDocumentProxy.insertText(" ")
   }
   
