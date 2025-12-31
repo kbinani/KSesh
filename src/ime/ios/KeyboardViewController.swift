@@ -234,11 +234,27 @@ class KeyboardViewController: UIInputViewController {
   }
   
   @objc private func toLeftKeyPressed(_ button: UIView) {
-    textDocumentProxy.adjustTextPosition(byCharacterOffset: -1)
+    guard let leading = textDocumentProxy.documentContextBeforeInput else {
+      textDocumentProxy.adjustTextPosition(byCharacterOffset: -1)
+      return
+    }
+    guard let last = leading.unicodeScalars.last else {
+      textDocumentProxy.adjustTextPosition(byCharacterOffset: -1)
+      return
+    }
+    textDocumentProxy.adjustTextPosition(byCharacterOffset: -last.utf16.count)
   }
   
   @objc private func toRightKeyPressed(_ button: UIView) {
-    textDocumentProxy.adjustTextPosition(byCharacterOffset: 1)
+    guard let trailing = textDocumentProxy.documentContextAfterInput else {
+      textDocumentProxy.adjustTextPosition(byCharacterOffset: 1)
+      return
+    }
+    guard let first = trailing.first else {
+      textDocumentProxy.adjustTextPosition(byCharacterOffset: 1)
+      return
+    }
+    textDocumentProxy.adjustTextPosition(byCharacterOffset: first.utf16.count)
   }
   
   @objc private func returnKeyPressed(_ button: UIView) {
