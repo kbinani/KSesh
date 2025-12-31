@@ -234,6 +234,9 @@ if (IOS)
     src/ime/ios/CTLine.swift
     src/ime/ios/UnicodeScalar.swift
     src/ime/ios/CTRun.swift
+    src/ime/ios/NSString.swift
+    src/ime/ios/UIFont.swift
+    src/ime/ios/BoundingBox.swift
     src/ime/ios/Info.plist
     res/font/EglyfDebugNG-Regular-3.02.ttf
   )
