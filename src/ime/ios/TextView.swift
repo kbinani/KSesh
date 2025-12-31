@@ -8,6 +8,7 @@ class TextView: UIView {
 
   private enum Style {
     static let lineHeightRatio: CGFloat = 0.9
+    static let caretLineWidthRatio: CGFloat = 0.025
   }
 
   private struct Metrics {
@@ -17,7 +18,13 @@ class TextView: UIView {
   }
   
   private var metrics: Metrics?
-  private var line: CTLine?
+  
+  private struct Presentation {
+    let line: CTLine
+    let width: CGFloat
+    let center: CGFloat
+  }
+  private var presentation: Presentation?
   
   var appearance: UIKeyboardAppearance? = nil {
     didSet {
@@ -36,11 +43,11 @@ class TextView: UIView {
   
   private func update() {
     guard let metrics = ensureMetrics() else {
-      self.line = nil
+      self.presentation = nil
       return
     }
     guard let h = Font.get(size: metrics.fontSize) else {
-      self.line = nil
+      self.presentation = nil
       return
     }
     let f = UIFont.systemFont(ofSize: metrics.fontSize)
@@ -56,7 +63,8 @@ class TextView: UIView {
       index += count
     }
     let line = CTLineCreateWithAttributedString(s)
-    self.line = line
+    let center = CTLineGetOffsetForStringIndex(line, content.leading.utf16.count, nil)
+    self.presentation = .init(line: line, width: line.typographicBounds.width, center: center)
   }
   
   override func layoutSubviews() {
@@ -67,19 +75,30 @@ class TextView: UIView {
   }
   
   override func draw(_ rect: CGRect) {
-    guard let line, let ctx = UIGraphicsGetCurrentContext(), let metrics = ensureMetrics() else {
+    guard let presentation, let ctx = UIGraphicsGetCurrentContext(), let metrics = ensureMetrics() else {
       return
     }
     let size = bounds.size
-    let width = CTLineGetTypographicBounds(line, nil, nil, nil)
     ctx.saveGState()
     defer {
       ctx.restoreGState()
     }
+
+    ctx.saveGState()
+    ctx.setLineWidth(size.height * Style.caretLineWidthRatio)
+    ctx.setStrokeColor(UIColor.systemBlue.cgColor)
+    ctx.setLineCap(.round)
+    ctx.strokeLineSegments(between: [
+      .init(x: size.width * 0.5, y: size.height * 0.5 - size.height * Style.lineHeightRatio * 0.5),
+      .init(x: size.width * 0.5, y: size.height * 0.5 + size.height * Style.lineHeightRatio * 0.5)
+    ])
+    ctx.restoreGState()
+
     ctx.translateBy(x: 0, y: size.height)
     ctx.scaleBy(x: 1, y: -1)
-    ctx.translateBy(x: size.width * 0.5 - width * 0.5, y: size.height * 0.5 - metrics.ascent * 0.5 + metrics.descent * 0.5)
-    CTLineDraw(line, ctx)
+    ctx.translateBy(x: size.width * 0.5 - presentation.center, y: size.height * 0.5 - metrics.ascent * 0.5 + metrics.descent * 0.5)
+    
+    CTLineDraw(presentation.line, ctx)
   }
   
   private func ensureMetrics() -> Metrics? {
