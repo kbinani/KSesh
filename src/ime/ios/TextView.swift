@@ -224,19 +224,8 @@ class TextView: UIView {
       x: size.width * 0.5 - presentation.center,
       y: size.height * 0.5 - metrics.ascent * 0.5 + metrics.descent * 0.5
     )
-    
-    if let cursorBounds = presentation.cursorBounds {
-      ctx.saveGState()
-      ctx.setLineWidth(size.height * Style.caretLineWidthRatio)
-      ctx.setStrokeColor(UIColor.systemBlue.cgColor)
-      ctx.setLineCap(.round)
-      ctx.strokeLineSegments(between: [
-        .init(x: cursorBounds.minX, y: cursorBounds.minY),
-        .init(x: cursorBounds.maxX, y: cursorBounds.maxY)
-      ])
-      ctx.restoreGState()
-    }
-    
+     
+    ctx.saveGState()
     presentation.line.runs.forEach { run in
       run.useGlyphs { glyph, position, stringIndex in
         guard let font = presentation.string.attribute(.font, at: stringIndex, effectiveRange: nil) as? UIFont else {
@@ -250,6 +239,19 @@ class TextView: UIView {
         CTFontDrawGlyphs(font, [glyph], [position], 1, ctx)
         return true
       }
+    }
+    ctx.restoreGState()
+    
+    if let cursorBounds = presentation.cursorBounds {
+      ctx.saveGState()
+      ctx.setLineWidth(size.height * Style.caretLineWidthRatio)
+      ctx.setStrokeColor(UIColor.systemBlue.cgColor)
+      ctx.setLineCap(.round)
+      ctx.strokeLineSegments(between: [
+        .init(x: cursorBounds.minX, y: cursorBounds.minY),
+        .init(x: cursorBounds.maxX, y: cursorBounds.maxY)
+      ])
+      ctx.restoreGState()
     }
   }
   
