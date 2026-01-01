@@ -238,6 +238,8 @@ if (IOS)
     src/ime/ios/UIFont.swift
     src/ime/ios/BoundingBox.swift
     src/ime/ios/String.swift
+    src/ime/ios/TextViewContent.swift
+    src/ime/ios/TextViewSource.swift
     src/ime/ios/Info.plist
     res/font/EglyfDebugNG-Regular-3.02.ttf
   )

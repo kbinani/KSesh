@@ -376,9 +376,6 @@ class KeyboardViewController: UIInputViewController {
   }
   
   private func updateTextView() {
-    textView.content = .init(
-      leading: textDocumentProxy.documentContextBeforeInput ?? "",
-      trailing: textDocumentProxy.documentContextAfterInput ?? ""
-    )
+    textView.source = .init(textDocumentProxy: textDocumentProxy)
   }
 }
