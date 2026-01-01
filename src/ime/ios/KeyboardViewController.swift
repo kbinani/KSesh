@@ -62,12 +62,12 @@ class KeyboardViewController: UIInputViewController {
     let appearance = proxy.keyboardAppearance
     
     // row 0
-    let toLeft = Button()
+    let toLeft = Button(keyCapRole: .default)
     toLeft.centerIcon = UIImageView(image: UIImage(systemName: "arrow.left"))
     toLeft.addTarget(self, action: #selector(toLeftKeyPressed(_:)), for: .touchUpInside)
     self.toLeft = toLeft
     allButtons.append(toLeft)
-    let toRight = Button()
+    let toRight = Button(keyCapRole: .default)
     toRight.centerIcon = UIImageView(image: UIImage(systemName: "arrow.right"))
     toRight.addTarget(self, action: #selector(toRightKeyPressed(_:)), for: .touchUpInside)
     self.toRight = toRight
@@ -83,38 +83,38 @@ class KeyboardViewController: UIInputViewController {
     allButtons.append(backspace)
     
     // row 1
-    let aleph = Button(keyCapRole: .left)
+    let aleph = Button(keyCapRole: .default)
     aleph.bottomText = "ȝ"
     self.aleph = aleph
     allButtons.append(aleph)
-    let a = Button(top: "A", bottom: "𓀀")
+    let a = Button(category: "A", bottom: "𓀀")
     self.a = a
     allButtons.append(a)
-    let b = Button(top: "B", bottom: "𓁐")
+    let b = Button(category: "B", bottom: "𓁐")
     self.b = b
     allButtons.append(b)
-    let c = Button(top: "C", bottom: "𓁚")
+    let c = Button(category: "C", bottom: "𓁚")
     self.c = c
     allButtons.append(c)
-    let d = Button(top: "D", bottom: "𓁶")
+    let d = Button(category: "D", bottom: "𓁶")
     self.d = d
     allButtons.append(d)
-    let e = Button(top: "E", bottom: "𓃒")
+    let e = Button(category: "E", bottom: "𓃒")
     self.e = e
     allButtons.append(e)
-    let f = Button(top: "F", bottom: "𓃾")
+    let f = Button(category: "F", bottom: "𓃾")
     self.f = f
     allButtons.append(f)
-    let g = Button(top: "G", bottom: "𓄿")
+    let g = Button(category: "G", bottom: "𓄿")
     self.g = g
     allButtons.append(g)
-    let h = Button(top: "H", bottom: "𓅿")
+    let h = Button(category: "H", bottom: "𓅿")
     self.h = h
     allButtons.append(h)
-    let i = Button(top: "I", bottom: "𓆈")
+    let i = Button(category: "I", bottom: "𓆈")
     self.i = i
     allButtons.append(i)
-    let k = Button(top: "K", bottom: "𓆛")
+    let k = Button(category: "K", bottom: "𓆛")
     self.k = k
     allButtons.append(k)
     let ret = Button(keyCapRole: .right)
@@ -124,81 +124,85 @@ class KeyboardViewController: UIInputViewController {
     allButtons.append(ret)
     
     // row 2
-    let shift = Button(keyCapRole: .left)
+    let shift = Button(keyCapRole: .default)
     shift.leftIcon = UIImageView(image: UIImage(systemName: "shift"))
     self.shift = shift
     allButtons.append(shift)
-    let l = Button(top: "L", bottom: "𓆣")
+    let l = Button(category: "L", bottom: "𓆣")
     self.l = l
     allButtons.append(l)
-    let m = Button(top: "M", bottom: "𓆭")
+    let m = Button(category: "M", bottom: "𓆭")
     self.m = m
     allButtons.append(m)
-    let n = Button(top: "N", bottom: "𓇯")
+    let n = Button(category: "N", bottom: "𓇯")
     self.n = n
     allButtons.append(n)
-    let o = Button(top: "O", bottom: "𓉐")
+    let o = Button(category: "O", bottom: "𓉐")
     self.o = o
     allButtons.append(o)
-    let p = Button(top: "P", bottom: "𓊛")
+    let p = Button(category: "P", bottom: "𓊛")
     self.p = p
     allButtons.append(p)
-    let q = Button(top: "Q", bottom: "𓊨")
+    let q = Button(category: "Q", bottom: "𓊨")
     self.q = q
     allButtons.append(q)
-    let r = Button(top: "R", bottom: "𓊯")
+    let r = Button(category: "R", bottom: "𓊯")
     self.r = r
     allButtons.append(r)
-    let s = Button(top: "S", bottom: "𓋑")
+    let s = Button(category: "S", bottom: "𓋑")
     self.s = s
     allButtons.append(s)
-    let t = Button(top: "T", bottom: "𓌇")
+    let t = Button(category: "T", bottom: "𓌇")
     self.t = t
     allButtons.append(t)
-    let u = Button(top: "U", bottom: "𓌳")
+    let u = Button(category: "U", bottom: "𓌳")
     self.u = u
     allButtons.append(u)
-    let v = Button(top: "V", bottom: "𓍢")
+    let v = Button(category: "V", bottom: "𓍢")
     self.v = v
     allButtons.append(v)
-    let w = Button(top: "W", bottom: "𓎯")
+    let w = Button(category: "W", bottom: "𓎯")
     self.w = w
     allButtons.append(w)
     
     // row 3
-    let globe = Button(keyCapRole: .left)
+    let globe = Button(keyCapRole: .default)
     globe.leftIcon = UIImageView(image: UIImage(systemName: "globe"))
     self.globe = globe
     allButtons.append(globe)
-    let x = Button(top: "X", bottom: "𓏏")
+    let x = Button(category: "X", bottom: "𓏏")
     self.x = x
     allButtons.append(x)
-    let y = Button(top: "Y", bottom: "𓏛")
+    let y = Button(category: "Y", bottom: "𓏛")
     self.y = y
     allButtons.append(y)
-    let z = Button(top: "Z", bottom: "𓏤")
+    let z = Button(category: "Z", bottom: "𓏤")
     self.z = z
     allButtons.append(z)
-    let aa = Button(top: "Aa", bottom: "𓐍")
+    let aa = Button(category: "Aa", bottom: "𓐍")
     self.aa = aa
     allButtons.append(aa)
-    let space = Button(keyCapRole: .left)
+    let space = Button(keyCapRole: .default)
     space.addTarget(self, action: #selector(spaceKeyPressed(_:)), for: .touchUpInside)
     self.space = space
     allButtons.append(space)
-    let vj = Button(middle: ":")
+    let vj = Button(keyCapRole: .default)
+    vj.middleText = ":"
     vj.addTarget(self, action: #selector(verticalJoinKeyPressed(_:)), for: .touchUpInside)
     self.vj = vj
     allButtons.append(vj)
-    let hj = Button(middle: "*")
+    let hj = Button(keyCapRole: .default)
+    hj.middleText = "*"
     hj.addTarget(self, action: #selector(horizontalJoinKeyPressed(_:)), for: .touchUpInside)
     self.hj = hj
     allButtons.append(hj)
-    let beginSegment = Button(middle: "(")
+    let beginSegment = Button(keyCapRole: .default)
+    beginSegment.middleText = "("
     beginSegment.addTarget(self, action: #selector(beginSegmentKeyPressed(_:)), for: .touchUpInside)
     self.beginSegment = beginSegment
     allButtons.append(beginSegment)
-    let endSegment = Button(middle: ")")
+    let endSegment = Button(keyCapRole: .default)
+    endSegment.middleText = ")"
     endSegment.addTarget(self, action: #selector(endSegmentKeyPressed(_:)), for: .touchUpInside)
     self.endSegment = endSegment
     allButtons.append(endSegment)
@@ -217,6 +221,12 @@ class KeyboardViewController: UIInputViewController {
       button.appearance = appearance
       container.addSubview(button)
     }
+    allButtons.forEach { button in
+      guard case .hieroglyph = button.keyCapRole else {
+        return
+      }
+      button.addTarget(self, action: #selector(buttonPressed(_:)), for: .touchUpInside)
+    }
     view.addSubview(container)
     container.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
     container.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
@@ -231,6 +241,47 @@ class KeyboardViewController: UIInputViewController {
     
     globe.addTarget(self, action: #selector(handleInputModeList(from:with:)), for: .allTouchEvents)
     close.addTarget(self, action: #selector(dismissKeyboard), for: .touchUpInside)
+  }
+  
+  @objc private func buttonPressed(_ button: Button) {
+    guard case .hieroglyph(let category) = button.keyCapRole else {
+      return
+    }
+    guard let window = self.view.window, let scene = window.windowScene else {
+      return
+    }
+    heightConstraint.constant = scene.screen.bounds.height
+    let glyphs = Hieroglyph.get(category: category)
+    class V: UIViewController {
+      private let glyphs: [(String, String)]
+      init(glyphs: [(String, String)]) {
+        self.glyphs = glyphs
+        super.init(nibName: nil, bundle: nil)
+      }
+      
+      required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+      }
+      
+      override func viewDidLoad() {
+        super.viewDidLoad()
+        let tap = UITapGestureRecognizer(target: self, action: #selector(onTap(_:)))
+        view.addGestureRecognizer(tap)
+      }
+      
+      @objc private func onTap(_ sender: AnyObject) {
+        if let p = presentationController {
+          //TODO
+          p.delegate?.presentationControllerWillDismiss?(p)
+        }
+        dismiss(animated: true)
+      }
+    }
+    let v = V(glyphs: glyphs)
+    v.modalPresentationStyle = .overFullScreen
+    v.presentationController?.delegate = self
+    v.view.backgroundColor = .blue.withAlphaComponent(0.2)
+    present(v, animated: true)
   }
   
   @objc private func verticalJoinKeyPressed(_ button: UIView) {
@@ -319,14 +370,16 @@ class KeyboardViewController: UIInputViewController {
   
   override func viewWillLayoutSubviews() {
     let j = Layout(width: view.bounds.width)
+    let height = j.preferredHeight
+    let top = view.bounds.height - height
     
-    let flow = HorizontalViewFlow(origin: .init(x: 0, y: j.top(row: 0)), height: j.buttonHeight, gap: j.hGap)
+    let flow = HorizontalViewFlow(origin: .init(x: 0, y: top + j.top(row: 0)), height: j.buttonHeight, gap: j.hGap)
     flow.next(width: j.toLeftButtonWidth, button: toLeft)
     flow.next(width: j.toRightButtonWidth, button: toRight)
     flow.next(width: j.textViewWidth, button: textView)
     flow.next(width: j.backspaceButtonWidth, button: backspace)
     
-    flow.reset(x: 0, y: j.top(row: 1))
+    flow.reset(x: 0, y: top + j.top(row: 1))
     flow.next(width: j.alephButtonWidth, button: aleph)
     flow.next(width: j.regularButtonWidth, button: a)
     flow.next(width: j.regularButtonWidth, button: b)
@@ -340,7 +393,7 @@ class KeyboardViewController: UIInputViewController {
     flow.next(width: j.regularButtonWidth, button: k)
     flow.next(width: j.returnButtonWidth, button: ret)
     
-    flow.reset(x: 0, y: j.top(row: 2))
+    flow.reset(x: 0, y: top + j.top(row: 2))
     flow.next(width: j.shiftButtonWidth, button: shift)
     flow.next(width: j.regularButtonWidth, button: l)
     flow.next(width: j.regularButtonWidth, button: m)
@@ -355,7 +408,7 @@ class KeyboardViewController: UIInputViewController {
     flow.next(width: j.regularButtonWidth, button: v)
     flow.next(width: j.regularButtonWidth, button: w)
     
-    flow.reset(x: 0, y: j.top(row: 3))
+    flow.reset(x: 0, y: top + j.top(row: 3))
     flow.next(width: j.globeButtonWidth, button: globe)
     flow.next(width: j.regularButtonWidth, button: x)
     flow.next(width: j.regularButtonWidth, button: y)
@@ -377,5 +430,12 @@ class KeyboardViewController: UIInputViewController {
   
   private func updateTextView() {
     textView.source = .init(textDocumentProxy: textDocumentProxy)
+  }
+}
+
+extension KeyboardViewController: UIAdaptivePresentationControllerDelegate {
+  func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
+    let layout = Layout(width: view.bounds.width)
+    heightConstraint.constant = layout.preferredHeight
   }
 }

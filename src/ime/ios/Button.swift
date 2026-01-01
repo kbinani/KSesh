@@ -2,9 +2,9 @@ import UIKit
 
 class Button: UIButton {
   enum KeyCapRole {
-    case left
+    case `default`
     case right
-    case hieroglyph
+    case hieroglyph(category: String)
   }
   
   var leftIcon: UIImageView? {
@@ -38,7 +38,7 @@ class Button: UIButton {
     }
   }
   
-  private let keyCapRole: KeyCapRole
+  let keyCapRole: KeyCapRole
   private var topLabel: UILabel!
   private var middleLabel: UILabel!
   private var bottomLabel: UILabel!
@@ -53,13 +53,13 @@ class Button: UIButton {
     fatalError("init(coder:) has not been implemented")
   }
   
-  convenience init(top: String? = nil, middle: String? = nil, bottom: String? = nil) {
-    self.init(keyCapRole: .hieroglyph)
-    self.topLabel.text = top
+  convenience init(category: String, middle: String? = nil, bottom: String? = nil) {
+    self.init(keyCapRole: .hieroglyph(category: category))
+    self.topLabel.text = category
     self.middleLabel.text = middle
     self.bottomLabel.text = bottom
   }
-  
+
   var appearance: UIKeyboardAppearance? = nil {
     didSet {
       updateColors()
@@ -80,7 +80,9 @@ class Button: UIButton {
 
     let bottomLabel = UILabel()
     self.bottomLabel = bottomLabel
-    if keyCapRole != .hieroglyph {
+    if case .hieroglyph = keyCapRole {
+      
+    } else {
       let base = UIFont.systemFont(ofSize: UIFont.labelFontSize)
       bottomLabel.font = base.fontDescriptor.withDesign(.serif).map({ descriptor in
         UIFont(descriptor: descriptor, size: UIFont.labelFontSize)
@@ -94,7 +96,7 @@ class Button: UIButton {
     middleLabel.contentMode = .center
     middleLabel.baselineAdjustment = .alignCenters
     switch keyCapRole {
-    case .left:
+    case .`default`:
       bottomLabel.textAlignment = .left
     case .right:
       bottomLabel.textAlignment = .right
@@ -169,7 +171,7 @@ class Button: UIButton {
       height: middleLabel.font.pointSize
     )
 
-    if keyCapRole == .hieroglyph {
+    if case .hieroglyph = keyCapRole {
       bottomLabel.font = Font.get(size: size.height * 0.5)
     } else {
       bottomLabel.font = bottomLabel.font.withSize(size.height * 0.3)
