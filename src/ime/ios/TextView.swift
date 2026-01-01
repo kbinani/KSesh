@@ -98,7 +98,7 @@ class TextView: UIView {
     )
      
     ctx.saveGState()
-    content.line.useGlyphs { glyph, position, stringIndex in
+    content.line.useGlyphs { run, glyph, position, stringIndex in
       guard let font = content.string.attribute(.font, at: stringIndex, effectiveRange: nil) as? UIFont else {
         return true
       }

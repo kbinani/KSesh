@@ -11,7 +11,7 @@ extension CTRun {
     CTRunGetPositions(self, .init(location: 0, length: count), &positions)
     CTRunGetStringIndices(self, .init(location: 0, length: count), &indices)
     for i in 0..<count {
-      if !block(glyphs[i], positions[i], indices[i]) {
+      guard block(glyphs[i], positions[i], indices[i]) else {
         return false
       }
     }

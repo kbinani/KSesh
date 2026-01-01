@@ -1,4 +1,4 @@
-import CoreText
+import UIKit
 
 extension CTLine {
   var typographicBounds: CGRect {
@@ -14,12 +14,54 @@ extension CTLine {
   }
   
   @discardableResult
-  func useGlyphs(_ block: (_ glyph: CGGlyph, _ position: CGPoint, _ stringIndex: CFIndex) -> Bool) -> Bool {
+  func useGlyphs(_ block: (_ run: CTRun, _ glyph: CGGlyph, _ position: CGPoint, _ stringIndex: CFIndex) -> Bool) -> Bool {
     for run in runs {
-      guard run.useGlyphs(block) else {
+      guard run.useGlyphs({ glyph, position, stringIndex in
+        return block(run, glyph, position, stringIndex)
+      }) else {
         return false
       }
     }
     return true
+  }
+  
+  func textRect(for range: NSRange) -> CGRect? {
+    var boundingBox = BoundingBox()
+    if range.length == 0 {
+      useGlyphs { run, glyph, position, stringIndex in
+        guard range.location == stringIndex else {
+          return true
+        }
+        let attributes = CTRunGetAttributes(run) as NSDictionary
+        guard let font = attributes.value(forKey: NSAttributedString.Key.font.rawValue) as? UIFont else {
+          return true
+        }
+        guard let bounds = font.opticalBounds(glyph), bounds.width > 0, bounds.height > 0 else {
+          return true
+        }
+        boundingBox.add(bounds.offsetBy(dx: position.x, dy: position.y))
+        return true
+      }
+      guard let rect = boundingBox.rect else {
+        return nil
+      }
+      return .init(x: rect.minX, y: rect.minY, width: 0, height: rect.height)
+    } else {
+      useGlyphs { run, glyph, position, stringIndex in
+        guard range.contains(stringIndex) else {
+          return true
+        }
+        let attributes = CTRunGetAttributes(run) as NSDictionary
+        guard let font = attributes.value(forKey: NSAttributedString.Key.font.rawValue) as? UIFont else {
+          return true
+        }
+        guard let bounds = font.opticalBounds(glyph), bounds.width > 0, bounds.height > 0 else {
+          return true
+        }
+        boundingBox.add(bounds.offsetBy(dx: position.x, dy: position.y))
+        return true
+      }
+      return boundingBox.rect
+    }
   }
 }
