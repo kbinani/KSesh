@@ -84,7 +84,7 @@ class TextView: UIView {
         } else {
           self.cursorBounds = .init(x: 0, y: 0, width: 0, height: bounds.height)
         }
-      } else if (deleteString == "\u{13430}" || deleteString == "\u{13431}") && deleteRange.lowerBound > 0 {
+      } else if (deleteString == .verticalJoin || deleteString == .horizontalJoin) && deleteRange.lowerBound > 0 {
         let leadingRange = ns.rangeOfComposedCharacterSequences(for: .init(location: deleteRange.lowerBound - 1, length: 1))
         var boundingBox = BoundingBox()
         line.runs.forEach { run in
@@ -103,7 +103,7 @@ class TextView: UIView {
           }
         }
         if let rect = boundingBox.rect {
-          if deleteString == "\u{13430}" {
+          if deleteString == .verticalJoin {
             // vertical joiner
             self.cursorBounds = .init(x: rect.minX, y: rect.minY - caretLineWidth, width: rect.width, height: 0)
           } else {

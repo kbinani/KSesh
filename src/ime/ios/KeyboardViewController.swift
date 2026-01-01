@@ -42,8 +42,8 @@ class KeyboardViewController: UIInputViewController {
   private var space: Button!
   private var vj: Button!
   private var hj: Button!
-  private var beginGroup: Button!
-  private var endGroup: Button!
+  private var beginSegment: Button!
+  private var endSegment: Button!
   private var close: Button!
   private var container: ContainerView!
   
@@ -187,17 +187,21 @@ class KeyboardViewController: UIInputViewController {
     self.space = space
     allButtons.append(space)
     let vj = Button(middle: ":")
+    vj.addTarget(self, action: #selector(verticalJoinKeyPressed(_:)), for: .touchUpInside)
     self.vj = vj
     allButtons.append(vj)
     let hj = Button(middle: "*")
+    hj.addTarget(self, action: #selector(horizontalJoinKeyPressed(_:)), for: .touchUpInside)
     self.hj = hj
     allButtons.append(hj)
-    let beginGroup = Button(middle: "(")
-    self.beginGroup = beginGroup
-    allButtons.append(beginGroup)
-    let endGroup = Button(middle: ")")
-    self.endGroup = endGroup
-    allButtons.append(endGroup)
+    let beginSegment = Button(middle: "(")
+    beginSegment.addTarget(self, action: #selector(beginSegmentKeyPressed(_:)), for: .touchUpInside)
+    self.beginSegment = beginSegment
+    allButtons.append(beginSegment)
+    let endSegment = Button(middle: ")")
+    endSegment.addTarget(self, action: #selector(endSegmentKeyPressed(_:)), for: .touchUpInside)
+    self.endSegment = endSegment
+    allButtons.append(endSegment)
     let close = Button(keyCapRole: .right)
     close.rightIcon = UIImageView(image: UIImage(systemName: "keyboard.chevron.compact.down"))
     self.close = close
@@ -229,8 +233,29 @@ class KeyboardViewController: UIInputViewController {
     close.addTarget(self, action: #selector(dismissKeyboard), for: .touchUpInside)
   }
   
+  @objc private func verticalJoinKeyPressed(_ button: UIView) {
+    textDocumentProxy.insertText(.verticalJoin)
+    updateTextView()
+  }
+  
+  @objc private func horizontalJoinKeyPressed(_ button: UIView) {
+    textDocumentProxy.insertText(.horizontalJoin)
+    updateTextView()
+  }
+  
+  @objc private func beginSegmentKeyPressed(_ button: UIView) {
+    textDocumentProxy.insertText(.beginSegment)
+    updateTextView()
+  }
+  
+  @objc private func endSegmentKeyPressed(_ button: UIView) {
+    textDocumentProxy.insertText(.endSegment)
+    updateTextView()
+  }
+  
   @objc private func backspaceKeyPressed(_ button: UIView) {
     textDocumentProxy.deleteBackward()
+    updateTextView()
   }
   
   @objc private func toLeftKeyPressed(_ button: UIView) {
@@ -259,10 +284,12 @@ class KeyboardViewController: UIInputViewController {
   
   @objc private func returnKeyPressed(_ button: UIView) {
     textDocumentProxy.insertText("\n")
+    updateTextView()
   }
   
   @objc private func spaceKeyPressed(_ button: UIView) {
     textDocumentProxy.insertText(" ")
+    updateTextView()
   }
   
   private func updateHeightConstraint() {
@@ -337,18 +364,18 @@ class KeyboardViewController: UIInputViewController {
     flow.next(width: j.spaceButtonWidth, button: space)
     flow.next(width: j.regularButtonWidth, button: vj)
     flow.next(width: j.regularButtonWidth, button: hj)
-    flow.next(width: j.regularButtonWidth, button: beginGroup)
-    flow.next(width: j.regularButtonWidth, button: endGroup)
+    flow.next(width: j.regularButtonWidth, button: beginSegment)
+    flow.next(width: j.regularButtonWidth, button: endSegment)
     flow.next(width: j.closeButtonWidth, button: close)
     super.viewWillLayoutSubviews()
   }
   
-  override func textWillChange(_ textInput: UITextInput?) {
-    // The app is about to change the document's contents. Perform any preparation here.
-  }
-  
   override func textDidChange(_ textInput: UITextInput?) {
     appearance = self.textDocumentProxy.keyboardAppearance
+    updateTextView()
+  }
+  
+  private func updateTextView() {
     textView.content = .init(
       leading: textDocumentProxy.documentContextBeforeInput ?? "",
       trailing: textDocumentProxy.documentContextAfterInput ?? ""

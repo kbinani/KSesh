@@ -237,6 +237,7 @@ if (IOS)
     src/ime/ios/NSString.swift
     src/ime/ios/UIFont.swift
     src/ime/ios/BoundingBox.swift
+    src/ime/ios/String.swift
     src/ime/ios/Info.plist
     res/font/EglyfDebugNG-Regular-3.02.ttf
   )
