@@ -252,35 +252,14 @@ class KeyboardViewController: UIInputViewController {
     }
     heightConstraint.constant = scene.screen.bounds.height
     let glyphs = Hieroglyph.get(category: category)
-    class V: UIViewController {
-      private let glyphs: [(String, String)]
-      init(glyphs: [(String, String)]) {
-        self.glyphs = glyphs
-        super.init(nibName: nil, bundle: nil)
-      }
-      
-      required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-      }
-      
-      override func viewDidLoad() {
-        super.viewDidLoad()
-        let tap = UITapGestureRecognizer(target: self, action: #selector(onTap(_:)))
-        view.addGestureRecognizer(tap)
-      }
-      
-      @objc private func onTap(_ sender: AnyObject) {
-        if let p = presentationController {
-          //TODO
-          p.delegate?.presentationControllerWillDismiss?(p)
-        }
-        dismiss(animated: true)
-      }
-    }
-    let v = V(glyphs: glyphs)
+    let layout = Layout(width: view.bounds.width)
+    let v = GlyphsPanelViewController(
+      glyphs: glyphs,
+      buttonSize: button.bounds.size,
+      gap: .init(width: layout.hGap, height: layout.vGap)
+    )
+    v.delegate = self
     v.modalPresentationStyle = .overFullScreen
-    v.presentationController?.delegate = self
-    v.view.backgroundColor = .blue.withAlphaComponent(0.2)
     present(v, animated: true)
   }
   
@@ -433,8 +412,8 @@ class KeyboardViewController: UIInputViewController {
   }
 }
 
-extension KeyboardViewController: UIAdaptivePresentationControllerDelegate {
-  func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
+extension KeyboardViewController: GlyphsPanelViewControllerDelegate {
+  func glyphsPanelViewControllerWillDismiss(_ sender: GlyphsPanelViewController) {
     let layout = Layout(width: view.bounds.width)
     heightConstraint.constant = layout.preferredHeight
   }

@@ -241,6 +241,8 @@ if (IOS)
     src/ime/ios/TextViewContent.swift
     src/ime/ios/TextViewSource.swift
     src/ime/ios/Hieroglyph.swift
+    src/ime/ios/GlyphsPanelViewController.swift
+    src/ime/ios/GlyphsPanelViewController.xib
     src/ime/ios/Info.plist
     res/font/EglyfDebugNG-Regular-3.02.ttf
   )
@@ -255,7 +257,7 @@ if (IOS)
       XCODE_ATTRIBUTE_LD_RUNPATH_SEARCH_PATHS "\$(inherited)\n@executable_path/Frameworks\n@executable_path/../../Frameworks"
       XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.github.kbinani.ksesh.keyboard"
       XCODE_ATTRIBUTE_MACH_O_TYPE "mh_execute"
-      RESOURCE res/font/EglyfDebugNG-Regular-3.02.ttf
+      RESOURCE "res/font/EglyfDebugNG-Regular-3.02.ttf;src/ime/ios/GlyphsPanelViewController.xib"
   )
   set_target_properties(ksesh
     PROPERTIES
