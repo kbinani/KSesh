@@ -26,6 +26,7 @@ class GlyphsPanelViewController: UIViewController {
   }
   private var shift: Button!
   private weak var parentShiftButton: UIView?
+  private let swipeDownToCloseThreshold: CGFloat = 150
   
   init(glyphs: [(String, String)], buttonSize: CGSize, gap: CGSize, shifted: Bool, parentShiftButton: UIView) {
     self.glyphs = glyphs
@@ -61,8 +62,8 @@ class GlyphsPanelViewController: UIViewController {
 
     container.addSubview(shift)
     
-    let tap = UITapGestureRecognizer(target: self, action: #selector(onTapContainer(_:)))
-    view.addGestureRecognizer(tap)
+    let pan = UIPanGestureRecognizer(target: self, action: #selector(onPanContainer(_:)))
+    view.addGestureRecognizer(pan)
     shift.addTarget(self, action: #selector(onTapShiftKey(_:)), for: .touchUpInside)
   }
  
@@ -98,6 +99,40 @@ class GlyphsPanelViewController: UIViewController {
     super.viewDidLayoutSubviews()
   }
 
+  @objc private func onPanContainer(_ sender: UIPanGestureRecognizer) {
+    let translation = sender.translation(in: container)
+    let velocity = sender.velocity(in: container)
+    switch sender.state {
+    case .began:
+      container.transform = .identity
+      shift.transform = .identity
+      view.alpha = 1
+    case .changed:
+      container.transform = .init(translationX: 0, y: max(0, translation.y))
+      shift.transform = .init(translationX: 0, y: -max(0, translation.y))
+      view.alpha = max(0, 1 - translation.y / swipeDownToCloseThreshold)
+    case .ended:
+      container.transform = .init(translationX: 0, y: max(0, translation.y))
+      shift.transform = .init(translationX: 0, y: -max(0, translation.y))
+      if translation.y > swipeDownToCloseThreshold || velocity.y > 1000 {
+        delegate?.glyphsPanelViewControllerWillDismiss(self)
+        dismiss(animated: false)
+        sender.isEnabled = false
+        sender.isEnabled = true
+      } else {
+        container.transform = .identity
+        shift.transform = .identity
+        view.alpha = 1
+      }
+    case .cancelled:
+      container.transform = .identity
+      shift.transform = .identity
+      view.alpha = 1
+    default:
+      break
+    }
+  }
+  
   @objc private func onTapShiftKey(_ sender: Button) {
     shifted.toggle()
     delegate?.glyphsPanelViewController(self, didChangeShifted: shifted)
@@ -109,12 +144,7 @@ class GlyphsPanelViewController: UIViewController {
     }
     shift.leftIcon = UIImageView(image: Button.shiftIcon(shifted: shifted))
   }
-  
-  @objc private func onTapContainer(_ sender: AnyObject) {
-    delegate?.glyphsPanelViewControllerWillDismiss(self)
-    dismiss(animated: false)
-  }
-  
+
   @objc private func onTapKeyCap(_ sender: Button) {
     guard let key = sender.topText, let glyph = sender.bottomText else {
       return
