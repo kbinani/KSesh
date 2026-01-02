@@ -101,6 +101,12 @@ class Button: UIButton {
     
     topLabel.textAlignment = .left
     topLabel.contentMode = .top
+    if case .hieroglyph = keyCapRole {
+    } else {
+      topLabel.minimumScaleFactor = 0
+      topLabel.adjustsFontSizeToFitWidth = true
+      topLabel.numberOfLines = 2
+    }
     middleLabel.textAlignment = .center
     middleLabel.contentMode = .center
     middleLabel.baselineAdjustment = .alignCenters
@@ -171,11 +177,16 @@ class Button: UIButton {
     let width = size.width - 2 * hMargin
     let iconSizeRatio: CGFloat = 0.3
 
+    let topLabelHeight = if case .hieroglyph = keyCapRole {
+      topLabel.font.pointSize
+    } else {
+      topLabel.font.pointSize * CGFloat(topLabel.numberOfLines)
+    }
     topLabel.frame = .init(
       x: hMargin,
       y: vMargin,
       width: width,
-      height: topLabel.font.pointSize
+      height: topLabelHeight
     )
 
     middleLabel.frame = .init(

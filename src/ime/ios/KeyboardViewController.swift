@@ -429,6 +429,11 @@ class KeyboardViewController: UIInputViewController {
   
   private func updateTextView() {
     textView.source = .init(textDocumentProxy: textDocumentProxy)
+    if let before = textDocumentProxy.documentContextBeforeInput, let last = before.unicodeScalars.last, let name = last.properties.name {
+      backspace.topText = name
+    } else {
+      backspace.topText = ""
+    }
   }
 }
 

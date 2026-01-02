@@ -42,7 +42,7 @@ struct Layout {
     self.closeButtonWidth = alephButtonWidth
     self.globeButtonWidth = regularButtonWidth
     self.spaceButtonWidth = width - sideMargin * 2 - globeButtonWidth - regularButtonWidth * 8 - closeButtonWidth - hGap * 10
-    self.backspaceButtonWidth = closeButtonWidth
+    self.backspaceButtonWidth = toLeftButtonWidth + hGap + toRightButtonWidth
     self.textViewWidth = width - sideMargin * 2 - toLeftButtonWidth - toRightButtonWidth - backspaceButtonWidth - hGap * 3
   }
   
