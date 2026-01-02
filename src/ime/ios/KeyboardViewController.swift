@@ -187,12 +187,12 @@ class KeyboardViewController: UIInputViewController {
     self.space = space
     allButtons.append(space)
     let vj = Button(keyCapRole: .default)
-    vj.middleText = ":"
+    vj.centerIcon = UIImageView(image: .init(systemName: "square.split.1x2"))
     vj.addTarget(self, action: #selector(verticalJoinKeyPressed(_:)), for: .touchUpInside)
     self.vj = vj
     allButtons.append(vj)
     let hj = Button(keyCapRole: .default)
-    hj.middleText = "*"
+    hj.centerIcon = UIImageView(image: .init(systemName: "square.split.2x1"))
     hj.addTarget(self, action: #selector(horizontalJoinKeyPressed(_:)), for: .touchUpInside)
     self.hj = hj
     allButtons.append(hj)
