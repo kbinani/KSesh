@@ -3,46 +3,16 @@ import UIKit
 @MainActor
 protocol GlyphsPanelViewControllerDelegate: AnyObject {
   func glyphsPanelViewControllerWillDismiss(_ sender: GlyphsPanelViewController)
+  func glyphsPanelViewController(_ sender: GlyphsPanelViewController, didTouchUpInsideKeyCap glyph: String)
 }
 
 class GlyphsPanelViewController: UIViewController {
   weak var delegate: GlyphsPanelViewControllerDelegate?
-  
-  class Cell: UICollectionViewCell {
-    var key: String?
-    var glyph: String?
-    private var button: Button?
-    
-    override func prepareForReuse() {
-      self.key = nil
-      self.glyph = nil
-      button?.topText = ""
-      button?.bottomText = ""
-    }
-    
-    override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
-      button?.frame = .init(origin: .zero, size: layoutAttributes.size)
-    }
-    
-    func setup(key: String, glyph: String) {
-      self.key = key
-      self.glyph = glyph
-      if let button  {
-        button.topText = key
-        button.bottomText = glyph
-      } else {
-        let b = Button(category: key, bottom: glyph)
-        b.frame = .init(origin: .zero, size: contentView.bounds.size)
-        self.button = b
-        contentView.addSubview(b)
-      }
-    }
-  }
-  
-  @IBOutlet var collectionView: UICollectionView!
-  @IBOutlet var layout: UICollectionViewFlowLayout!
+
+  @IBOutlet var container: ContainerView!
   
   private let glyphs: [(String, String)]
+  private let buttons: [Button]
   private let buttonSize: CGSize
   private let gap: CGSize
   
@@ -50,6 +20,12 @@ class GlyphsPanelViewController: UIViewController {
     self.glyphs = glyphs
     self.buttonSize = buttonSize
     self.gap = gap
+    var buttons: [Button] = []
+    for (key, glyph) in glyphs {
+      let button = Button(category: key, bottom: glyph)
+      buttons.append(button)
+    }
+    self.buttons = buttons
     super.init(nibName: "GlyphsPanelViewController", bundle: nil)
   }
   
@@ -59,38 +35,53 @@ class GlyphsPanelViewController: UIViewController {
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    
-    layout.itemSize = buttonSize
-    layout.minimumInteritemSpacing = gap.width
-    layout.minimumLineSpacing = gap.height
-    collectionView.register(Cell.self, forCellWithReuseIdentifier: "cell")
-    collectionView.dataSource = self
+
+    for button in buttons {
+      container.addSubview(button)
+      button.addTarget(self, action: #selector(onTapKeyCap(_:)), for: .touchUpInside)
+    }
     
     let tap = UITapGestureRecognizer(target: self, action: #selector(onTap(_:)))
     view.addGestureRecognizer(tap)
   }
+ 
+  override func viewDidLayoutSubviews() {
+    let size = container.bounds.size
+    let columns = Int(floor(size.width + gap.width) / (buttonSize.width + gap.width))
+    let x0 = (size.width - buttonSize.width * CGFloat(columns) - gap.width * CGFloat(columns - 1)) * 0.5
+    let flow = HorizontalViewFlow(
+      origin: .init(x: x0 - gap.width, y: 0),
+      height: buttonSize.height,
+      gap: gap.width
+    )
+    var index: Int = 0
+    for row in 0 ..< buttons.count {
+      let y = (buttonSize.height + gap.height) * CGFloat(row)
+      flow.reset(x: x0 - gap.width, y: y)
+      for _ in 0 ..< columns {
+        guard index < buttons.count else {
+          break
+        }
+        let button = buttons[index]
+        flow.next(width: buttonSize.width, button: button)
+        index += 1
+      }
+      guard index < buttons.count else {
+        break
+      }
+    }
+    super.viewDidLayoutSubviews()
+  }
   
   @objc private func onTap(_ sender: AnyObject) {
     delegate?.glyphsPanelViewControllerWillDismiss(self)
-    dismiss(animated: true)
-  }
-}
-
-extension GlyphsPanelViewController: UICollectionViewDataSource {
-  func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-    guard section == 0 else {
-      return 0
-    }
-    return glyphs.count
+    dismiss(animated: false)
   }
   
-  func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-    let index = indexPath.row
-    let (key, glyph) = glyphs[index]
-    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
-    if let typed = cell as? Cell {
-      typed.setup(key: key, glyph: glyph)
+  @objc private func onTapKeyCap(_ sender: Button) {
+    guard let glyph = sender.bottomText else {
+      return
     }
-    return cell
+    delegate?.glyphsPanelViewController(self, didTouchUpInsideKeyCap: glyph)
   }
 }

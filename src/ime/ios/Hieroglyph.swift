@@ -1,7 +1,7 @@
 enum Hieroglyph {
   static let basic: [(String, String)] = [
     // A
-    ("A1", "﻿𓀀"),
+    ("A1", "𓀀"),
     ("A2", "𓀁"),
     ("A3", "𓀂"),
     ("A4", "𓀃"),

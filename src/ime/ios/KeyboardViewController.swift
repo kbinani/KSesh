@@ -260,7 +260,7 @@ class KeyboardViewController: UIInputViewController {
     )
     v.delegate = self
     v.modalPresentationStyle = .overFullScreen
-    present(v, animated: true)
+    present(v, animated: false)
   }
   
   @objc private func verticalJoinKeyPressed(_ button: UIView) {
@@ -416,5 +416,10 @@ extension KeyboardViewController: GlyphsPanelViewControllerDelegate {
   func glyphsPanelViewControllerWillDismiss(_ sender: GlyphsPanelViewController) {
     let layout = Layout(width: view.bounds.width)
     heightConstraint.constant = layout.preferredHeight
+  }
+  
+  func glyphsPanelViewController(_ sender: GlyphsPanelViewController, didTouchUpInsideKeyCap glyph: String) {
+    textDocumentProxy.insertText(glyph)
+    updateTextView()
   }
 }

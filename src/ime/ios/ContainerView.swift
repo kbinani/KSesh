@@ -1,5 +1,6 @@
 import UIKit
 
+@IBDesignable
 class ContainerView: UIView {
   override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
     let hit = super.hitTest(point, with: event)
