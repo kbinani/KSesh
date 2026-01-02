@@ -243,6 +243,7 @@ if (IOS)
     src/ime/ios/Hieroglyph.swift
     src/ime/ios/GlyphsPanelViewController.swift
     src/ime/ios/GlyphsPanelViewController.xib
+    src/ime/ios/NSLayoutConstraint.swift
     src/ime/ios/Info.plist
     res/font/EglyfDebugNG-Regular-3.02.ttf
   )

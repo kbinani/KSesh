@@ -3,7 +3,8 @@ import UIKit
 @MainActor
 protocol GlyphsPanelViewControllerDelegate: AnyObject {
   func glyphsPanelViewControllerWillDismiss(_ sender: GlyphsPanelViewController)
-  func glyphsPanelViewController(_ sender: GlyphsPanelViewController, didTouchUpInsideKeyCap glyph: String)
+  func glyphsPanelViewController(_ sender: GlyphsPanelViewController, didTouchUpInsideKeyCap text: String)
+  func glyphsPanelViewController(_ sender: GlyphsPanelViewController, didChangeShifted shifted: Bool)
 }
 
 class GlyphsPanelViewController: UIViewController {
@@ -15,17 +16,32 @@ class GlyphsPanelViewController: UIViewController {
   private let buttons: [Button]
   private let buttonSize: CGSize
   private let gap: CGSize
+  private var shifted: Bool {
+    didSet {
+      guard oldValue != shifted else {
+        return
+      }
+      updateShiftState()
+    }
+  }
+  private var shift: Button!
+  private weak var parentShiftButton: UIView?
   
-  init(glyphs: [(String, String)], buttonSize: CGSize, gap: CGSize) {
+  init(glyphs: [(String, String)], buttonSize: CGSize, gap: CGSize, shifted: Bool, parentShiftButton: UIView) {
     self.glyphs = glyphs
     self.buttonSize = buttonSize
     self.gap = gap
     var buttons: [Button] = []
     for (key, glyph) in glyphs {
       let button = Button(category: key, bottom: glyph)
+      button.shifted = shifted
       buttons.append(button)
     }
     self.buttons = buttons
+    self.shifted = shifted
+    self.shift = Button(keyCapRole: .default)
+    shift.leftIcon = UIImageView(image: Button.shiftIcon(shifted: shifted))
+    self.parentShiftButton = parentShiftButton
     super.init(nibName: "GlyphsPanelViewController", bundle: nil)
   }
   
@@ -40,9 +56,14 @@ class GlyphsPanelViewController: UIViewController {
       container.addSubview(button)
       button.addTarget(self, action: #selector(onTapKeyCap(_:)), for: .touchUpInside)
     }
+    container.clipsToBounds = false
+    container.autoresizesSubviews = false
+
+    container.addSubview(shift)
     
-    let tap = UITapGestureRecognizer(target: self, action: #selector(onTap(_:)))
+    let tap = UITapGestureRecognizer(target: self, action: #selector(onTapContainer(_:)))
     view.addGestureRecognizer(tap)
+    shift.addTarget(self, action: #selector(onTapShiftKey(_:)), for: .touchUpInside)
   }
  
   override func viewDidLayoutSubviews() {
@@ -70,18 +91,39 @@ class GlyphsPanelViewController: UIViewController {
         break
       }
     }
+    if let parentShiftButton {
+      let frame = container.convert(parentShiftButton.frame, from: parentShiftButton.superview)
+      self.shift.frame = frame
+    }
     super.viewDidLayoutSubviews()
   }
+
+  @objc private func onTapShiftKey(_ sender: Button) {
+    shifted.toggle()
+    delegate?.glyphsPanelViewController(self, didChangeShifted: shifted)
+  }
   
-  @objc private func onTap(_ sender: AnyObject) {
+  private func updateShiftState() {
+    buttons.forEach { button in
+      button.shifted = shifted
+    }
+    shift.leftIcon = UIImageView(image: Button.shiftIcon(shifted: shifted))
+  }
+  
+  @objc private func onTapContainer(_ sender: AnyObject) {
     delegate?.glyphsPanelViewControllerWillDismiss(self)
     dismiss(animated: false)
   }
   
   @objc private func onTapKeyCap(_ sender: Button) {
-    guard let glyph = sender.bottomText else {
+    guard let key = sender.topText, let glyph = sender.bottomText else {
       return
     }
-    delegate?.glyphsPanelViewController(self, didTouchUpInsideKeyCap: glyph)
+    let text = if shifted {
+      key
+    } else {
+      glyph
+    }
+    delegate?.glyphsPanelViewController(self, didTouchUpInsideKeyCap: text)
   }
 }

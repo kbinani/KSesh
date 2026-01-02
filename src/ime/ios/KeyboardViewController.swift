@@ -49,6 +49,14 @@ class KeyboardViewController: UIInputViewController {
   
   private var allButtons: [Button] = []
   private var heightConstraint: NSLayoutConstraint!
+  private var shifted: Bool = false {
+    didSet {
+      guard oldValue != shifted else {
+        return
+      }
+      updateShiftState()
+    }
+  }
   
   override func updateViewConstraints() {
     super.updateViewConstraints()
@@ -125,7 +133,7 @@ class KeyboardViewController: UIInputViewController {
     
     // row 2
     let shift = Button(keyCapRole: .default)
-    shift.leftIcon = UIImageView(image: UIImage(systemName: "shift"))
+    shift.addTarget(self, action: #selector(shiftKeyPressed(_:)), for: .touchUpInside)
     self.shift = shift
     allButtons.append(shift)
     let l = Button(category: "L", bottom: "𓆣")
@@ -228,10 +236,7 @@ class KeyboardViewController: UIInputViewController {
       button.addTarget(self, action: #selector(buttonPressed(_:)), for: .touchUpInside)
     }
     view.addSubview(container)
-    container.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-    container.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-    container.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-    container.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+    NSLayoutConstraint.identicalBoundingBox(master: view, slave: container)
     
     let layout = Layout(width: view.bounds.width)
     let heightConstraint = view.heightAnchor.constraint(equalToConstant: layout.preferredHeight)
@@ -241,6 +246,19 @@ class KeyboardViewController: UIInputViewController {
     
     globe.addTarget(self, action: #selector(handleInputModeList(from:with:)), for: .allTouchEvents)
     close.addTarget(self, action: #selector(dismissKeyboard), for: .touchUpInside)
+    
+    updateShiftState()
+  }
+  
+  @objc private func shiftKeyPressed(_ button: Button) {
+    shifted.toggle()
+  }
+  
+  private func updateShiftState() {
+    shift.leftIcon = UIImageView(image: Button.shiftIcon(shifted: shifted))
+    allButtons.forEach { button in
+      button.shifted = shifted
+    }
   }
   
   @objc private func buttonPressed(_ button: Button) {
@@ -256,7 +274,9 @@ class KeyboardViewController: UIInputViewController {
     let v = GlyphsPanelViewController(
       glyphs: glyphs,
       buttonSize: button.bounds.size,
-      gap: .init(width: layout.hGap, height: layout.vGap)
+      gap: .init(width: layout.hGap, height: layout.vGap),
+      shifted: shifted,
+      parentShiftButton: shift
     )
     v.delegate = self
     v.modalPresentationStyle = .overFullScreen
@@ -418,8 +438,12 @@ extension KeyboardViewController: GlyphsPanelViewControllerDelegate {
     heightConstraint.constant = layout.preferredHeight
   }
   
-  func glyphsPanelViewController(_ sender: GlyphsPanelViewController, didTouchUpInsideKeyCap glyph: String) {
-    textDocumentProxy.insertText(glyph)
+  func glyphsPanelViewController(_ sender: GlyphsPanelViewController, didTouchUpInsideKeyCap text: String) {
+    textDocumentProxy.insertText(text)
     updateTextView()
+  }
+  
+  func glyphsPanelViewController(_ sender: GlyphsPanelViewController, didChangeShifted shifted: Bool) {
+    self.shifted = shifted
   }
 }

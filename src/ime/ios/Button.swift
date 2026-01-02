@@ -38,6 +38,15 @@ class Button: UIButton {
     }
   }
   
+  var shifted: Bool = false {
+    didSet {
+      guard shifted != oldValue else {
+        return
+      }
+      updateColors()
+    }
+  }
+  
   let keyCapRole: KeyCapRole
   private var topLabel: UILabel!
   private var middleLabel: UILabel!
@@ -121,20 +130,20 @@ class Button: UIButton {
       CATransaction.commit()
     }
     CATransaction.setDisableActions(true)
-    let textColor: UIColor
-    let topTextColor: UIColor
+    let mainTextColor: UIColor
+    let subTextColor: UIColor
     let baseBackgroundColor: UIColor
     if case .dark = appearance {
-      textColor = UIColor.white
-      topTextColor = #colorLiteral(red: 0.4665528536, green: 0.4665527344, blue: 0.4665527344, alpha: 1)
+      mainTextColor = UIColor.white
+      subTextColor = #colorLiteral(red: 0.4665528536, green: 0.4665527344, blue: 0.4665527344, alpha: 1)
       if isHighlighted {
         baseBackgroundColor = #colorLiteral(red: 0.4863533378, green: 0.4863144159, blue: 0.4910370708, alpha: 1)
       } else {
         baseBackgroundColor = #colorLiteral(red: 0.2353515327, green: 0.2353515029, blue: 0.2353515029, alpha: 1)
       }
     } else {
-      textColor = UIColor.black
-      topTextColor = #colorLiteral(red: 0.7524755597, green: 0.7555301785, blue: 0.7636918426, alpha: 1)
+      mainTextColor = UIColor.black
+      subTextColor = #colorLiteral(red: 0.7524755597, green: 0.7555301785, blue: 0.7636918426, alpha: 1)
       if isHighlighted {
         baseBackgroundColor = #colorLiteral(red: 0.6213026643, green: 0.6484116316, blue: 0.6926683784, alpha: 1)
       } else {
@@ -142,12 +151,17 @@ class Button: UIButton {
       }
     }
     configuration?.baseBackgroundColor = baseBackgroundColor
-    topLabel.textColor = topTextColor
-    middleLabel.textColor = textColor
-    bottomLabel.textColor = textColor
-    leftIcon?.tintColor = textColor
-    rightIcon?.tintColor = textColor
-    centerIcon?.tintColor = textColor
+    if shifted, case .hieroglyph = keyCapRole {
+      topLabel.textColor = mainTextColor
+      bottomLabel.textColor = subTextColor
+    } else {
+      topLabel.textColor = subTextColor
+      bottomLabel.textColor = mainTextColor
+    }
+    middleLabel.textColor = mainTextColor
+    leftIcon?.tintColor = mainTextColor
+    rightIcon?.tintColor = mainTextColor
+    centerIcon?.tintColor = mainTextColor
   }
   
   override func layoutSubviews() {
@@ -244,6 +258,16 @@ class Button: UIButton {
     }
     set {
       bottomLabel.text = newValue
+    }
+  }
+}
+
+extension Button {
+  static func shiftIcon(shifted: Bool) -> UIImage? {
+    if shifted {
+      return UIImage(systemName: "shift.fill")
+    } else {
+      return UIImage(systemName: "shift")
     }
   }
 }
