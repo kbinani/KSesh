@@ -1,9 +1,11 @@
 import UIKit
 
 class AlephButton: Button, KeyCap {
-  private var bottomLabel: UILabel!
+  private let iconView: UIImageView!
   
   override init() {
+    let iconView = UIImageView(image: .init(named: "a1_small"))
+    self.iconView = iconView
     super.init()
     commonInit()
   }
@@ -13,35 +15,29 @@ class AlephButton: Button, KeyCap {
   }
   
   private func commonInit() {
-    let bottomLabel = UILabel()
-    self.bottomLabel = bottomLabel
-    let base = UIFont.systemFont(ofSize: UIFont.labelFontSize)
-    bottomLabel.font = base.fontDescriptor.withDesign(.serif).map({ descriptor in
-      UIFont(descriptor: descriptor, size: UIFont.labelFontSize)
-    })
-    self.addSubview(bottomLabel)
-    
-    bottomLabel.textAlignment = .left
-    bottomLabel.contentMode   = .bottom
-    bottomLabel.text = "ȝ"
+    self.addSubview(iconView)
   }
   
   override func updateAppearance() {
-    bottomLabel.textColor = appearance?.tintColor
+    iconView.tintColor = appearance?.tintColor
     super.updateAppearance()
   }
   
   override func layoutSubviews() {
-    let size = self.bounds.size
-    let width = size.width - 2 * Style.hMargin
-    
-    bottomLabel.font = bottomLabel.font.withSize(size.height * 0.3)
-    bottomLabel.frame = .init(
-      x: Style.hMargin,
-      y: size.height - Style.vMargin - bottomLabel.font.pointSize,
-      width: width,
-      height: bottomLabel.font.pointSize
-    )
+    let size = bounds.size
+    let iconSize = size.height * 0.7
+    let xOffset = -iconSize * 0.05
+    let yOffset = iconSize * 0.1
+    if let image = iconView.image {
+      let iconHeight = iconSize
+      let iconWidth = iconHeight * image.size.width / image.size.height
+      iconView.frame = .init(
+        x: xOffset,
+        y: size.height - iconHeight + yOffset,
+        width: iconWidth,
+        height: iconHeight
+      )
+    }
     super.layoutSubviews()
   }
 }
