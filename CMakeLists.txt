@@ -223,6 +223,11 @@ if (MSVC)
 endif()
 
 if (IOS)
+  list(APPEND keyboard_resources
+    src/ime/ios/GlyphsPanelViewController.xib
+    res/font/EglyfDebugNG-Regular-3.02.ttf
+    src/ime/ios/assets.xcassets
+  )
   list(APPEND keyboard_files
     src/ime/ios/KeyboardViewController.swift
     src/ime/ios/Button.swift
@@ -242,7 +247,6 @@ if (IOS)
     src/ime/ios/TextViewSource.swift
     src/ime/ios/Hieroglyph.swift
     src/ime/ios/GlyphsPanelViewController.swift
-    src/ime/ios/GlyphsPanelViewController.xib
     src/ime/ios/NSLayoutConstraint.swift
     src/ime/ios/KeyCap.swift
     src/ime/ios/UIKeyboardAppearance.swift
@@ -256,8 +260,7 @@ if (IOS)
     src/ime/ios/BackspaceButton.swift
     src/ime/ios/HieroglyphButton.swift
     src/ime/ios/Info.plist
-    res/font/EglyfDebugNG-Regular-3.02.ttf
-    src/ime/ios/assets.xcassets
+    "${keyboard_resources}"
   )
   add_library(ksesh-keyboard MODULE)
   target_sources(ksesh-keyboard PRIVATE ${keyboard_files})
@@ -270,12 +273,18 @@ if (IOS)
       XCODE_ATTRIBUTE_LD_RUNPATH_SEARCH_PATHS "\$(inherited)\n@executable_path/Frameworks\n@executable_path/../../Frameworks"
       XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.github.kbinani.ksesh.keyboard"
       XCODE_ATTRIBUTE_MACH_O_TYPE "mh_execute"
-      RESOURCE "res/font/EglyfDebugNG-Regular-3.02.ttf;src/ime/ios/GlyphsPanelViewController.xib;src/ime/ios/assets.xcassets"
+      RESOURCE "$keyboard_resources"
   )
   set_target_properties(ksesh
     PROPERTIES
       XCODE_EMBED_APP_EXTENSIONS ksesh-keyboard
   )
+  foreach(file IN LISTS keyboard_resources)
+    set_source_files_properties(${file}
+      PROPERTIES
+        MACOSX_PACKAGE_LOCATION Resources
+    )
+  endforeach()
 endif()
 
 source_group(TREE ${CMAKE_CURRENT_LIST_DIR} FILES ${all_files})
