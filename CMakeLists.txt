@@ -257,6 +257,56 @@ if (IOS)
     src/ime/ios/HieroglyphButton.swift
     src/ime/ios/Info.plist
     res/font/EglyfDebugNG-Regular-3.02.ttf
+    res/font/icon/a1_small.pdf
+    res/font/icon/a2_small.pdf
+    res/font/icon/b_capital.pdf
+    res/font/icon/b_small.pdf
+    res/font/icon/d_capital.pdf
+    res/font/icon/d_small.pdf
+    res/font/icon/d1_capital.pdf
+    res/font/icon/d1_small.pdf
+    res/font/icon/f_capital.pdf
+    res/font/icon/f_small.pdf
+    res/font/icon/g_capital.pdf
+    res/font/icon/g_small.pdf
+    res/font/icon/h_capital.pdf
+    res/font/icon/h_small.pdf
+    res/font/icon/h1_capital.pdf
+    res/font/icon/h1_small.pdf
+    res/font/icon/h2_capital.pdf
+    res/font/icon/h2_small.pdf
+    res/font/icon/h3_capital.pdf
+    res/font/icon/h3_small.pdf
+    res/font/icon/i_capital.pdf
+    res/font/icon/i_small.pdf
+    res/font/icon/i1_small.pdf
+    res/font/icon/k_capital.pdf
+    res/font/icon/k_small.pdf
+    res/font/icon/k1_capital.pdf
+    res/font/icon/k1_small.pdf
+    res/font/icon/m_capital.pdf
+    res/font/icon/m_small.pdf
+    res/font/icon/n_capital.pdf
+    res/font/icon/n_small.pdf
+    res/font/icon/p_capital.pdf
+    res/font/icon/p_small.pdf
+    res/font/icon/q_capital.pdf
+    res/font/icon/q_small.pdf
+    res/font/icon/r_capital.pdf
+    res/font/icon/r_small.pdf
+    res/font/icon/s_capital.pdf
+    res/font/icon/s_small.pdf
+    res/font/icon/s1_capital.pdf
+    res/font/icon/s1_small.pdf
+    res/font/icon/t_capital.pdf
+    res/font/icon/t_small.pdf
+    res/font/icon/t1_capital.pdf
+    res/font/icon/t1_small.pdf
+    res/font/icon/w_capital.pdf
+    res/font/icon/w_small.pdf
+    res/font/icon/y_small.pdf
+    res/font/icon/z_capital.pdf
+    res/font/icon/z_small.pdf
   )
   add_library(ksesh-keyboard MODULE)
   target_sources(ksesh-keyboard PRIVATE ${keyboard_files})
@@ -269,7 +319,7 @@ if (IOS)
       XCODE_ATTRIBUTE_LD_RUNPATH_SEARCH_PATHS "\$(inherited)\n@executable_path/Frameworks\n@executable_path/../../Frameworks"
       XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.github.kbinani.ksesh.keyboard"
       XCODE_ATTRIBUTE_MACH_O_TYPE "mh_execute"
-      RESOURCE "res/font/EglyfDebugNG-Regular-3.02.ttf;src/ime/ios/GlyphsPanelViewController.xib"
+      RESOURCE "res/font/EglyfDebugNG-Regular-3.02.ttf;src/ime/ios/GlyphsPanelViewController.xib;res/font/icon/a1_small.pdf;res/font/icon/a2_small.pdf;res/font/icon/b_capital.pdf;res/font/icon/b_small.pdf;res/font/icon/d_capital.pdf;res/font/icon/d_small.pdf;res/font/icon/d1_capital.pdf;res/font/icon/d1_small.pdf;res/font/icon/f_capital.pdf;res/font/icon/f_small.pdf;res/font/icon/g_capital.pdf;res/font/icon/g_small.pdf;res/font/icon/h_capital.pdf;res/font/icon/h_small.pdf;res/font/icon/h1_capital.pdf;res/font/icon/h1_small.pdf;res/font/icon/h2_capital.pdf;res/font/icon/h2_small.pdf;res/font/icon/h3_capital.pdf;res/font/icon/h3_small.pdf;res/font/icon/i_capital.pdf;res/font/icon/i_small.pdf;res/font/icon/i1_small.pdf;res/font/icon/k_capital.pdf;res/font/icon/k_small.pdf;res/font/icon/k1_capital.pdf;res/font/icon/k1_small.pdf;res/font/icon/m_capital.pdf;res/font/icon/m_small.pdf;res/font/icon/n_capital.pdf;res/font/icon/n_small.pdf;res/font/icon/p_capital.pdf;res/font/icon/p_small.pdf;res/font/icon/q_capital.pdf;res/font/icon/q_small.pdf;res/font/icon/r_capital.pdf;res/font/icon/r_small.pdf;res/font/icon/s_capital.pdf;res/font/icon/s_small.pdf;res/font/icon/s1_capital.pdf;res/font/icon/s1_small.pdf;res/font/icon/t_capital.pdf;res/font/icon/t_small.pdf;res/font/icon/t1_capital.pdf;res/font/icon/t1_small.pdf;res/font/icon/w_capital.pdf;res/font/icon/w_small.pdf;res/font/icon/y_small.pdf;res/font/icon/z_capital.pdf;res/font/icon/z_small.pdf"
   )
   set_target_properties(ksesh
     PROPERTIES
