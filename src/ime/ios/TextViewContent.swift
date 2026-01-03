@@ -9,21 +9,34 @@ struct TextViewContent {
   let cursorBounds: CGRect?
   let deleteRange: NSRange
   
-  init(string: NSAttributedString, line: CTLine, centerStringIndex: Int, caretLineWidth: CGFloat) {
-    self.string = string
-    self.line = line
+  init(string: String, font: UIFont, centerStringIndex: Int, caretLineWidth: CGFloat) {
+    let f = UIFont.systemFont(ofSize: font.pointSize)
+    let s = NSMutableAttributedString(string: string, attributes: [.font: f])
+    var index: Int = 0
+    var last: UnicodeScalar?
+    for scalar in s.string.unicodeScalars {
+      let count = scalar.utf16.count
+      if scalar.isHieroglyph || (scalar.isVariationSelector && last?.isHieroglyph == true) {
+        s.addAttribute(.font, value: font, range: .init(location: index, length: count))
+      }
+      last = scalar
+      index += count
+    }
     self.centerStringIndex = centerStringIndex
     
-    let bounds = line.typographicBounds
-    self.width = bounds.width
-    
-    let ns: NSString = string.string as NSString
+    let ns: NSString = s.string as NSString
     let backspaceDeletingCount = ns.backspaceDeletingRange(at: centerStringIndex)
     let deleteRange = NSRange(
       location: centerStringIndex - backspaceDeletingCount,
       length: backspaceDeletingCount
     )
     self.deleteRange = deleteRange
+    
+    let line = CTLineCreateWithAttributedString(s)
+    self.string = s
+    self.line = line
+    let bounds = line.typographicBounds
+    self.width = bounds.width
     
     let center = CTLineGetOffsetForStringIndex(line, centerStringIndex, nil)
     

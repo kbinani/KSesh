@@ -2,52 +2,53 @@ import UIKit
 
 class KeyboardViewController: UIInputViewController {
   // row 0
-  private var toLeft: Button!
-  private var toRight: Button!
+  private var toLeft: CenterIconButton!
+  private var toRight: CenterIconButton!
   private var textView: TextView!
-  private var backspace: Button!
+  private var backspace: BackspaceButton!
   // row 1
-  private var aleph: Button!
-  private var a: Button!
-  private var b: Button!
-  private var c: Button!
-  private var d: Button!
-  private var e: Button!
-  private var f: Button!
-  private var g: Button!
-  private var h: Button!
-  private var i: Button!
-  private var k: Button!
-  private var ret: Button!
+  private var aleph: AlephButton!
+  private var a: HieroglyphButton!
+  private var b: HieroglyphButton!
+  private var c: HieroglyphButton!
+  private var d: HieroglyphButton!
+  private var e: HieroglyphButton!
+  private var f: HieroglyphButton!
+  private var g: HieroglyphButton!
+  private var h: HieroglyphButton!
+  private var i: HieroglyphButton!
+  private var k: HieroglyphButton!
+  private var ret: RightIconButton!
   // row 2
-  private var shift: Button!
-  private var l: Button!
-  private var m: Button!
-  private var n: Button!
-  private var o: Button!
-  private var p: Button!
-  private var q: Button!
-  private var r: Button!
-  private var s: Button!
-  private var t: Button!
-  private var u: Button!
-  private var v: Button!
-  private var w: Button!
+  private var shift: ShiftButton!
+  private var l: HieroglyphButton!
+  private var m: HieroglyphButton!
+  private var n: HieroglyphButton!
+  private var o: HieroglyphButton!
+  private var p: HieroglyphButton!
+  private var q: HieroglyphButton!
+  private var r: HieroglyphButton!
+  private var s: HieroglyphButton!
+  private var t: HieroglyphButton!
+  private var u: HieroglyphButton!
+  private var v: HieroglyphButton!
+  private var w: HieroglyphButton!
   // row 3
-  private var globe: Button!
-  private var x: Button!
-  private var y: Button!
-  private var z: Button!
-  private var aa: Button!
-  private var space: Button!
-  private var vj: Button!
-  private var hj: Button!
-  private var beginSegment: Button!
-  private var endSegment: Button!
-  private var close: Button!
+  private var globe: LeftIconButton!
+  private var x: HieroglyphButton!
+  private var y: HieroglyphButton!
+  private var z: HieroglyphButton!
+  private var aa: HieroglyphButton!
+  private var space: TextButton!
+  private var vj: CenterIconButton!
+  private var hj: CenterIconButton!
+  private var beginSegment: TextButton!
+  private var endSegment: TextButton!
+  private var close: RightIconButton!
   private var container: ContainerView!
   
-  private var allButtons: [Button] = []
+  private var allButtons: [KeyCap] = []
+  private var shiftableButtons: [ShiftableKeyCap] = []
   private var heightConstraint: NSLayoutConstraint!
   private var shifted: Bool = false {
     didSet {
@@ -70,13 +71,11 @@ class KeyboardViewController: UIInputViewController {
     let appearance = proxy.keyboardAppearance
     
     // row 0
-    let toLeft = Button(keyCapRole: .default)
-    toLeft.centerIcon = UIImageView(image: UIImage(systemName: "arrow.left"))
+    let toLeft = CenterIconButton(icon: .init(systemName: "arrow.left"))
     toLeft.addTarget(self, action: #selector(toLeftKeyPressed(_:)), for: .touchUpInside)
     self.toLeft = toLeft
     allButtons.append(toLeft)
-    let toRight = Button(keyCapRole: .default)
-    toRight.centerIcon = UIImageView(image: UIImage(systemName: "arrow.right"))
+    let toRight = CenterIconButton(icon: .init(systemName: "arrow.right"))
     toRight.addTarget(self, action: #selector(toRightKeyPressed(_:)), for: .touchUpInside)
     self.toRight = toRight
     allButtons.append(toRight)
@@ -84,138 +83,129 @@ class KeyboardViewController: UIInputViewController {
     textView.backgroundColor = .black.withAlphaComponent(0.1)
     textView.appearance = appearance
     self.textView = textView
-    let backspace = Button(keyCapRole: .right)
-    backspace.rightIcon = UIImageView(image: UIImage(systemName: "delete.left"))
+    let backspace = BackspaceButton()
     backspace.addTarget(self, action: #selector(backspaceKeyPressed(_:)), for: .touchUpInside)
     self.backspace = backspace
     allButtons.append(backspace)
     
     // row 1
-    let aleph = Button(keyCapRole: .default)
-    aleph.bottomText = "ȝ"
+    let aleph = AlephButton()
     self.aleph = aleph
     allButtons.append(aleph)
-    let a = Button(category: "A", bottom: "𓀀")
+    let a = HieroglyphButton(category: "A", hieroglyph: "𓀀")
     self.a = a
     allButtons.append(a)
-    let b = Button(category: "B", bottom: "𓁐")
+    let b = HieroglyphButton(category: "B", hieroglyph: "𓁐")
     self.b = b
     allButtons.append(b)
-    let c = Button(category: "C", bottom: "𓁚")
+    let c = HieroglyphButton(category: "C", hieroglyph: "𓁚")
     self.c = c
     allButtons.append(c)
-    let d = Button(category: "D", bottom: "𓁶")
+    let d = HieroglyphButton(category: "D", hieroglyph: "𓁶")
     self.d = d
     allButtons.append(d)
-    let e = Button(category: "E", bottom: "𓃒")
+    let e = HieroglyphButton(category: "E", hieroglyph: "𓃒")
     self.e = e
     allButtons.append(e)
-    let f = Button(category: "F", bottom: "𓃾")
+    let f = HieroglyphButton(category: "F", hieroglyph: "𓃾")
     self.f = f
     allButtons.append(f)
-    let g = Button(category: "G", bottom: "𓄿")
+    let g = HieroglyphButton(category: "G", hieroglyph: "𓄿")
     self.g = g
     allButtons.append(g)
-    let h = Button(category: "H", bottom: "𓅿")
+    let h = HieroglyphButton(category: "H", hieroglyph: "𓅿")
     self.h = h
     allButtons.append(h)
-    let i = Button(category: "I", bottom: "𓆈")
+    let i = HieroglyphButton(category: "I", hieroglyph: "𓆈")
     self.i = i
     allButtons.append(i)
-    let k = Button(category: "K", bottom: "𓆛")
+    let k = HieroglyphButton(category: "K", hieroglyph: "𓆛")
     self.k = k
     allButtons.append(k)
-    let ret = Button(keyCapRole: .right)
-    ret.rightIcon = UIImageView(image: UIImage(systemName: "return"))
+    let ret = RightIconButton(icon: .init(systemName: "return"))
     ret.addTarget(self, action: #selector(returnKeyPressed(_:)), for: .touchUpInside)
     self.ret = ret
     allButtons.append(ret)
     
     // row 2
-    let shift = Button(keyCapRole: .default)
+    let shift = ShiftButton()
     shift.addTarget(self, action: #selector(shiftKeyPressed(_:)), for: .touchUpInside)
     self.shift = shift
     allButtons.append(shift)
-    let l = Button(category: "L", bottom: "𓆣")
+    let l = HieroglyphButton(category: "L", hieroglyph: "𓆣")
     self.l = l
     allButtons.append(l)
-    let m = Button(category: "M", bottom: "𓆭")
+    let m = HieroglyphButton(category: "M", hieroglyph: "𓆭")
     self.m = m
     allButtons.append(m)
-    let n = Button(category: "N", bottom: "𓇯")
+    let n = HieroglyphButton(category: "N", hieroglyph: "𓇯")
     self.n = n
     allButtons.append(n)
-    let o = Button(category: "O", bottom: "𓉐")
+    let o = HieroglyphButton(category: "O", hieroglyph: "𓉐")
     self.o = o
     allButtons.append(o)
-    let p = Button(category: "P", bottom: "𓊛")
+    let p = HieroglyphButton(category: "P", hieroglyph: "𓊛")
     self.p = p
     allButtons.append(p)
-    let q = Button(category: "Q", bottom: "𓊨")
+    let q = HieroglyphButton(category: "Q", hieroglyph: "𓊨")
     self.q = q
     allButtons.append(q)
-    let r = Button(category: "R", bottom: "𓊯")
+    let r = HieroglyphButton(category: "R", hieroglyph: "𓊯")
     self.r = r
     allButtons.append(r)
-    let s = Button(category: "S", bottom: "𓋑")
+    let s = HieroglyphButton(category: "S", hieroglyph: "𓋑")
     self.s = s
     allButtons.append(s)
-    let t = Button(category: "T", bottom: "𓌇")
+    let t = HieroglyphButton(category: "T", hieroglyph: "𓌇")
     self.t = t
     allButtons.append(t)
-    let u = Button(category: "U", bottom: "𓌳")
+    let u = HieroglyphButton(category: "U", hieroglyph: "𓌳")
     self.u = u
     allButtons.append(u)
-    let v = Button(category: "V", bottom: "𓍢")
+    let v = HieroglyphButton(category: "V", hieroglyph: "𓍢")
     self.v = v
     allButtons.append(v)
-    let w = Button(category: "W", bottom: "𓎯")
+    let w = HieroglyphButton(category: "W", hieroglyph: "𓎯")
     self.w = w
     allButtons.append(w)
     
     // row 3
-    let globe = Button(keyCapRole: .default)
-    globe.leftIcon = UIImageView(image: UIImage(systemName: "globe"))
+    let globe = LeftIconButton(icon: .init(systemName: "globe"))
     self.globe = globe
     allButtons.append(globe)
-    let x = Button(category: "X", bottom: "𓏏")
+    let x = HieroglyphButton(category: "X", hieroglyph: "𓏏")
     self.x = x
     allButtons.append(x)
-    let y = Button(category: "Y", bottom: "𓏛")
+    let y = HieroglyphButton(category: "Y", hieroglyph: "𓏛")
     self.y = y
     allButtons.append(y)
-    let z = Button(category: "Z", bottom: "𓏤")
+    let z = HieroglyphButton(category: "Z", hieroglyph: "𓏤")
     self.z = z
     allButtons.append(z)
-    let aa = Button(category: "Aa", bottom: "𓐍")
+    let aa = HieroglyphButton(category: "Aa", hieroglyph: "𓐍")
     self.aa = aa
     allButtons.append(aa)
-    let space = Button(keyCapRole: .default)
+    let space = TextButton(text: "")
     space.addTarget(self, action: #selector(spaceKeyPressed(_:)), for: .touchUpInside)
     self.space = space
     allButtons.append(space)
-    let vj = Button(keyCapRole: .default)
-    vj.centerIcon = UIImageView(image: .init(systemName: "square.split.1x2"))
+    let vj = CenterIconButton(icon: .init(systemName: "square.split.1x2"))
     vj.addTarget(self, action: #selector(verticalJoinKeyPressed(_:)), for: .touchUpInside)
     self.vj = vj
     allButtons.append(vj)
-    let hj = Button(keyCapRole: .default)
-    hj.centerIcon = UIImageView(image: .init(systemName: "square.split.2x1"))
+    let hj = CenterIconButton(icon: .init(systemName: "square.split.2x1"))
     hj.addTarget(self, action: #selector(horizontalJoinKeyPressed(_:)), for: .touchUpInside)
     self.hj = hj
     allButtons.append(hj)
-    let beginSegment = Button(keyCapRole: .default)
-    beginSegment.middleText = "("
+    let beginSegment = TextButton(text: "(")
     beginSegment.addTarget(self, action: #selector(beginSegmentKeyPressed(_:)), for: .touchUpInside)
     self.beginSegment = beginSegment
     allButtons.append(beginSegment)
-    let endSegment = Button(keyCapRole: .default)
-    endSegment.middleText = ")"
+    let endSegment = TextButton(text: ")")
     endSegment.addTarget(self, action: #selector(endSegmentKeyPressed(_:)), for: .touchUpInside)
     self.endSegment = endSegment
     allButtons.append(endSegment)
-    let close = Button(keyCapRole: .right)
-    close.rightIcon = UIImageView(image: UIImage(systemName: "keyboard.chevron.compact.down"))
+    let close = RightIconButton(icon: .init(systemName: "keyboard.chevron.compact.down"))
     self.close = close
     allButtons.append(close)
     
@@ -229,11 +219,12 @@ class KeyboardViewController: UIInputViewController {
       button.appearance = appearance
       container.addSubview(button)
     }
+    shiftableButtons.append(contentsOf: allButtons.compactMap { $0 as? ShiftableKeyCap })
     allButtons.forEach { button in
-      guard case .hieroglyph = button.keyCapRole else {
+      guard let hieroglyph = button as? HieroglyphButton else {
         return
       }
-      button.addTarget(self, action: #selector(buttonPressed(_:)), for: .touchUpInside)
+      hieroglyph.addTarget(self, action: #selector(buttonPressed(_:)), for: .touchUpInside)
     }
     view.addSubview(container)
     NSLayoutConstraint.identicalBoundingBox(master: view, slave: container)
@@ -250,33 +241,31 @@ class KeyboardViewController: UIInputViewController {
     updateShiftState()
   }
   
-  @objc private func shiftKeyPressed(_ button: Button) {
+  @objc private func shiftKeyPressed(_ button: HieroglyphButton) {
     shifted.toggle()
   }
   
   private func updateShiftState() {
-    shift.leftIcon = UIImageView(image: Button.shiftIcon(shifted: shifted))
-    allButtons.forEach { button in
+    shift.shifted = shifted
+    shiftableButtons.forEach { button in
       button.shifted = shifted
     }
   }
   
-  @objc private func buttonPressed(_ button: Button) {
-    guard case .hieroglyph(let category) = button.keyCapRole else {
-      return
-    }
+  @objc private func buttonPressed(_ button: HieroglyphButton) {
     guard let window = self.view.window, let scene = window.windowScene else {
       return
     }
     heightConstraint.constant = scene.screen.bounds.height
-    let glyphs = Hieroglyph.get(category: category)
+    let glyphs = Hieroglyph.get(category: button.category)
     let layout = Layout(width: view.bounds.width)
     let v = GlyphsPanelViewController(
       glyphs: glyphs,
       buttonSize: button.bounds.size,
       gap: .init(width: layout.hGap, height: layout.vGap),
       shifted: shifted,
-      parentShiftButton: shift
+      parentShiftButton: shift,
+      appearance: textDocumentProxy.keyboardAppearance
     )
     v.delegate = self
     v.modalPresentationStyle = .overFullScreen

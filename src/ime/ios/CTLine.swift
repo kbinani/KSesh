@@ -32,8 +32,7 @@ extension CTLine {
         guard range.location == stringIndex else {
           return true
         }
-        let attributes = CTRunGetAttributes(run) as NSDictionary
-        guard let font = attributes.value(forKey: NSAttributedString.Key.font.rawValue) as? UIFont else {
+        guard let font = run.font else {
           return true
         }
         guard let bounds = font.opticalBounds(glyph), bounds.width > 0, bounds.height > 0 else {
@@ -51,8 +50,7 @@ extension CTLine {
         guard range.contains(stringIndex) else {
           return true
         }
-        let attributes = CTRunGetAttributes(run) as NSDictionary
-        guard let font = attributes.value(forKey: NSAttributedString.Key.font.rawValue) as? UIFont else {
+        guard let font = run.font else {
           return true
         }
         guard let bounds = font.opticalBounds(glyph), bounds.width > 0, bounds.height > 0 else {

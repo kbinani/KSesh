@@ -1,4 +1,4 @@
-import CoreText
+import UIKit
 
 extension CTRun {
   @discardableResult
@@ -16,5 +16,10 @@ extension CTRun {
       }
     }
     return true
+  }
+  
+  var font: UIFont? {
+    let attributes = CTRunGetAttributes(self) as NSDictionary
+    return attributes[NSAttributedString.Key.font.rawValue] as? UIFont
   }
 }

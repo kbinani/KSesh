@@ -13,7 +13,7 @@ class GlyphsPanelViewController: UIViewController {
   @IBOutlet var container: ContainerView!
   
   private let glyphs: [(String, String)]
-  private let buttons: [Button]
+  private let buttons: [HieroglyphButton]
   private let buttonSize: CGSize
   private let gap: CGSize
   private var shifted: Bool {
@@ -24,24 +24,34 @@ class GlyphsPanelViewController: UIViewController {
       updateShiftState()
     }
   }
-  private var shift: Button!
+  private var shift: ShiftButton!
   private weak var parentShiftButton: UIView?
   private let swipeDownToCloseThreshold: CGFloat = 150
   
-  init(glyphs: [(String, String)], buttonSize: CGSize, gap: CGSize, shifted: Bool, parentShiftButton: UIView) {
+  init(
+    glyphs: [(String, String)],
+    buttonSize: CGSize,
+    gap: CGSize,
+    shifted: Bool,
+    parentShiftButton: UIView,
+    appearance: UIKeyboardAppearance?
+  ) {
     self.glyphs = glyphs
     self.buttonSize = buttonSize
     self.gap = gap
-    var buttons: [Button] = []
+    var buttons: [HieroglyphButton] = []
     for (key, glyph) in glyphs {
-      let button = Button(category: key, bottom: glyph)
+      let button = HieroglyphButton(category: key, hieroglyph: glyph)
       button.shifted = shifted
+      button.appearance = appearance
       buttons.append(button)
     }
     self.buttons = buttons
     self.shifted = shifted
-    self.shift = Button(keyCapRole: .default)
-    shift.leftIcon = UIImageView(image: Button.shiftIcon(shifted: shifted))
+    let shift = ShiftButton()
+    shift.shifted = shifted
+    shift.appearance = appearance
+    self.shift = shift
     self.parentShiftButton = parentShiftButton
     super.init(nibName: "GlyphsPanelViewController", bundle: nil)
   }
@@ -133,7 +143,7 @@ class GlyphsPanelViewController: UIViewController {
     }
   }
   
-  @objc private func onTapShiftKey(_ sender: Button) {
+  @objc private func onTapShiftKey(_ sender: ShiftButton) {
     shifted.toggle()
     delegate?.glyphsPanelViewController(self, didChangeShifted: shifted)
   }
@@ -142,17 +152,14 @@ class GlyphsPanelViewController: UIViewController {
     buttons.forEach { button in
       button.shifted = shifted
     }
-    shift.leftIcon = UIImageView(image: Button.shiftIcon(shifted: shifted))
+    shift.shifted = shifted
   }
 
-  @objc private func onTapKeyCap(_ sender: Button) {
-    guard let key = sender.topText, let glyph = sender.bottomText else {
-      return
-    }
+  @objc private func onTapKeyCap(_ sender: HieroglyphButton) {
     let text = if shifted {
-      key
+      sender.category
     } else {
-      glyph
+      sender.hieroglyph
     }
     delegate?.glyphsPanelViewController(self, didTouchUpInsideKeyCap: text)
   }

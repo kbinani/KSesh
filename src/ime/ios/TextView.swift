@@ -5,7 +5,7 @@ class TextView: UIView {
     static let lineHeightRatio: CGFloat = 0.9
     static let caretLineWidthRatio: CGFloat = 0.03
   }
-
+  
   private struct Metrics {
     let fontSize: CGFloat
     let ascent: CGFloat
@@ -40,7 +40,7 @@ class TextView: UIView {
       setNeedsDisplay()
     }
   }
-
+  
   private var textColor: UIColor = .black
   
   private func updateContent() {
@@ -48,26 +48,13 @@ class TextView: UIView {
       self.content = nil
       return
     }
-    guard let h = Font.get(size: metrics.fontSize) else {
+    guard let font = Font.get(size: metrics.fontSize) else {
       self.content = nil
       return
     }
-    let f = UIFont.systemFont(ofSize: metrics.fontSize)
-    let s = NSMutableAttributedString(string: source.leading + source.trailing, attributes: [.font: f])
-    var index: Int = 0
-    var last: UnicodeScalar?
-    for scalar in s.string.unicodeScalars {
-      let count = scalar.utf16.count
-      if scalar.isHieroglyph || (scalar.isVariationSelector && last?.isHieroglyph == true) {
-        s.addAttribute(.font, value: h, range: .init(location: index, length: count))
-      }
-      last = scalar
-      index += count
-    }
-    let line = CTLineCreateWithAttributedString(s)
     self.content = .init(
-      string: s,
-      line: line,
+      string: source.leading + source.trailing,
+      font: font,
       centerStringIndex: source.leading.utf16.count,
       caretLineWidth: metrics.caretLineWidth
     )
@@ -89,17 +76,17 @@ class TextView: UIView {
     defer {
       ctx.restoreGState()
     }
-        
+    
     ctx.translateBy(x: 0, y: size.height)
     ctx.scaleBy(x: 1, y: -1)
     ctx.translateBy(
       x: size.width * 0.5 - content.center,
       y: size.height * 0.5 - metrics.ascent * 0.5 + metrics.descent * 0.5
     )
-     
+    
     ctx.saveGState()
     content.line.useGlyphs { run, glyph, position, stringIndex in
-      guard let font = content.string.attribute(.font, at: stringIndex, effectiveRange: nil) as? UIFont else {
+      guard let font = run.font else {
         return true
       }
       if content.deleteRange.lowerBound <= stringIndex && stringIndex < content.deleteRange.upperBound {

@@ -244,6 +244,17 @@ if (IOS)
     src/ime/ios/GlyphsPanelViewController.swift
     src/ime/ios/GlyphsPanelViewController.xib
     src/ime/ios/NSLayoutConstraint.swift
+    src/ime/ios/KeyCap.swift
+    src/ime/ios/UIKeyboardAppearance.swift
+    src/ime/ios/CenterIconButton.swift
+    src/ime/ios/Button.swift
+    src/ime/ios/AlephButton.swift
+    src/ime/ios/ShiftButton.swift
+    src/ime/ios/LeftIconButton.swift
+    src/ime/ios/RightIconButton.swift
+    src/ime/ios/TextButton.swift
+    src/ime/ios/BackspaceButton.swift
+    src/ime/ios/HieroglyphButton.swift
     src/ime/ios/Info.plist
     res/font/EglyfDebugNG-Regular-3.02.ttf
   )
