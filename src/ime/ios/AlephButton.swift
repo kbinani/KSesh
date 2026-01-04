@@ -26,14 +26,12 @@ class AlephButton: Button, KeyCap {
   override func layoutSubviews() {
     let size = bounds.size
     let iconSize = size.height * 0.7
-    let xOffset = -iconSize * 0.05
-    let yOffset = iconSize * 0.1
     if let image = iconView.image {
       let iconHeight = iconSize
       let iconWidth = iconHeight * image.size.width / image.size.height
       iconView.frame = .init(
-        x: xOffset,
-        y: size.height - iconHeight + yOffset,
+        x: 0,
+        y: size.height - iconHeight,
         width: iconWidth,
         height: iconHeight
       )

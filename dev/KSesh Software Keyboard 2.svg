@@ -12,6 +12,8 @@
    inkscape:export-filename="res\font\a.pdf"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
+   inkscape:export-batch-path="..\res\font\icon"
+   inkscape:export-batch-name=""
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -27,10 +29,10 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
-     inkscape:zoom="1.0444209"
-     inkscape:cx="549.10812"
-     inkscape:cy="496.44736"
-     inkscape:current-layer="layer3" />
+     inkscape:zoom="0.13055261"
+     inkscape:cx="3117.5171"
+     inkscape:cy="-187.6638"
+     inkscape:current-layer="layer4" />
   <defs
      id="defs1">
     <clipPath
@@ -1321,7 +1323,8 @@
      inkscape:groupmode="layer"
      id="layer3"
      inkscape:label="Layer 3"
-     style="display:inline">
+     style="display:none"
+     sodipodi:insensitive="true">
     <g
        id="g17"
        clip-path="url(#clipPath18)"
@@ -3085,6 +3088,1310 @@
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
            x="166.90387"
            y="194.97861">Z</tspan></text>
+    </g>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer4"
+     inkscape:label="KeyCap">
+    <g
+       id="g8"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="a1_small">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4"><tspan
+           sodipodi:role="line"
+           id="tspan6-5"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">A</tspan></text>
+    </g>
+    <g
+       id="g8-15"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="z_small"
+       transform="translate(1059.6033)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-78"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-58"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-32"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">z</tspan></text>
+    </g>
+    <g
+       id="g8-53"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="z_capital"
+       transform="translate(1059.6033,61.43625)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-244"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-42"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-79"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">Z</tspan></text>
+    </g>
+    <g
+       id="g8-27"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="y_small"
+       transform="translate(132.45042)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-65"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-13"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-99"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">y</tspan></text>
+    </g>
+    <g
+       id="g8-666"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="w_small"
+       transform="translate(331.12604)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-76"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-77"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-19"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">w</tspan></text>
+    </g>
+    <g
+       id="g8-83"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="w_capital"
+       transform="translate(331.12604,61.43625)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-45"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-014"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-56"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">W</tspan></text>
+    </g>
+    <g
+       id="g8-89"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="t1_small"
+       transform="translate(1589.405)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-307"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-47"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-83"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">T</tspan></text>
+    </g>
+    <g
+       id="g8-301"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="t1_capital"
+       transform="translate(1589.405,61.43625)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-29"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-03"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-88"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">7</tspan></text>
+    </g>
+    <g
+       id="g8-60"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="t_small"
+       transform="translate(1523.1798)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-61"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-11"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-73"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">t</tspan></text>
+    </g>
+    <g
+       id="g8-30"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="t_capital"
+       transform="translate(1523.1798,61.43625)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-223"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-67"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-15"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">6</tspan></text>
+    </g>
+    <g
+       id="g8-84"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="s1_small"
+       transform="translate(1192.0537)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-926"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-57"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-74"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">S</tspan></text>
+    </g>
+    <g
+       id="g8-492"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="s1_capital"
+       transform="translate(1192.0537,61.43625)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-07"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-060"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-70"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">5</tspan></text>
+    </g>
+    <g
+       id="g8-495"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="s_small"
+       transform="translate(1125.8285)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-64"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-82"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-168"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">s</tspan></text>
+    </g>
+    <g
+       id="g8-05"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="s_capital"
+       transform="translate(1125.8285,61.43625)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-31"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-06"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-75"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">4</tspan></text>
+    </g>
+    <g
+       id="g8-51"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="r_small"
+       transform="translate(728.47728)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-22"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-26"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-407"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">r</tspan></text>
+    </g>
+    <g
+       id="g8-297"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="r_capital"
+       transform="translate(728.47729,61.43625)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-534"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-32"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-11"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">R</tspan></text>
+    </g>
+    <g
+       id="g8-7787"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="q_small"
+       transform="translate(1258.2789)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-30"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-38"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-25"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">o</tspan></text>
+    </g>
+    <g
+       id="g8-125"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="q_capital"
+       transform="translate(1258.2789,61.43625)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-74"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-44"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-44"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">O</tspan></text>
+    </g>
+    <g
+       id="g8-40"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="p_small"
+       transform="translate(463.57645)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-59"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-63"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-428"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">p</tspan></text>
+    </g>
+    <g
+       id="g8-291"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="p_capital"
+       transform="translate(463.57646,61.43625)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-50"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-36"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-49"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">P</tspan></text>
+    </g>
+    <g
+       id="g8-28"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="n_small"
+       transform="translate(662.25208)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-253"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-61"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-86"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">n</tspan></text>
+    </g>
+    <g
+       id="g8-25"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="n_capital"
+       transform="translate(662.25208,61.43625)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-44"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-16"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-163"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">N</tspan></text>
+    </g>
+    <g
+       id="g8-97"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="m_small"
+       transform="translate(596.02687)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-69"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-35"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-7"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">m</tspan></text>
+    </g>
+    <g
+       id="g8-91"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="m_capital"
+       transform="translate(596.02687,61.43625)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-25"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-08"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-393"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">M</tspan></text>
+    </g>
+    <g
+       id="g8-294"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="k1_small"
+       transform="translate(1324.5042)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-19"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-6"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-98"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">q</tspan></text>
+    </g>
+    <g
+       id="g8-9"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="k1_capital"
+       transform="translate(1324.5042,61.43625)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-53"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-252"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-58"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">Q</tspan></text>
+    </g>
+    <g
+       id="g8-29"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="k_small"
+       transform="translate(1390.7294)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-5"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-20"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-03"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">k</tspan></text>
+    </g>
+    <g
+       id="g8-39"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="k_capital"
+       transform="translate(1390.7294,61.43625)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-246"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-18"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-21"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">K</tspan></text>
+    </g>
+    <g
+       id="g8-86"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="i1_small"
+       transform="translate(198.67562)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-124"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-25"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-8"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">Y</tspan></text>
+    </g>
+    <g
+       id="g8-72"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="i_small"
+       transform="translate(66.225208)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-28"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-28"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-90"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">i</tspan></text>
+    </g>
+    <g
+       id="g8-38"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="i_capital"
+       transform="translate(66.225208,61.43625)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-08"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-80"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-68"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">I</tspan></text>
+    </g>
+    <g
+       id="g8-49"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="h3_small"
+       transform="translate(993.37812)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-92"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-5"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-53"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">X</tspan></text>
+    </g>
+    <g
+       id="g8-5"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="h3_capital"
+       transform="translate(993.37812,61.43625)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-10"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-99"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-6"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">3</tspan></text>
+    </g>
+    <g
+       id="g8-778"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="h2_small"
+       transform="translate(927.15291)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-383"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-71"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-07"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">x</tspan></text>
+    </g>
+    <g
+       id="g8-8"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="h2_capital"
+       transform="translate(927.15291,61.43625)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-4"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-14"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-39"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">2</tspan></text>
+    </g>
+    <g
+       id="g8-35"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="h1_small"
+       transform="translate(860.9277)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-12"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-016"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-40"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">H</tspan></text>
+    </g>
+    <g
+       id="g8-660"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="h1_capital"
+       transform="translate(860.9277,61.43625)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-380"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-12"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-50"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">1</tspan></text>
+    </g>
+    <g
+       id="g8-77"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="h_small"
+       transform="translate(794.70249)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-7"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-33"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-599"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">h</tspan></text>
+    </g>
+    <g
+       id="g8-12"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="h_capital"
+       transform="translate(794.70249,61.43625)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-0"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-01"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-46"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">0</tspan></text>
+    </g>
+    <g
+       id="g8-7"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="g_small"
+       transform="translate(1456.9546)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-26"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-0"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-16"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">g</tspan></text>
+    </g>
+    <g
+       id="g8-63"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="g_capital"
+       transform="translate(1456.9546,61.43625)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-6"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-15"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-42"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">G</tspan></text>
+    </g>
+    <g
+       id="g8-2"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="f_small"
+       transform="translate(529.80166)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-91"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-3"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-59"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">f</tspan></text>
+    </g>
+    <g
+       id="g8-66"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="f_capital"
+       transform="translate(529.80166,61.43625)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-18"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-4"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-96"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">F</tspan></text>
+    </g>
+    <g
+       id="g8-13"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="d1_small"
+       transform="translate(1721.8554)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-8"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-9"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-3"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">D</tspan></text>
+    </g>
+    <g
+       id="g8-0"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="d1_capital"
+       transform="translate(1721.8554,61.43625)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-24"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-865"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-0"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">9</tspan></text>
+    </g>
+    <g
+       id="g8-31"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="d_small"
+       transform="translate(1655.6302)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-9"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-86"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-5"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">d</tspan></text>
+    </g>
+    <g
+       id="g8-1"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="d_capital"
+       transform="translate(1655.6302,61.43625)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-38"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-7"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-4"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">8</tspan></text>
+    </g>
+    <g
+       id="g8-4"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="b_small"
+       transform="translate(397.35125)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-3"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-1"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-2"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">b</tspan></text>
+    </g>
+    <g
+       id="g8-6"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="b_capital"
+       transform="translate(397.35125,61.43625)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-1"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.395601"
+         y="45.577553"
+         id="text6-4-8"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-9"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.395601"
+           y="45.577553">B</tspan></text>
+    </g>
+    <g
+       id="g8-3"
+       inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="a2_small"
+       transform="translate(264.90083)">
+      <rect
+         style="fill:none;stroke:none;stroke-width:1.45864;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:13.9374"
+         id="rect6-2-2"
+         width="66.225204"
+         height="61.436249"
+         x="-2.4560547e-06"
+         y="-1.2304688e-06" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
+         x="16.902262"
+         y="46.844204"
+         id="text6-4-2"><tspan
+           sodipodi:role="line"
+           id="tspan6-5-1"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="16.902262"
+           y="46.844204">a</tspan></text>
     </g>
   </g>
   <g
