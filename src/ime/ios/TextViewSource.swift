@@ -20,9 +20,12 @@ struct TextViewSource: Equatable {
   
   @MainActor
   init(textDocumentProxy: UITextDocumentProxy) {
+    let before = textDocumentProxy.documentContextBeforeInput ?? ""
+    let selected = textDocumentProxy.selectedText ?? ""
+    let after = textDocumentProxy.documentContextAfterInput ?? ""
     self.init(
-      leading: textDocumentProxy.documentContextBeforeInput ?? "",
-      trailing: textDocumentProxy.documentContextAfterInput ?? ""
+      leading: before + selected,
+      trailing: after
     )
   }
 }
