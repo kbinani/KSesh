@@ -27,7 +27,7 @@ class HieroglyphButton: Button, ShiftableKeyCap {
   
   let category: String
   let hieroglyph: String
-  private let transcription: Transcription?
+  let transcription: Transcription?
   var mode: Mode = .hieroglyph {
     didSet {
       guard oldValue != mode else {

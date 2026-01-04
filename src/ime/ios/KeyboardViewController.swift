@@ -379,23 +379,36 @@ class KeyboardViewController: UIInputViewController {
   }
   
   @objc private func buttonPressed(_ button: HieroglyphButton) {
-    guard let window = self.view.window, let scene = window.windowScene else {
-      return
+    switch mode {
+    case .hieroglyph:
+      guard let window = self.view.window, let scene = window.windowScene else {
+        return
+      }
+      heightConstraint.constant = scene.screen.bounds.height
+      let glyphs = Hieroglyph.get(category: button.category)
+      let layout = Layout(width: view.bounds.width)
+      let v = GlyphsPanelViewController(
+        glyphs: glyphs,
+        buttonSize: button.bounds.size,
+        gap: .init(width: layout.hGap, height: layout.vGap),
+        shifted: shifted,
+        parentShiftButton: shift,
+        appearance: textDocumentProxy.keyboardAppearance
+      )
+      v.delegate = self
+      v.modalPresentationStyle = .overFullScreen
+      present(v, animated: false)
+    case .transcription:
+      guard let transcription = button.transcription else {
+        return
+      }
+      if shifted, let capital = transcription.capital {
+        textDocumentProxy.insertText(capital)
+      } else {
+        textDocumentProxy.insertText(transcription.small)
+      }
+      updateTextView()
     }
-    heightConstraint.constant = scene.screen.bounds.height
-    let glyphs = Hieroglyph.get(category: button.category)
-    let layout = Layout(width: view.bounds.width)
-    let v = GlyphsPanelViewController(
-      glyphs: glyphs,
-      buttonSize: button.bounds.size,
-      gap: .init(width: layout.hGap, height: layout.vGap),
-      shifted: shifted,
-      parentShiftButton: shift,
-      appearance: textDocumentProxy.keyboardAppearance
-    )
-    v.delegate = self
-    v.modalPresentationStyle = .overFullScreen
-    present(v, animated: false)
   }
   
   @objc private func verticalJoinKeyPressed(_ button: UIView) {

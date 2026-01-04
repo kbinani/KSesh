@@ -1,7 +1,8 @@
 import UIKit
 
 class AlephButton: Button, KeyCap {
-  private let iconView: UIImageView!
+  private let iconView: UIImageView
+  private let label: UILabel
   var mode: HieroglyphButton.Mode = .hieroglyph {
     didSet {
       guard oldValue != mode else {
@@ -12,8 +13,8 @@ class AlephButton: Button, KeyCap {
   }
   
   override init() {
-    let iconView = UIImageView()
-    self.iconView = iconView
+    iconView = UIImageView()
+    label = UILabel()
     super.init()
     commonInit()
     updateMode()
@@ -24,11 +25,14 @@ class AlephButton: Button, KeyCap {
   }
   
   private func commonInit() {
-    self.addSubview(iconView)
+    addSubview(iconView)
+    label.text = "𓀀"
+    addSubview(label)
   }
   
   override func updateAppearance() {
     iconView.tintColor = appearance?.tintColor
+    label.tintColor = appearance?.tintColor
     super.updateAppearance()
   }
   
@@ -45,6 +49,13 @@ class AlephButton: Button, KeyCap {
         height: iconHeight
       )
     }
+    label.font = Font.get(size: size.height * 0.5)
+    label.frame = .init(
+      x: Style.hMargin,
+      y: size.height - Style.vMargin - label.font.pointSize,
+      width: size.width - Style.hMargin * 2,
+      height: label.font.pointSize
+    )
     super.layoutSubviews()
   }
   
@@ -52,9 +63,11 @@ class AlephButton: Button, KeyCap {
     switch mode {
     case .hieroglyph:
       iconView.image = .init(named: "a1_small")
+      iconView.isHidden = false
+      label.isHidden = true
     case .transcription:
-      break
-      //TODO:
+      label.isHidden = false
+      iconView.isHidden = true
     }
   }
 }
