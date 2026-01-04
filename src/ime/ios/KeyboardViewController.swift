@@ -49,6 +49,7 @@ class KeyboardViewController: UIInputViewController {
   
   private var allButtons: [KeyCap] = []
   private var shiftableButtons: [ShiftableKeyCap] = []
+  private var hieroglyphButtons: [HieroglyphButton] = []
   private var heightConstraint: NSLayoutConstraint!
   private var shifted: Bool = false {
     didSet {
@@ -56,6 +57,14 @@ class KeyboardViewController: UIInputViewController {
         return
       }
       updateShiftState()
+    }
+  }
+  private var mode: HieroglyphButton.Mode = .hieroglyph {
+    didSet {
+      guard oldValue != mode else {
+        return
+      }
+      updateMode()
     }
   }
   
@@ -90,36 +99,77 @@ class KeyboardViewController: UIInputViewController {
     
     // row 1
     let aleph = AlephButton()
+    aleph.addTarget(self, action: #selector(alephButtonPressed(_:)), for: .touchUpInside)
     self.aleph = aleph
     allButtons.append(aleph)
-    let a = HieroglyphButton(category: "A", hieroglyph: "𓀀")
+    let a = HieroglyphButton(
+      category: "A",
+      hieroglyph: "𓀀",
+      transcription: .init(small: "ȝ", capital: nil, resource: "a1")
+    )
     self.a = a
     allButtons.append(a)
-    let b = HieroglyphButton(category: "B", hieroglyph: "𓁐")
+    let b = HieroglyphButton(
+      category: "B",
+      hieroglyph: "𓁐",
+      transcription: .init(small: "ı͗", capital: "I͗", resource: "i")
+    )
     self.b = b
     allButtons.append(b)
-    let c = HieroglyphButton(category: "C", hieroglyph: "𓁚")
+    let c = HieroglyphButton(
+      category: "C",
+      hieroglyph: "𓁚",
+      transcription: .init(small: "y", capital: nil, resource: "y")
+    )
     self.c = c
     allButtons.append(c)
-    let d = HieroglyphButton(category: "D", hieroglyph: "𓁶")
+    let d = HieroglyphButton(
+      category: "D",
+      hieroglyph: "𓁶",
+      transcription: .init(small: "ï", capital: nil, resource: "i1")
+    )
     self.d = d
     allButtons.append(d)
-    let e = HieroglyphButton(category: "E", hieroglyph: "𓃒")
+    let e = HieroglyphButton(
+      category: "E",
+      hieroglyph: "𓃒",
+      transcription: .init(small: "ʿ", capital: nil, resource: "a2")
+    )
     self.e = e
     allButtons.append(e)
-    let f = HieroglyphButton(category: "F", hieroglyph: "𓃾")
+    let f = HieroglyphButton(
+      category: "F",
+      hieroglyph: "𓃾",
+      transcription: .init(small: "w", capital: "W", resource: "w")
+    )
     self.f = f
     allButtons.append(f)
-    let g = HieroglyphButton(category: "G", hieroglyph: "𓄿")
+    let g = HieroglyphButton(
+      category: "G",
+      hieroglyph: "𓄿",
+      transcription: .init(small: "b", capital: "B", resource: "b")
+    )
     self.g = g
     allButtons.append(g)
-    let h = HieroglyphButton(category: "H", hieroglyph: "𓅿")
+    let h = HieroglyphButton(
+      category: "H",
+      hieroglyph: "𓅿",
+      transcription: .init(small: "p", capital: "P", resource: "p")
+    )
     self.h = h
     allButtons.append(h)
-    let i = HieroglyphButton(category: "I", hieroglyph: "𓆈")
+    let i = HieroglyphButton(
+      category: "I",
+      hieroglyph: "𓆈",
+      transcription: .init(small: "f", capital: "F", resource: "f")
+    )
     self.i = i
     allButtons.append(i)
-    let k = HieroglyphButton(category: "K", hieroglyph: "𓆛")
+    let k = HieroglyphButton(
+      category: "K",
+      hieroglyph: "𓆛",
+      transcription: .init(small: "m", capital: "M", resource: "m")
+    )
     self.k = k
     allButtons.append(k)
     let ret = RightIconButton(icon: .init(systemName: "return"))
@@ -132,40 +182,88 @@ class KeyboardViewController: UIInputViewController {
     shift.addTarget(self, action: #selector(shiftKeyPressed(_:)), for: .touchUpInside)
     self.shift = shift
     allButtons.append(shift)
-    let l = HieroglyphButton(category: "L", hieroglyph: "𓆣")
+    let l = HieroglyphButton(
+      category: "L",
+      hieroglyph: "𓆣",
+      transcription: .init(small: "n", capital: "N", resource: "n")
+    )
     self.l = l
     allButtons.append(l)
-    let m = HieroglyphButton(category: "M", hieroglyph: "𓆭")
+    let m = HieroglyphButton(
+      category: "M",
+      hieroglyph: "𓆭",
+      transcription: .init(small: "r", capital: "R", resource: "r")
+    )
     self.m = m
     allButtons.append(m)
-    let n = HieroglyphButton(category: "N", hieroglyph: "𓇯")
+    let n = HieroglyphButton(
+      category: "N",
+      hieroglyph: "𓇯",
+      transcription: .init(small: "h", capital: "H", resource: "h")
+    )
     self.n = n
     allButtons.append(n)
-    let o = HieroglyphButton(category: "O", hieroglyph: "𓉐")
+    let o = HieroglyphButton(
+      category: "O",
+      hieroglyph: "𓉐",
+      transcription: .init(small: "ḥ", capital: "Ḥ", resource: "h1")
+    )
     self.o = o
     allButtons.append(o)
-    let p = HieroglyphButton(category: "P", hieroglyph: "𓊛")
+    let p = HieroglyphButton(
+      category: "P",
+      hieroglyph: "𓊛",
+      transcription: .init(small: "ḫ", capital: "Ḫ", resource: "h2")
+    )
     self.p = p
     allButtons.append(p)
-    let q = HieroglyphButton(category: "Q", hieroglyph: "𓊨")
+    let q = HieroglyphButton(
+      category: "Q",
+      hieroglyph: "𓊨",
+      transcription: .init(small: "ẖ", capital: "H̱", resource: "h3")
+    )
     self.q = q
     allButtons.append(q)
-    let r = HieroglyphButton(category: "R", hieroglyph: "𓊯")
+    let r = HieroglyphButton(
+      category: "R",
+      hieroglyph: "𓊯",
+      transcription: .init(small: "z", capital: "Z", resource: "z")
+    )
     self.r = r
     allButtons.append(r)
-    let s = HieroglyphButton(category: "S", hieroglyph: "𓋑")
+    let s = HieroglyphButton(
+      category: "S",
+      hieroglyph: "𓋑",
+      transcription: .init(small: "s", capital: "S", resource: "s")
+    )
     self.s = s
     allButtons.append(s)
-    let t = HieroglyphButton(category: "T", hieroglyph: "𓌇")
+    let t = HieroglyphButton(
+      category: "T",
+      hieroglyph: "𓌇",
+      transcription: .init(small: "š", capital: "Š", resource: "s1")
+    )
     self.t = t
     allButtons.append(t)
-    let u = HieroglyphButton(category: "U", hieroglyph: "𓌳")
+    let u = HieroglyphButton(
+      category: "U",
+      hieroglyph: "𓌳",
+      transcription: .init(small: "q", capital: "Q", resource: "q")
+    )
     self.u = u
     allButtons.append(u)
-    let v = HieroglyphButton(category: "V", hieroglyph: "𓍢")
+    let v = HieroglyphButton(
+      category: "V",
+      hieroglyph: "𓍢",
+      transcription: .init(small: "k", capital: "K", resource: "k")
+    )
     self.v = v
     allButtons.append(v)
-    let w = HieroglyphButton(category: "W", hieroglyph: "𓎯")
+    let w = HieroglyphButton(
+      category: "W",
+      hieroglyph: "𓎯",
+      transcription: .init(small: "g", capital: "G", resource: "g")
+    )
     self.w = w
     allButtons.append(w)
     
@@ -173,16 +271,32 @@ class KeyboardViewController: UIInputViewController {
     let globe = LeftIconButton(icon: .init(systemName: "globe"))
     self.globe = globe
     allButtons.append(globe)
-    let x = HieroglyphButton(category: "X", hieroglyph: "𓏏")
+    let x = HieroglyphButton(
+      category: "X",
+      hieroglyph: "𓏏",
+      transcription: .init(small: "t", capital: "T", resource: "t")
+    )
     self.x = x
     allButtons.append(x)
-    let y = HieroglyphButton(category: "Y", hieroglyph: "𓏛")
+    let y = HieroglyphButton(
+      category: "Y",
+      hieroglyph: "𓏛",
+      transcription: .init(small: "ṯ", capital: "Ṯ", resource: "t1")
+    )
     self.y = y
     allButtons.append(y)
-    let z = HieroglyphButton(category: "Z", hieroglyph: "𓏤")
+    let z = HieroglyphButton(
+      category: "Z",
+      hieroglyph: "𓏤",
+      transcription: .init(small: "d", capital: "D", resource: "d")
+    )
     self.z = z
     allButtons.append(z)
-    let aa = HieroglyphButton(category: "Aa", hieroglyph: "𓐍")
+    let aa = HieroglyphButton(
+      category: "Aa",
+      hieroglyph: "𓐍",
+      transcription: .init(small: "ḏ", capital: "Ḏ", resource: "d1")
+    )
     self.aa = aa
     allButtons.append(aa)
     let space = TextButton(text: "")
@@ -220,6 +334,7 @@ class KeyboardViewController: UIInputViewController {
       container.addSubview(button)
     }
     shiftableButtons.append(contentsOf: allButtons.compactMap { $0 as? ShiftableKeyCap })
+    hieroglyphButtons.append(contentsOf: allButtons.compactMap { $0 as? HieroglyphButton })
     allButtons.forEach { button in
       guard let hieroglyph = button as? HieroglyphButton else {
         return
@@ -239,6 +354,17 @@ class KeyboardViewController: UIInputViewController {
     close.addTarget(self, action: #selector(dismissKeyboard), for: .touchUpInside)
     
     updateShiftState()
+  }
+  
+  @objc private func alephButtonPressed(_ button: AlephButton) {
+    mode = mode.rotated
+  }
+  
+  private func updateMode() {
+    hieroglyphButtons.forEach { button in
+      button.mode = mode
+    }
+    aleph.mode = mode
   }
   
   @objc private func shiftKeyPressed(_ button: HieroglyphButton) {

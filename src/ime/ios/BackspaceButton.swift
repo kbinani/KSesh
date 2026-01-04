@@ -18,7 +18,6 @@ class BackspaceButton: Button, KeyCap {
   private func commonInit() {
     addSubview(topLabel)
     topLabel.textAlignment = .left
-    topLabel.contentMode = .top
     topLabel.minimumScaleFactor = 0
     topLabel.adjustsFontSizeToFitWidth = true
     topLabel.numberOfLines = 2

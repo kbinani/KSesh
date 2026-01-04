@@ -259,6 +259,7 @@ if (IOS)
     src/ime/ios/TextButton.swift
     src/ime/ios/BackspaceButton.swift
     src/ime/ios/HieroglyphButton.swift
+    src/ime/ios/Transcription.swift
     src/ime/ios/Info.plist
     "${keyboard_resources}"
   )
