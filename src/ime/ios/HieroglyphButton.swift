@@ -105,10 +105,9 @@ class HieroglyphButton: Button, ShiftableKeyCap {
     if let image = iconView.image {
       let iconHeight = size.height * 0.7
       let iconWidth = iconHeight * image.size.width / image.size.height
-      let xOffset: CGFloat = iconWidth * 0.14
       let yOffset: CGFloat = -iconHeight * 0.05
       iconView.frame = .init(
-        x: size.width * 0.5 - iconWidth * 0.5 + xOffset,
+        x: size.width * 0.5 - iconWidth * 0.5,
         y: size.height * 0.5 - iconHeight * 0.5 + yOffset,
         width: iconWidth,
         height: iconHeight

@@ -29,9 +29,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
-     inkscape:zoom="1.0444209"
-     inkscape:cx="655.86585"
-     inkscape:cy="405.48786"
+     inkscape:zoom="0.18462928"
+     inkscape:cx="3314.7506"
+     inkscape:cy="522.66901"
      inkscape:current-layer="layer4" />
   <defs
      id="defs1">
@@ -1323,7 +1323,7 @@
      inkscape:groupmode="layer"
      id="layer3"
      inkscape:label="Layer 3"
-     style="display:inline"
+     style="display:none"
      sodipodi:insensitive="true">
     <g
        id="g17"
@@ -3094,8 +3094,7 @@
      inkscape:groupmode="layer"
      id="layer4"
      inkscape:label="KeyCap"
-     style="display:none"
-     sodipodi:insensitive="true">
+     style="display:inline">
     <g
        id="g8"
        inkscape:export-filename="..\src\ime\ios\assets.xcassets\a1_small.imageset\a1_small.pdf"
@@ -3112,13 +3111,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="25.606081"
          y="45.577553"
          id="text6-4"><tspan
            sodipodi:role="line"
            id="tspan6-5"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="25.606081"
            y="45.577553">A</tspan></text>
     </g>
     <g
@@ -3138,13 +3137,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="26.210695"
          y="45.577553"
          id="text6-4-58"><tspan
            sodipodi:role="line"
            id="tspan6-5-32"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="26.210695"
            y="45.577553">z</tspan></text>
     </g>
     <g
@@ -3164,13 +3163,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="21.708645"
          y="45.577553"
          id="text6-4-42"><tspan
            sodipodi:role="line"
            id="tspan6-5-79"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="21.708645"
            y="45.577553">Z</tspan></text>
     </g>
     <g
@@ -3190,13 +3189,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="26.080471"
          y="45.577553"
          id="text6-4-13"><tspan
            sodipodi:role="line"
            id="tspan6-5-99"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="26.080471"
            y="45.577553">y</tspan></text>
     </g>
     <g
@@ -3216,13 +3215,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="19.8762"
          y="45.577553"
          id="text6-4-77"><tspan
            sodipodi:role="line"
            id="tspan6-5-19"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="19.8762"
            y="45.577553">w</tspan></text>
     </g>
     <g
@@ -3242,13 +3241,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="13.504495"
          y="45.577553"
          id="text6-4-014"><tspan
            sodipodi:role="line"
            id="tspan6-5-56"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="13.504495"
            y="45.577553">W</tspan></text>
     </g>
     <g
@@ -3268,13 +3267,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="27.940823"
          y="45.577553"
          id="text6-4-47"><tspan
            sodipodi:role="line"
            id="tspan6-5-83"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="27.940823"
            y="45.577553">T</tspan></text>
     </g>
     <g
@@ -3294,13 +3293,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="19.67156"
          y="45.577553"
          id="text6-4-03"><tspan
            sodipodi:role="line"
            id="tspan6-5-88"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="19.67156"
            y="45.577553">7</tspan></text>
     </g>
     <g
@@ -3320,13 +3319,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="26.926931"
          y="45.577553"
          id="text6-4-11"><tspan
            sodipodi:role="line"
            id="tspan6-5-73"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="26.926931"
            y="45.577553">t</tspan></text>
     </g>
     <g
@@ -3346,13 +3345,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="19.625051"
          y="45.577553"
          id="text6-4-67"><tspan
            sodipodi:role="line"
            id="tspan6-5-15"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="19.625051"
            y="45.577553">6</tspan></text>
     </g>
     <g
@@ -3372,13 +3371,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="24.722414"
          y="45.577553"
          id="text6-4-57"><tspan
            sodipodi:role="line"
            id="tspan6-5-74"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="24.722414"
            y="45.577553">S</tspan></text>
     </g>
     <g
@@ -3398,13 +3397,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="22.443483"
          y="45.577553"
          id="text6-4-060"><tspan
            sodipodi:role="line"
            id="tspan6-5-70"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="22.443483"
            y="45.577553">5</tspan></text>
     </g>
     <g
@@ -3424,13 +3423,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="25.950247"
          y="45.577553"
          id="text6-4-82"><tspan
            sodipodi:role="line"
            id="tspan6-5-168"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="25.950247"
            y="45.577553">s</tspan></text>
     </g>
     <g
@@ -3450,13 +3449,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="22.452785"
          y="45.577553"
          id="text6-4-06"><tspan
            sodipodi:role="line"
            id="tspan6-5-75"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="22.452785"
            y="45.577553">4</tspan></text>
     </g>
     <g
@@ -3476,13 +3475,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="24.508474"
          y="45.577553"
          id="text6-4-26"><tspan
            sodipodi:role="line"
            id="tspan6-5-407"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="24.508474"
            y="45.577553">r</tspan></text>
     </g>
     <g
@@ -3502,13 +3501,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="22.108622"
          y="45.577553"
          id="text6-4-32"><tspan
            sodipodi:role="line"
            id="tspan6-5-11"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="22.108622"
            y="45.577553">R</tspan></text>
     </g>
     <g
@@ -3528,13 +3527,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="23.076004"
          y="45.577553"
          id="text6-4-38"><tspan
            sodipodi:role="line"
            id="tspan6-5-25"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="23.076004"
            y="45.577553">o</tspan></text>
     </g>
     <g
@@ -3554,13 +3553,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="18.229788"
          y="45.577553"
          id="text6-4-44"><tspan
            sodipodi:role="line"
            id="tspan6-5-44"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="18.229788"
            y="45.577553">O</tspan></text>
     </g>
     <g
@@ -3580,13 +3579,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="26.12698"
          y="45.577553"
          id="text6-4-63"><tspan
            sodipodi:role="line"
            id="tspan6-5-428"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="26.12698"
            y="45.577553">p</tspan></text>
     </g>
     <g
@@ -3606,13 +3605,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="20.862185"
          y="45.577553"
          id="text6-4-36"><tspan
            sodipodi:role="line"
            id="tspan6-5-49"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="20.862185"
            y="45.577553">P</tspan></text>
     </g>
     <g
@@ -3632,13 +3631,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="23.782938"
          y="45.577553"
          id="text6-4-61"><tspan
            sodipodi:role="line"
            id="tspan6-5-86"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="23.782938"
            y="45.577553">n</tspan></text>
     </g>
     <g
@@ -3658,13 +3657,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="18.778591"
          y="45.577553"
          id="text6-4-16"><tspan
            sodipodi:role="line"
            id="tspan6-5-163"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="18.778591"
            y="45.577553">N</tspan></text>
     </g>
     <g
@@ -3684,13 +3683,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="19.373903"
          y="45.577553"
          id="text6-4-35"><tspan
            sodipodi:role="line"
            id="tspan6-5-7"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="19.373903"
            y="45.577553">m</tspan></text>
     </g>
     <g
@@ -3710,13 +3709,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="16.722902"
          y="45.577553"
          id="text6-4-08"><tspan
            sodipodi:role="line"
            id="tspan6-5-393"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="16.722902"
            y="45.577553">M</tspan></text>
     </g>
     <g
@@ -3736,13 +3735,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="24.657303"
          y="45.577553"
          id="text6-4-6"><tspan
            sodipodi:role="line"
            id="tspan6-5-98"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="24.657303"
            y="45.577553">q</tspan></text>
     </g>
     <g
@@ -3762,13 +3761,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="19.076248"
          y="45.577553"
          id="text6-4-252"><tspan
            sodipodi:role="line"
            id="tspan6-5-58"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="19.076248"
            y="45.577553">Q</tspan></text>
     </g>
     <g
@@ -3788,13 +3787,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="24.285233"
          y="45.577553"
          id="text6-4-20"><tspan
            sodipodi:role="line"
            id="tspan6-5-03"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="24.285233"
            y="45.577553">k</tspan></text>
     </g>
     <g
@@ -3814,13 +3813,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="19.076248"
          y="45.577553"
          id="text6-4-18"><tspan
            sodipodi:role="line"
            id="tspan6-5-21"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="19.076248"
            y="45.577553">K</tspan></text>
     </g>
     <g
@@ -3840,13 +3839,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="25.689796"
          y="45.577553"
          id="text6-4-25"><tspan
            sodipodi:role="line"
            id="tspan6-5-8"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="25.689796"
            y="45.577553">Y</tspan></text>
     </g>
     <g
@@ -3866,13 +3865,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="27.205984"
          y="45.577553"
          id="text6-4-28"><tspan
            sodipodi:role="line"
            id="tspan6-5-90"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="27.205984"
            y="45.577553">i</tspan></text>
     </g>
     <g
@@ -3892,13 +3891,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="24.461966"
          y="45.577553"
          id="text6-4-80"><tspan
            sodipodi:role="line"
            id="tspan6-5-68"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="24.461966"
            y="45.577553">I</tspan></text>
     </g>
     <g
@@ -3918,13 +3917,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="23.922464"
          y="45.577553"
          id="text6-4-5"><tspan
            sodipodi:role="line"
            id="tspan6-5-53"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="23.922464"
            y="45.577553">X</tspan></text>
     </g>
     <g
@@ -3944,13 +3943,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="18.313503"
          y="45.577553"
          id="text6-4-99"><tspan
            sodipodi:role="line"
            id="tspan6-5-6"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="18.313503"
            y="45.577553">3</tspan></text>
     </g>
     <g
@@ -3970,13 +3969,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="23.922464"
          y="45.577553"
          id="text6-4-71"><tspan
            sodipodi:role="line"
            id="tspan6-5-07"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="23.922464"
            y="45.577553">x</tspan></text>
     </g>
     <g
@@ -3996,13 +3995,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="18.313503"
          y="45.577553"
          id="text6-4-14"><tspan
            sodipodi:role="line"
            id="tspan6-5-39"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="18.313503"
            y="45.577553">2</tspan></text>
     </g>
     <g
@@ -4022,13 +4021,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="23.922464"
          y="45.577553"
          id="text6-4-016"><tspan
            sodipodi:role="line"
            id="tspan6-5-40"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="23.922464"
            y="45.577553">H</tspan></text>
     </g>
     <g
@@ -4048,13 +4047,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="18.853006"
          y="45.577553"
          id="text6-4-12"><tspan
            sodipodi:role="line"
            id="tspan6-5-50"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="18.853006"
            y="45.577553">1</tspan></text>
     </g>
     <g
@@ -4074,13 +4073,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="23.922464"
          y="45.577553"
          id="text6-4-33"><tspan
            sodipodi:role="line"
            id="tspan6-5-599"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="23.922464"
            y="45.577553">h</tspan></text>
     </g>
     <g
@@ -4100,13 +4099,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="18.313503"
          y="45.577553"
          id="text6-4-01"><tspan
            sodipodi:role="line"
            id="tspan6-5-46"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="18.313503"
            y="45.577553">0</tspan></text>
     </g>
     <g
@@ -4126,13 +4125,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="23.941067"
          y="45.577553"
          id="text6-4-0"><tspan
            sodipodi:role="line"
            id="tspan6-5-16"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="23.941067"
            y="45.577553">g</tspan></text>
     </g>
     <g
@@ -4152,13 +4151,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="17.262405"
          y="45.577553"
          id="text6-4-15"><tspan
            sodipodi:role="line"
            id="tspan6-5-42"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="17.262405"
            y="45.577553">G</tspan></text>
     </g>
     <g
@@ -4178,13 +4177,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="27.959427"
          y="45.577553"
          id="text6-4-3"><tspan
            sodipodi:role="line"
            id="tspan6-5-59"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="27.959427"
            y="45.577553">f</tspan></text>
     </g>
     <g
@@ -4204,13 +4203,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="21.131937"
          y="45.577553"
          id="text6-4-4"><tspan
            sodipodi:role="line"
            id="tspan6-5-96"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="21.131937"
            y="45.577553">F</tspan></text>
     </g>
     <g
@@ -4230,13 +4229,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="22.731838"
          y="45.577553"
          id="text6-4-9"><tspan
            sodipodi:role="line"
            id="tspan6-5-3"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="22.731838"
            y="45.577553">D</tspan></text>
     </g>
     <g
@@ -4256,13 +4255,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="20.583132"
          y="45.577553"
          id="text6-4-865"><tspan
            sodipodi:role="line"
            id="tspan6-5-0"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="20.583132"
            y="45.577553">9</tspan></text>
     </g>
     <g
@@ -4282,13 +4281,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="22.731838"
          y="45.577553"
          id="text6-4-86"><tspan
            sodipodi:role="line"
            id="tspan6-5-5"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="22.731838"
            y="45.577553">d</tspan></text>
     </g>
     <g
@@ -4308,13 +4307,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="20.583132"
          y="45.577553"
          id="text6-4-7"><tspan
            sodipodi:role="line"
            id="tspan6-5-4"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="20.583132"
            y="45.577553">8</tspan></text>
     </g>
     <g
@@ -4334,13 +4333,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="23.829447"
          y="45.577553"
          id="text6-4-1"><tspan
            sodipodi:role="line"
            id="tspan6-5-2"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="23.829447"
            y="45.577553">b</tspan></text>
     </g>
     <g
@@ -4360,13 +4359,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.395601"
+         x="21.913284"
          y="45.577553"
          id="text6-4-8"><tspan
            sodipodi:role="line"
            id="tspan6-5-9"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.395601"
+           x="21.913284"
            y="45.577553">B</tspan></text>
     </g>
     <g
@@ -4386,13 +4385,13 @@
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:1.25;font-family:'Eglyf Debug NG';-inkscape-font-specification:'Eglyf Debug NG, Normal';stroke-width:0.264583"
-         x="16.902262"
+         x="25.54097"
          y="46.844204"
          id="text6-4-2"><tspan
            sodipodi:role="line"
            id="tspan6-5-1"
            style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:38.1px;font-family:'Trlit_CG Times';-inkscape-font-specification:'Trlit_CG Times, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="16.902262"
+           x="25.54097"
            y="46.844204">a</tspan></text>
     </g>
   </g>

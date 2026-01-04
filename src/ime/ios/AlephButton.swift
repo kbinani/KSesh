@@ -42,8 +42,9 @@ class AlephButton: Button, KeyCap {
     if let image = iconView.image {
       let iconHeight = iconSize
       let iconWidth = iconHeight * image.size.width / image.size.height
+      let xOffset = -iconWidth * 0.15
       iconView.frame = .init(
-        x: 0,
+        x: xOffset,
         y: size.height - iconHeight,
         width: iconWidth,
         height: iconHeight
